@@ -55,7 +55,7 @@ extension CameraInferenceEventPatterns on CameraInferenceEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( InitializeCamera value)?  initializeCamera,TResult Function( ChangeModel value)?  changeModel,TResult Function( FlipCamera value)?  flipCamera,TResult Function( SetZoomLevel value)?  setZoomLevel,TResult Function( UpdateConfidenceThreshold value)?  updateConfidenceThreshold,TResult Function( UpdateIouThreshold value)?  updateIouThreshold,TResult Function( UpdateNumItemsThreshold value)?  updateNumItemsThreshold,TResult Function( DetectionsOccurred value)?  detectionsOccurred,TResult Function( ToggleSlider value)?  toggleSlider,TResult Function( UpdateFps value)?  updateFps,TResult Function( UpdateLensFacing value)?  updateLensFacing,TResult Function( ModelDownloadStarted value)?  modelDownloadStarted,TResult Function( ModelDownloadProgressed value)?  modelDownloadProgressed,TResult Function( ModelDownloadCompleted value)?  modelDownloadCompleted,TResult Function( ModelDownloadFailed value)?  modelDownloadFailed,TResult Function( RetryModelDownload value)?  retryModelDownload,TResult Function( ResumeCamera value)?  resumeCamera,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( InitializeCamera value)?  initializeCamera,TResult Function( ChangeModel value)?  changeModel,TResult Function( FlipCamera value)?  flipCamera,TResult Function( SetZoomLevel value)?  setZoomLevel,TResult Function( UpdateConfidenceThreshold value)?  updateConfidenceThreshold,TResult Function( UpdateIouThreshold value)?  updateIouThreshold,TResult Function( UpdateNumItemsThreshold value)?  updateNumItemsThreshold,TResult Function( DetectionsOccurred value)?  detectionsOccurred,TResult Function( ToggleSlider value)?  toggleSlider,TResult Function( UpdateFps value)?  updateFps,TResult Function( UpdateLensFacing value)?  updateLensFacing,TResult Function( RetryModelDownload value)?  retryModelDownload,TResult Function( ResumeCamera value)?  resumeCamera,TResult Function( SetInitialConfig value)?  setInitialConfig,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
@@ -69,13 +69,10 @@ return updateNumItemsThreshold(_that);case DetectionsOccurred() when detectionsO
 return detectionsOccurred(_that);case ToggleSlider() when toggleSlider != null:
 return toggleSlider(_that);case UpdateFps() when updateFps != null:
 return updateFps(_that);case UpdateLensFacing() when updateLensFacing != null:
-return updateLensFacing(_that);case ModelDownloadStarted() when modelDownloadStarted != null:
-return modelDownloadStarted(_that);case ModelDownloadProgressed() when modelDownloadProgressed != null:
-return modelDownloadProgressed(_that);case ModelDownloadCompleted() when modelDownloadCompleted != null:
-return modelDownloadCompleted(_that);case ModelDownloadFailed() when modelDownloadFailed != null:
-return modelDownloadFailed(_that);case RetryModelDownload() when retryModelDownload != null:
+return updateLensFacing(_that);case RetryModelDownload() when retryModelDownload != null:
 return retryModelDownload(_that);case ResumeCamera() when resumeCamera != null:
-return resumeCamera(_that);case _:
+return resumeCamera(_that);case SetInitialConfig() when setInitialConfig != null:
+return setInitialConfig(_that);case _:
   return orElse();
 
 }
@@ -93,7 +90,7 @@ return resumeCamera(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( InitializeCamera value)  initializeCamera,required TResult Function( ChangeModel value)  changeModel,required TResult Function( FlipCamera value)  flipCamera,required TResult Function( SetZoomLevel value)  setZoomLevel,required TResult Function( UpdateConfidenceThreshold value)  updateConfidenceThreshold,required TResult Function( UpdateIouThreshold value)  updateIouThreshold,required TResult Function( UpdateNumItemsThreshold value)  updateNumItemsThreshold,required TResult Function( DetectionsOccurred value)  detectionsOccurred,required TResult Function( ToggleSlider value)  toggleSlider,required TResult Function( UpdateFps value)  updateFps,required TResult Function( UpdateLensFacing value)  updateLensFacing,required TResult Function( ModelDownloadStarted value)  modelDownloadStarted,required TResult Function( ModelDownloadProgressed value)  modelDownloadProgressed,required TResult Function( ModelDownloadCompleted value)  modelDownloadCompleted,required TResult Function( ModelDownloadFailed value)  modelDownloadFailed,required TResult Function( RetryModelDownload value)  retryModelDownload,required TResult Function( ResumeCamera value)  resumeCamera,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( InitializeCamera value)  initializeCamera,required TResult Function( ChangeModel value)  changeModel,required TResult Function( FlipCamera value)  flipCamera,required TResult Function( SetZoomLevel value)  setZoomLevel,required TResult Function( UpdateConfidenceThreshold value)  updateConfidenceThreshold,required TResult Function( UpdateIouThreshold value)  updateIouThreshold,required TResult Function( UpdateNumItemsThreshold value)  updateNumItemsThreshold,required TResult Function( DetectionsOccurred value)  detectionsOccurred,required TResult Function( ToggleSlider value)  toggleSlider,required TResult Function( UpdateFps value)  updateFps,required TResult Function( UpdateLensFacing value)  updateLensFacing,required TResult Function( RetryModelDownload value)  retryModelDownload,required TResult Function( ResumeCamera value)  resumeCamera,required TResult Function( SetInitialConfig value)  setInitialConfig,}){
 final _that = this;
 switch (_that) {
 case InitializeCamera():
@@ -107,13 +104,10 @@ return updateNumItemsThreshold(_that);case DetectionsOccurred():
 return detectionsOccurred(_that);case ToggleSlider():
 return toggleSlider(_that);case UpdateFps():
 return updateFps(_that);case UpdateLensFacing():
-return updateLensFacing(_that);case ModelDownloadStarted():
-return modelDownloadStarted(_that);case ModelDownloadProgressed():
-return modelDownloadProgressed(_that);case ModelDownloadCompleted():
-return modelDownloadCompleted(_that);case ModelDownloadFailed():
-return modelDownloadFailed(_that);case RetryModelDownload():
+return updateLensFacing(_that);case RetryModelDownload():
 return retryModelDownload(_that);case ResumeCamera():
-return resumeCamera(_that);case _:
+return resumeCamera(_that);case SetInitialConfig():
+return setInitialConfig(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -130,7 +124,7 @@ return resumeCamera(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( InitializeCamera value)?  initializeCamera,TResult? Function( ChangeModel value)?  changeModel,TResult? Function( FlipCamera value)?  flipCamera,TResult? Function( SetZoomLevel value)?  setZoomLevel,TResult? Function( UpdateConfidenceThreshold value)?  updateConfidenceThreshold,TResult? Function( UpdateIouThreshold value)?  updateIouThreshold,TResult? Function( UpdateNumItemsThreshold value)?  updateNumItemsThreshold,TResult? Function( DetectionsOccurred value)?  detectionsOccurred,TResult? Function( ToggleSlider value)?  toggleSlider,TResult? Function( UpdateFps value)?  updateFps,TResult? Function( UpdateLensFacing value)?  updateLensFacing,TResult? Function( ModelDownloadStarted value)?  modelDownloadStarted,TResult? Function( ModelDownloadProgressed value)?  modelDownloadProgressed,TResult? Function( ModelDownloadCompleted value)?  modelDownloadCompleted,TResult? Function( ModelDownloadFailed value)?  modelDownloadFailed,TResult? Function( RetryModelDownload value)?  retryModelDownload,TResult? Function( ResumeCamera value)?  resumeCamera,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( InitializeCamera value)?  initializeCamera,TResult? Function( ChangeModel value)?  changeModel,TResult? Function( FlipCamera value)?  flipCamera,TResult? Function( SetZoomLevel value)?  setZoomLevel,TResult? Function( UpdateConfidenceThreshold value)?  updateConfidenceThreshold,TResult? Function( UpdateIouThreshold value)?  updateIouThreshold,TResult? Function( UpdateNumItemsThreshold value)?  updateNumItemsThreshold,TResult? Function( DetectionsOccurred value)?  detectionsOccurred,TResult? Function( ToggleSlider value)?  toggleSlider,TResult? Function( UpdateFps value)?  updateFps,TResult? Function( UpdateLensFacing value)?  updateLensFacing,TResult? Function( RetryModelDownload value)?  retryModelDownload,TResult? Function( ResumeCamera value)?  resumeCamera,TResult? Function( SetInitialConfig value)?  setInitialConfig,}){
 final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
@@ -144,13 +138,10 @@ return updateNumItemsThreshold(_that);case DetectionsOccurred() when detectionsO
 return detectionsOccurred(_that);case ToggleSlider() when toggleSlider != null:
 return toggleSlider(_that);case UpdateFps() when updateFps != null:
 return updateFps(_that);case UpdateLensFacing() when updateLensFacing != null:
-return updateLensFacing(_that);case ModelDownloadStarted() when modelDownloadStarted != null:
-return modelDownloadStarted(_that);case ModelDownloadProgressed() when modelDownloadProgressed != null:
-return modelDownloadProgressed(_that);case ModelDownloadCompleted() when modelDownloadCompleted != null:
-return modelDownloadCompleted(_that);case ModelDownloadFailed() when modelDownloadFailed != null:
-return modelDownloadFailed(_that);case RetryModelDownload() when retryModelDownload != null:
+return updateLensFacing(_that);case RetryModelDownload() when retryModelDownload != null:
 return retryModelDownload(_that);case ResumeCamera() when resumeCamera != null:
-return resumeCamera(_that);case _:
+return resumeCamera(_that);case SetInitialConfig() when setInitialConfig != null:
+return setInitialConfig(_that);case _:
   return null;
 
 }
@@ -167,7 +158,7 @@ return resumeCamera(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initializeCamera,TResult Function( ModelType model)?  changeModel,TResult Function()?  flipCamera,TResult Function( double zoomLevel)?  setZoomLevel,TResult Function( double threshold)?  updateConfidenceThreshold,TResult Function( double threshold)?  updateIouThreshold,TResult Function( int threshold)?  updateNumItemsThreshold,TResult Function( List<DetectionResult> detections)?  detectionsOccurred,TResult Function( SliderType type)?  toggleSlider,TResult Function( double fps)?  updateFps,TResult Function( LensFacing lensFacing)?  updateLensFacing,TResult Function()?  modelDownloadStarted,TResult Function( double progress)?  modelDownloadProgressed,TResult Function()?  modelDownloadCompleted,TResult Function( String errorMessage)?  modelDownloadFailed,TResult Function()?  retryModelDownload,TResult Function()?  resumeCamera,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initializeCamera,TResult Function( ModelType model)?  changeModel,TResult Function()?  flipCamera,TResult Function( double zoomLevel)?  setZoomLevel,TResult Function( double threshold)?  updateConfidenceThreshold,TResult Function( double threshold)?  updateIouThreshold,TResult Function( int threshold)?  updateNumItemsThreshold,TResult Function( List<DetectionResult> detections)?  detectionsOccurred,TResult Function( SliderType type)?  toggleSlider,TResult Function( double fps)?  updateFps,TResult Function( LensFacing lensFacing)?  updateLensFacing,TResult Function()?  retryModelDownload,TResult Function()?  resumeCamera,TResult Function()?  setInitialConfig,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
 return initializeCamera();case ChangeModel() when changeModel != null:
@@ -180,13 +171,10 @@ return updateNumItemsThreshold(_that.threshold);case DetectionsOccurred() when d
 return detectionsOccurred(_that.detections);case ToggleSlider() when toggleSlider != null:
 return toggleSlider(_that.type);case UpdateFps() when updateFps != null:
 return updateFps(_that.fps);case UpdateLensFacing() when updateLensFacing != null:
-return updateLensFacing(_that.lensFacing);case ModelDownloadStarted() when modelDownloadStarted != null:
-return modelDownloadStarted();case ModelDownloadProgressed() when modelDownloadProgressed != null:
-return modelDownloadProgressed(_that.progress);case ModelDownloadCompleted() when modelDownloadCompleted != null:
-return modelDownloadCompleted();case ModelDownloadFailed() when modelDownloadFailed != null:
-return modelDownloadFailed(_that.errorMessage);case RetryModelDownload() when retryModelDownload != null:
+return updateLensFacing(_that.lensFacing);case RetryModelDownload() when retryModelDownload != null:
 return retryModelDownload();case ResumeCamera() when resumeCamera != null:
-return resumeCamera();case _:
+return resumeCamera();case SetInitialConfig() when setInitialConfig != null:
+return setInitialConfig();case _:
   return orElse();
 
 }
@@ -204,7 +192,7 @@ return resumeCamera();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initializeCamera,required TResult Function( ModelType model)  changeModel,required TResult Function()  flipCamera,required TResult Function( double zoomLevel)  setZoomLevel,required TResult Function( double threshold)  updateConfidenceThreshold,required TResult Function( double threshold)  updateIouThreshold,required TResult Function( int threshold)  updateNumItemsThreshold,required TResult Function( List<DetectionResult> detections)  detectionsOccurred,required TResult Function( SliderType type)  toggleSlider,required TResult Function( double fps)  updateFps,required TResult Function( LensFacing lensFacing)  updateLensFacing,required TResult Function()  modelDownloadStarted,required TResult Function( double progress)  modelDownloadProgressed,required TResult Function()  modelDownloadCompleted,required TResult Function( String errorMessage)  modelDownloadFailed,required TResult Function()  retryModelDownload,required TResult Function()  resumeCamera,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initializeCamera,required TResult Function( ModelType model)  changeModel,required TResult Function()  flipCamera,required TResult Function( double zoomLevel)  setZoomLevel,required TResult Function( double threshold)  updateConfidenceThreshold,required TResult Function( double threshold)  updateIouThreshold,required TResult Function( int threshold)  updateNumItemsThreshold,required TResult Function( List<DetectionResult> detections)  detectionsOccurred,required TResult Function( SliderType type)  toggleSlider,required TResult Function( double fps)  updateFps,required TResult Function( LensFacing lensFacing)  updateLensFacing,required TResult Function()  retryModelDownload,required TResult Function()  resumeCamera,required TResult Function()  setInitialConfig,}) {final _that = this;
 switch (_that) {
 case InitializeCamera():
 return initializeCamera();case ChangeModel():
@@ -217,13 +205,10 @@ return updateNumItemsThreshold(_that.threshold);case DetectionsOccurred():
 return detectionsOccurred(_that.detections);case ToggleSlider():
 return toggleSlider(_that.type);case UpdateFps():
 return updateFps(_that.fps);case UpdateLensFacing():
-return updateLensFacing(_that.lensFacing);case ModelDownloadStarted():
-return modelDownloadStarted();case ModelDownloadProgressed():
-return modelDownloadProgressed(_that.progress);case ModelDownloadCompleted():
-return modelDownloadCompleted();case ModelDownloadFailed():
-return modelDownloadFailed(_that.errorMessage);case RetryModelDownload():
+return updateLensFacing(_that.lensFacing);case RetryModelDownload():
 return retryModelDownload();case ResumeCamera():
-return resumeCamera();case _:
+return resumeCamera();case SetInitialConfig():
+return setInitialConfig();case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -240,7 +225,7 @@ return resumeCamera();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initializeCamera,TResult? Function( ModelType model)?  changeModel,TResult? Function()?  flipCamera,TResult? Function( double zoomLevel)?  setZoomLevel,TResult? Function( double threshold)?  updateConfidenceThreshold,TResult? Function( double threshold)?  updateIouThreshold,TResult? Function( int threshold)?  updateNumItemsThreshold,TResult? Function( List<DetectionResult> detections)?  detectionsOccurred,TResult? Function( SliderType type)?  toggleSlider,TResult? Function( double fps)?  updateFps,TResult? Function( LensFacing lensFacing)?  updateLensFacing,TResult? Function()?  modelDownloadStarted,TResult? Function( double progress)?  modelDownloadProgressed,TResult? Function()?  modelDownloadCompleted,TResult? Function( String errorMessage)?  modelDownloadFailed,TResult? Function()?  retryModelDownload,TResult? Function()?  resumeCamera,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initializeCamera,TResult? Function( ModelType model)?  changeModel,TResult? Function()?  flipCamera,TResult? Function( double zoomLevel)?  setZoomLevel,TResult? Function( double threshold)?  updateConfidenceThreshold,TResult? Function( double threshold)?  updateIouThreshold,TResult? Function( int threshold)?  updateNumItemsThreshold,TResult? Function( List<DetectionResult> detections)?  detectionsOccurred,TResult? Function( SliderType type)?  toggleSlider,TResult? Function( double fps)?  updateFps,TResult? Function( LensFacing lensFacing)?  updateLensFacing,TResult? Function()?  retryModelDownload,TResult? Function()?  resumeCamera,TResult? Function()?  setInitialConfig,}) {final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
 return initializeCamera();case ChangeModel() when changeModel != null:
@@ -253,13 +238,10 @@ return updateNumItemsThreshold(_that.threshold);case DetectionsOccurred() when d
 return detectionsOccurred(_that.detections);case ToggleSlider() when toggleSlider != null:
 return toggleSlider(_that.type);case UpdateFps() when updateFps != null:
 return updateFps(_that.fps);case UpdateLensFacing() when updateLensFacing != null:
-return updateLensFacing(_that.lensFacing);case ModelDownloadStarted() when modelDownloadStarted != null:
-return modelDownloadStarted();case ModelDownloadProgressed() when modelDownloadProgressed != null:
-return modelDownloadProgressed(_that.progress);case ModelDownloadCompleted() when modelDownloadCompleted != null:
-return modelDownloadCompleted();case ModelDownloadFailed() when modelDownloadFailed != null:
-return modelDownloadFailed(_that.errorMessage);case RetryModelDownload() when retryModelDownload != null:
+return updateLensFacing(_that.lensFacing);case RetryModelDownload() when retryModelDownload != null:
 return retryModelDownload();case ResumeCamera() when resumeCamera != null:
-return resumeCamera();case _:
+return resumeCamera();case SetInitialConfig() when setInitialConfig != null:
+return setInitialConfig();case _:
   return null;
 
 }
@@ -934,202 +916,6 @@ as LensFacing,
 /// @nodoc
 
 
-class ModelDownloadStarted implements CameraInferenceEvent {
-  const ModelDownloadStarted();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ModelDownloadStarted);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'CameraInferenceEvent.modelDownloadStarted()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class ModelDownloadProgressed implements CameraInferenceEvent {
-  const ModelDownloadProgressed(this.progress);
-  
-
- final  double progress;
-
-/// Create a copy of CameraInferenceEvent
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$ModelDownloadProgressedCopyWith<ModelDownloadProgressed> get copyWith => _$ModelDownloadProgressedCopyWithImpl<ModelDownloadProgressed>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ModelDownloadProgressed&&(identical(other.progress, progress) || other.progress == progress));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,progress);
-
-@override
-String toString() {
-  return 'CameraInferenceEvent.modelDownloadProgressed(progress: $progress)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $ModelDownloadProgressedCopyWith<$Res> implements $CameraInferenceEventCopyWith<$Res> {
-  factory $ModelDownloadProgressedCopyWith(ModelDownloadProgressed value, $Res Function(ModelDownloadProgressed) _then) = _$ModelDownloadProgressedCopyWithImpl;
-@useResult
-$Res call({
- double progress
-});
-
-
-
-
-}
-/// @nodoc
-class _$ModelDownloadProgressedCopyWithImpl<$Res>
-    implements $ModelDownloadProgressedCopyWith<$Res> {
-  _$ModelDownloadProgressedCopyWithImpl(this._self, this._then);
-
-  final ModelDownloadProgressed _self;
-  final $Res Function(ModelDownloadProgressed) _then;
-
-/// Create a copy of CameraInferenceEvent
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? progress = null,}) {
-  return _then(ModelDownloadProgressed(
-null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
-as double,
-  ));
-}
-
-
-}
-
-/// @nodoc
-
-
-class ModelDownloadCompleted implements CameraInferenceEvent {
-  const ModelDownloadCompleted();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ModelDownloadCompleted);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'CameraInferenceEvent.modelDownloadCompleted()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class ModelDownloadFailed implements CameraInferenceEvent {
-  const ModelDownloadFailed(this.errorMessage);
-  
-
- final  String errorMessage;
-
-/// Create a copy of CameraInferenceEvent
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$ModelDownloadFailedCopyWith<ModelDownloadFailed> get copyWith => _$ModelDownloadFailedCopyWithImpl<ModelDownloadFailed>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ModelDownloadFailed&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,errorMessage);
-
-@override
-String toString() {
-  return 'CameraInferenceEvent.modelDownloadFailed(errorMessage: $errorMessage)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $ModelDownloadFailedCopyWith<$Res> implements $CameraInferenceEventCopyWith<$Res> {
-  factory $ModelDownloadFailedCopyWith(ModelDownloadFailed value, $Res Function(ModelDownloadFailed) _then) = _$ModelDownloadFailedCopyWithImpl;
-@useResult
-$Res call({
- String errorMessage
-});
-
-
-
-
-}
-/// @nodoc
-class _$ModelDownloadFailedCopyWithImpl<$Res>
-    implements $ModelDownloadFailedCopyWith<$Res> {
-  _$ModelDownloadFailedCopyWithImpl(this._self, this._then);
-
-  final ModelDownloadFailed _self;
-  final $Res Function(ModelDownloadFailed) _then;
-
-/// Create a copy of CameraInferenceEvent
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? errorMessage = null,}) {
-  return _then(ModelDownloadFailed(
-null == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-
-}
-
-/// @nodoc
-
-
 class RetryModelDownload implements CameraInferenceEvent {
   const RetryModelDownload();
   
@@ -1183,6 +969,38 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'CameraInferenceEvent.resumeCamera()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class SetInitialConfig implements CameraInferenceEvent {
+  const SetInitialConfig();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SetInitialConfig);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'CameraInferenceEvent.setInitialConfig()';
 }
 
 

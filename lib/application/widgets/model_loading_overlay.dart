@@ -12,40 +12,37 @@ class ModelLoadingOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-      child: BlocBuilder<CameraInferenceBloc, CameraInferenceState>(
-        buildWhen: (previous, current) => previous.status != current.status,
-        builder: (context, state) {
-          final Widget? contentWidget = state.status.when(
-            initial: () => null,
-            loading: () => _buildLoadingWidget(context, 'Loading Model...'),
-            modelLoading: (progress) =>
-                _buildDownloadingWidget(context, progress),
-            success: () => null,
-            failure: (message) => _buildErrorWidget(context, message),
-          );
-
-          if (contentWidget == null) {
-            return const SizedBox.shrink();
-          }
-
-          return Container(
-            color: Colors.black.withAlpha(128),
-            alignment: Alignment.center,
-            child: Card(
-              margin: const EdgeInsets.all(32.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: contentWidget,
-              ),
+    return BlocBuilder<CameraInferenceBloc, CameraInferenceState>(
+      buildWhen: (previous, current) => previous.status != current.status,
+      builder: (context, state) {
+        final Widget? contentWidget = state.status.when(
+          initial: () => null,
+          loading: () => _buildLoadingWidget(context, 'Loading Model...'),
+          modelDownloading: (progress) =>
+              _buildDownloadingWidget(context, progress),
+          success: () => null,
+          failure: (message) => _buildErrorWidget(context, message),
+        );
+    
+        if (contentWidget == null) {
+          return const SizedBox.shrink();
+        }
+    
+        return Container(
+          color: Colors.black,
+          alignment: Alignment.center,
+          child: Card(
+            margin: const EdgeInsets.all(32.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-          );
-        },
-      ),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: contentWidget,
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -1,6 +1,5 @@
 import 'package:ultralytics_yolo/widgets/yolo_controller.dart';
 import 'dart:io';
-import 'package:ultralytics_yolo/yolo_view.dart';
 import 'package:yolo/domain/entities/models.dart';
 import 'package:yolo/domain/repositories/yolo_repository.dart';
 import 'package:yolo/domain/entities/model_loading_state.dart';
@@ -28,6 +27,8 @@ class YoloRepositoryImpl implements YoloRepository {
     String? modelPath = await localModelDataSource.getModelPath(modelType);
 
     if (modelPath != null) {
+      // Adding a small delay for smooth transition even if model is cached
+      await Future.delayed(const Duration(milliseconds: 500));
       yield ModelLoadingState.ready(modelPath);
     } else {
       yield const ModelLoadingState.loading(0.0);
@@ -70,11 +71,6 @@ class YoloRepositoryImpl implements YoloRepository {
   }
 
   @override
-  void setLensFacing(LensFacing facing) {
-    // This remains as is, as its implementation depends on YOLOViewController.
-  }
-
-  @override
   void setConfidenceThreshold(double threshold) {
     _yoloViewController.setConfidenceThreshold(threshold);
   }
@@ -87,5 +83,18 @@ class YoloRepositoryImpl implements YoloRepository {
   @override
   void setNumItemsThreshold(int threshold) {
     _yoloViewController.setNumItemsThreshold(threshold);
+  }
+
+  @override
+  void setThresholds({
+    required double confidenceThreshold,
+    required double iouThreshold,
+    required int numItemsThreshold,
+  }) {
+    _yoloViewController.setThresholds(
+      confidenceThreshold: confidenceThreshold,
+      iouThreshold: iouThreshold,
+      numItemsThreshold: numItemsThreshold,
+    );
   }
 }

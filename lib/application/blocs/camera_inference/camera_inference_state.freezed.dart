@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CameraInferenceState {
 
- CameraInferenceStatus get status; ModelType get modelType; String? get modelPath; double get confidenceThreshold; double get iouThreshold; int get numItemsThreshold; SliderType get activeSlider; bool get isFrontCamera; double get currentZoomLevel; List<DetectionResult> get detections; double get currentFps; LensFacing get currentLensFacing; String? get errorMessage;
+ CameraInferenceStatus get status; ModelType get modelType; String? get modelPath; double get confidenceThreshold; double get iouThreshold; int get numItemsThreshold; SliderType get activeSlider; bool get isFrontCamera; double get currentZoomLevel; List<DetectionResult> get detections; double get currentFps; LensFacing get currentLensFacing;
 /// Create a copy of CameraInferenceState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $CameraInferenceStateCopyWith<CameraInferenceState> get copyWith => _$CameraInfe
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CameraInferenceState&&(identical(other.status, status) || other.status == status)&&(identical(other.modelType, modelType) || other.modelType == modelType)&&(identical(other.modelPath, modelPath) || other.modelPath == modelPath)&&(identical(other.confidenceThreshold, confidenceThreshold) || other.confidenceThreshold == confidenceThreshold)&&(identical(other.iouThreshold, iouThreshold) || other.iouThreshold == iouThreshold)&&(identical(other.numItemsThreshold, numItemsThreshold) || other.numItemsThreshold == numItemsThreshold)&&(identical(other.activeSlider, activeSlider) || other.activeSlider == activeSlider)&&(identical(other.isFrontCamera, isFrontCamera) || other.isFrontCamera == isFrontCamera)&&(identical(other.currentZoomLevel, currentZoomLevel) || other.currentZoomLevel == currentZoomLevel)&&const DeepCollectionEquality().equals(other.detections, detections)&&(identical(other.currentFps, currentFps) || other.currentFps == currentFps)&&(identical(other.currentLensFacing, currentLensFacing) || other.currentLensFacing == currentLensFacing)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CameraInferenceState&&(identical(other.status, status) || other.status == status)&&(identical(other.modelType, modelType) || other.modelType == modelType)&&(identical(other.modelPath, modelPath) || other.modelPath == modelPath)&&(identical(other.confidenceThreshold, confidenceThreshold) || other.confidenceThreshold == confidenceThreshold)&&(identical(other.iouThreshold, iouThreshold) || other.iouThreshold == iouThreshold)&&(identical(other.numItemsThreshold, numItemsThreshold) || other.numItemsThreshold == numItemsThreshold)&&(identical(other.activeSlider, activeSlider) || other.activeSlider == activeSlider)&&(identical(other.isFrontCamera, isFrontCamera) || other.isFrontCamera == isFrontCamera)&&(identical(other.currentZoomLevel, currentZoomLevel) || other.currentZoomLevel == currentZoomLevel)&&const DeepCollectionEquality().equals(other.detections, detections)&&(identical(other.currentFps, currentFps) || other.currentFps == currentFps)&&(identical(other.currentLensFacing, currentLensFacing) || other.currentLensFacing == currentLensFacing));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,modelType,modelPath,confidenceThreshold,iouThreshold,numItemsThreshold,activeSlider,isFrontCamera,currentZoomLevel,const DeepCollectionEquality().hash(detections),currentFps,currentLensFacing,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,modelType,modelPath,confidenceThreshold,iouThreshold,numItemsThreshold,activeSlider,isFrontCamera,currentZoomLevel,const DeepCollectionEquality().hash(detections),currentFps,currentLensFacing);
 
 @override
 String toString() {
-  return 'CameraInferenceState(status: $status, modelType: $modelType, modelPath: $modelPath, confidenceThreshold: $confidenceThreshold, iouThreshold: $iouThreshold, numItemsThreshold: $numItemsThreshold, activeSlider: $activeSlider, isFrontCamera: $isFrontCamera, currentZoomLevel: $currentZoomLevel, detections: $detections, currentFps: $currentFps, currentLensFacing: $currentLensFacing, errorMessage: $errorMessage)';
+  return 'CameraInferenceState(status: $status, modelType: $modelType, modelPath: $modelPath, confidenceThreshold: $confidenceThreshold, iouThreshold: $iouThreshold, numItemsThreshold: $numItemsThreshold, activeSlider: $activeSlider, isFrontCamera: $isFrontCamera, currentZoomLevel: $currentZoomLevel, detections: $detections, currentFps: $currentFps, currentLensFacing: $currentLensFacing)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $CameraInferenceStateCopyWith<$Res>  {
   factory $CameraInferenceStateCopyWith(CameraInferenceState value, $Res Function(CameraInferenceState) _then) = _$CameraInferenceStateCopyWithImpl;
 @useResult
 $Res call({
- CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, SliderType activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing, String? errorMessage
+ CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, SliderType activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing
 });
 
 
@@ -62,7 +62,7 @@ class _$CameraInferenceStateCopyWithImpl<$Res>
 
 /// Create a copy of CameraInferenceState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? modelType = null,Object? modelPath = freezed,Object? confidenceThreshold = null,Object? iouThreshold = null,Object? numItemsThreshold = null,Object? activeSlider = null,Object? isFrontCamera = null,Object? currentZoomLevel = null,Object? detections = null,Object? currentFps = null,Object? currentLensFacing = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? modelType = null,Object? modelPath = freezed,Object? confidenceThreshold = null,Object? iouThreshold = null,Object? numItemsThreshold = null,Object? activeSlider = null,Object? isFrontCamera = null,Object? currentZoomLevel = null,Object? detections = null,Object? currentFps = null,Object? currentLensFacing = null,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as CameraInferenceStatus,modelType: null == modelType ? _self.modelType : modelType // ignore: cast_nullable_to_non_nullable
@@ -76,8 +76,7 @@ as bool,currentZoomLevel: null == currentZoomLevel ? _self.currentZoomLevel : cu
 as double,detections: null == detections ? _self.detections : detections // ignore: cast_nullable_to_non_nullable
 as List<DetectionResult>,currentFps: null == currentFps ? _self.currentFps : currentFps // ignore: cast_nullable_to_non_nullable
 as double,currentLensFacing: null == currentLensFacing ? _self.currentLensFacing : currentLensFacing // ignore: cast_nullable_to_non_nullable
-as LensFacing,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as LensFacing,
   ));
 }
 /// Create a copy of CameraInferenceState
@@ -171,10 +170,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  SliderType activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  SliderType activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CameraInferenceState() when $default != null:
-return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing,_that.errorMessage);case _:
+return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing);case _:
   return orElse();
 
 }
@@ -192,10 +191,10 @@ return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThr
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  SliderType activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  SliderType activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing)  $default,) {final _that = this;
 switch (_that) {
 case _CameraInferenceState():
-return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing,_that.errorMessage);case _:
+return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +211,10 @@ return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThr
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  SliderType activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  SliderType activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing)?  $default,) {final _that = this;
 switch (_that) {
 case _CameraInferenceState() when $default != null:
-return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing,_that.errorMessage);case _:
+return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing);case _:
   return null;
 
 }
@@ -227,7 +226,7 @@ return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThr
 
 
 class _CameraInferenceState implements CameraInferenceState {
-  const _CameraInferenceState({this.status = const CameraInferenceStatus.initial(), this.modelType = ModelType.detect, this.modelPath, this.confidenceThreshold = 0.5, this.iouThreshold = 0.45, this.numItemsThreshold = 30, this.activeSlider = SliderType.none, this.isFrontCamera = false, this.currentZoomLevel = 1.0, final  List<DetectionResult> detections = const [], this.currentFps = 0.0, this.currentLensFacing = LensFacing.back, this.errorMessage}): _detections = detections;
+  const _CameraInferenceState({this.status = const CameraInferenceStatus.initial(), this.modelType = ModelType.detect, this.modelPath, this.confidenceThreshold = 0.5, this.iouThreshold = 0.45, this.numItemsThreshold = 30, this.activeSlider = SliderType.none, this.isFrontCamera = false, this.currentZoomLevel = 1.0, final  List<DetectionResult> detections = const [], this.currentFps = 0.0, this.currentLensFacing = LensFacing.back}): _detections = detections;
   
 
 @override@JsonKey() final  CameraInferenceStatus status;
@@ -248,7 +247,6 @@ class _CameraInferenceState implements CameraInferenceState {
 
 @override@JsonKey() final  double currentFps;
 @override@JsonKey() final  LensFacing currentLensFacing;
-@override final  String? errorMessage;
 
 /// Create a copy of CameraInferenceState
 /// with the given fields replaced by the non-null parameter values.
@@ -260,16 +258,16 @@ _$CameraInferenceStateCopyWith<_CameraInferenceState> get copyWith => __$CameraI
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CameraInferenceState&&(identical(other.status, status) || other.status == status)&&(identical(other.modelType, modelType) || other.modelType == modelType)&&(identical(other.modelPath, modelPath) || other.modelPath == modelPath)&&(identical(other.confidenceThreshold, confidenceThreshold) || other.confidenceThreshold == confidenceThreshold)&&(identical(other.iouThreshold, iouThreshold) || other.iouThreshold == iouThreshold)&&(identical(other.numItemsThreshold, numItemsThreshold) || other.numItemsThreshold == numItemsThreshold)&&(identical(other.activeSlider, activeSlider) || other.activeSlider == activeSlider)&&(identical(other.isFrontCamera, isFrontCamera) || other.isFrontCamera == isFrontCamera)&&(identical(other.currentZoomLevel, currentZoomLevel) || other.currentZoomLevel == currentZoomLevel)&&const DeepCollectionEquality().equals(other._detections, _detections)&&(identical(other.currentFps, currentFps) || other.currentFps == currentFps)&&(identical(other.currentLensFacing, currentLensFacing) || other.currentLensFacing == currentLensFacing)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CameraInferenceState&&(identical(other.status, status) || other.status == status)&&(identical(other.modelType, modelType) || other.modelType == modelType)&&(identical(other.modelPath, modelPath) || other.modelPath == modelPath)&&(identical(other.confidenceThreshold, confidenceThreshold) || other.confidenceThreshold == confidenceThreshold)&&(identical(other.iouThreshold, iouThreshold) || other.iouThreshold == iouThreshold)&&(identical(other.numItemsThreshold, numItemsThreshold) || other.numItemsThreshold == numItemsThreshold)&&(identical(other.activeSlider, activeSlider) || other.activeSlider == activeSlider)&&(identical(other.isFrontCamera, isFrontCamera) || other.isFrontCamera == isFrontCamera)&&(identical(other.currentZoomLevel, currentZoomLevel) || other.currentZoomLevel == currentZoomLevel)&&const DeepCollectionEquality().equals(other._detections, _detections)&&(identical(other.currentFps, currentFps) || other.currentFps == currentFps)&&(identical(other.currentLensFacing, currentLensFacing) || other.currentLensFacing == currentLensFacing));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,modelType,modelPath,confidenceThreshold,iouThreshold,numItemsThreshold,activeSlider,isFrontCamera,currentZoomLevel,const DeepCollectionEquality().hash(_detections),currentFps,currentLensFacing,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,modelType,modelPath,confidenceThreshold,iouThreshold,numItemsThreshold,activeSlider,isFrontCamera,currentZoomLevel,const DeepCollectionEquality().hash(_detections),currentFps,currentLensFacing);
 
 @override
 String toString() {
-  return 'CameraInferenceState(status: $status, modelType: $modelType, modelPath: $modelPath, confidenceThreshold: $confidenceThreshold, iouThreshold: $iouThreshold, numItemsThreshold: $numItemsThreshold, activeSlider: $activeSlider, isFrontCamera: $isFrontCamera, currentZoomLevel: $currentZoomLevel, detections: $detections, currentFps: $currentFps, currentLensFacing: $currentLensFacing, errorMessage: $errorMessage)';
+  return 'CameraInferenceState(status: $status, modelType: $modelType, modelPath: $modelPath, confidenceThreshold: $confidenceThreshold, iouThreshold: $iouThreshold, numItemsThreshold: $numItemsThreshold, activeSlider: $activeSlider, isFrontCamera: $isFrontCamera, currentZoomLevel: $currentZoomLevel, detections: $detections, currentFps: $currentFps, currentLensFacing: $currentLensFacing)';
 }
 
 
@@ -280,7 +278,7 @@ abstract mixin class _$CameraInferenceStateCopyWith<$Res> implements $CameraInfe
   factory _$CameraInferenceStateCopyWith(_CameraInferenceState value, $Res Function(_CameraInferenceState) _then) = __$CameraInferenceStateCopyWithImpl;
 @override @useResult
 $Res call({
- CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, SliderType activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing, String? errorMessage
+ CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, SliderType activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing
 });
 
 
@@ -297,7 +295,7 @@ class __$CameraInferenceStateCopyWithImpl<$Res>
 
 /// Create a copy of CameraInferenceState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? modelType = null,Object? modelPath = freezed,Object? confidenceThreshold = null,Object? iouThreshold = null,Object? numItemsThreshold = null,Object? activeSlider = null,Object? isFrontCamera = null,Object? currentZoomLevel = null,Object? detections = null,Object? currentFps = null,Object? currentLensFacing = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? modelType = null,Object? modelPath = freezed,Object? confidenceThreshold = null,Object? iouThreshold = null,Object? numItemsThreshold = null,Object? activeSlider = null,Object? isFrontCamera = null,Object? currentZoomLevel = null,Object? detections = null,Object? currentFps = null,Object? currentLensFacing = null,}) {
   return _then(_CameraInferenceState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as CameraInferenceStatus,modelType: null == modelType ? _self.modelType : modelType // ignore: cast_nullable_to_non_nullable
@@ -311,8 +309,7 @@ as bool,currentZoomLevel: null == currentZoomLevel ? _self.currentZoomLevel : cu
 as double,detections: null == detections ? _self._detections : detections // ignore: cast_nullable_to_non_nullable
 as List<DetectionResult>,currentFps: null == currentFps ? _self.currentFps : currentFps // ignore: cast_nullable_to_non_nullable
 as double,currentLensFacing: null == currentLensFacing ? _self.currentLensFacing : currentLensFacing // ignore: cast_nullable_to_non_nullable
-as LensFacing,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as LensFacing,
   ));
 }
 
@@ -372,13 +369,13 @@ extension CameraInferenceStatusPatterns on CameraInferenceStatus {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _ModelLoading value)?  modelLoading,TResult Function( _Success value)?  success,TResult Function( _Failure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _ModelLoading value)?  modelDownloading,TResult Function( _Success value)?  success,TResult Function( _Failure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _ModelLoading() when modelLoading != null:
-return modelLoading(_that);case _Success() when success != null:
+return loading(_that);case _ModelLoading() when modelDownloading != null:
+return modelDownloading(_that);case _Success() when success != null:
 return success(_that);case _Failure() when failure != null:
 return failure(_that);case _:
   return orElse();
@@ -398,13 +395,13 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _ModelLoading value)  modelLoading,required TResult Function( _Success value)  success,required TResult Function( _Failure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _ModelLoading value)  modelDownloading,required TResult Function( _Success value)  success,required TResult Function( _Failure value)  failure,}){
 final _that = this;
 switch (_that) {
 case _Initial():
 return initial(_that);case _Loading():
 return loading(_that);case _ModelLoading():
-return modelLoading(_that);case _Success():
+return modelDownloading(_that);case _Success():
 return success(_that);case _Failure():
 return failure(_that);case _:
   throw StateError('Unexpected subclass');
@@ -423,13 +420,13 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _ModelLoading value)?  modelLoading,TResult? Function( _Success value)?  success,TResult? Function( _Failure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _ModelLoading value)?  modelDownloading,TResult? Function( _Success value)?  success,TResult? Function( _Failure value)?  failure,}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _ModelLoading() when modelLoading != null:
-return modelLoading(_that);case _Success() when success != null:
+return loading(_that);case _ModelLoading() when modelDownloading != null:
+return modelDownloading(_that);case _Success() when success != null:
 return success(_that);case _Failure() when failure != null:
 return failure(_that);case _:
   return null;
@@ -448,12 +445,12 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( double progress)?  modelLoading,TResult Function()?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( double progress)?  modelDownloading,TResult Function()?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
-return loading();case _ModelLoading() when modelLoading != null:
-return modelLoading(_that.progress);case _Success() when success != null:
+return loading();case _ModelLoading() when modelDownloading != null:
+return modelDownloading(_that.progress);case _Success() when success != null:
 return success();case _Failure() when failure != null:
 return failure(_that.message);case _:
   return orElse();
@@ -473,12 +470,12 @@ return failure(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( double progress)  modelLoading,required TResult Function()  success,required TResult Function( String message)  failure,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( double progress)  modelDownloading,required TResult Function()  success,required TResult Function( String message)  failure,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case _Loading():
 return loading();case _ModelLoading():
-return modelLoading(_that.progress);case _Success():
+return modelDownloading(_that.progress);case _Success():
 return success();case _Failure():
 return failure(_that.message);case _:
   throw StateError('Unexpected subclass');
@@ -497,12 +494,12 @@ return failure(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( double progress)?  modelLoading,TResult? Function()?  success,TResult? Function( String message)?  failure,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( double progress)?  modelDownloading,TResult? Function()?  success,TResult? Function( String message)?  failure,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
-return loading();case _ModelLoading() when modelLoading != null:
-return modelLoading(_that.progress);case _Success() when success != null:
+return loading();case _ModelLoading() when modelDownloading != null:
+return modelDownloading(_that.progress);case _Success() when success != null:
 return success();case _Failure() when failure != null:
 return failure(_that.message);case _:
   return null;
@@ -604,7 +601,7 @@ int get hashCode => Object.hash(runtimeType,progress);
 
 @override
 String toString() {
-  return 'CameraInferenceStatus.modelLoading(progress: $progress)';
+  return 'CameraInferenceStatus.modelDownloading(progress: $progress)';
 }
 
 

@@ -18,6 +18,8 @@ class CameraInferenceContent extends StatelessWidget {
     required this.onResult,
     required this.yoloViewController,
     required this.currentLensFacing,
+    required this.confidenceThreshold,
+    required this.iouThreshold,
   });
 
   final String? modelPath;
@@ -25,6 +27,8 @@ class CameraInferenceContent extends StatelessWidget {
   final Function(List<DetectionResult>) onResult;
   final YOLOViewController yoloViewController;
   final LensFacing currentLensFacing;
+  final double confidenceThreshold;
+  final double iouThreshold;
 
   @override
   Widget build(BuildContext context) {
@@ -38,12 +42,10 @@ class CameraInferenceContent extends StatelessWidget {
         useGpu: true,
         lensFacing: currentLensFacing,
         showOverlays: true,
+        confidenceThreshold: confidenceThreshold,
+        iouThreshold: iouThreshold,
         onResult: (results) {
-          final detections = results
-              .map(
-                (e) => e.toDetectionResult(),
-              )
-              .toList();
+          final detections = results.map((e) => e.toDetectionResult()).toList();
           onResult(detections);
         },
         onPerformanceMetrics: (metrics) {

@@ -35,7 +35,7 @@ class CameraInferenceOverlay extends StatelessWidget {
                 isModelLoading: state.status.when(
                   initial: () => false,
                   loading: () => true,
-                  modelLoading: (progress) => true,
+                  modelDownloading: (progress) => true,
                   success: () => false,
                   failure: (message) => false,
                 ),

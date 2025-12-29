@@ -4,11 +4,12 @@ import 'package:injectable/injectable.dart';
 
 @injectable
 class FlipCamera {
-  final YoloRepository repository;
+  final YoloRepository _repository;
 
-  FlipCamera(this.repository);
+  FlipCamera({required YoloRepository yoloRepository})
+    : _repository = yoloRepository;
 
   void call() {
-    repository.flipCamera();
+    _repository.flipCamera();
   }
 }

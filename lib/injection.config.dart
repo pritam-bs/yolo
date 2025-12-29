@@ -21,10 +21,11 @@ import 'data/datasources/remote_model_data_source.dart' as _i992;
 import 'data/repositories/yolo_repository_impl.dart' as _i320;
 import 'domain/repositories/yolo_repository.dart' as _i25;
 import 'domain/usecases/flip_camera.dart' as _i638;
+import 'domain/usecases/get_model_path.dart' as _i584;
 import 'domain/usecases/set_confidence_threshold.dart' as _i659;
 import 'domain/usecases/set_iou_threshold.dart' as _i837;
-import 'domain/usecases/set_lens_facing.dart' as _i225;
 import 'domain/usecases/set_num_items_threshold.dart' as _i965;
+import 'domain/usecases/set_thresholds.dart' as _i390;
 import 'domain/usecases/set_zoom_level.dart' as _i649;
 
 // initializes the registration of main-scope dependencies inside of GetIt
@@ -50,25 +51,37 @@ _i174.GetIt initGetIt(
     ),
   );
   gh.factory<_i638.FlipCamera>(
-    () => _i638.FlipCamera(gh<_i25.YoloRepository>()),
+    () => _i638.FlipCamera(yoloRepository: gh<_i25.YoloRepository>()),
+  );
+  gh.factory<_i584.GetModelPath>(
+    () => _i584.GetModelPath(yoloRepository: gh<_i25.YoloRepository>()),
   );
   gh.factory<_i659.SetConfidenceThreshold>(
-    () => _i659.SetConfidenceThreshold(gh<_i25.YoloRepository>()),
+    () =>
+        _i659.SetConfidenceThreshold(yoloRepository: gh<_i25.YoloRepository>()),
   );
   gh.factory<_i837.SetIoUThreshold>(
-    () => _i837.SetIoUThreshold(gh<_i25.YoloRepository>()),
-  );
-  gh.factory<_i225.SetLensFacing>(
-    () => _i225.SetLensFacing(gh<_i25.YoloRepository>()),
+    () => _i837.SetIoUThreshold(yoloRepository: gh<_i25.YoloRepository>()),
   );
   gh.factory<_i965.SetNumItemsThreshold>(
-    () => _i965.SetNumItemsThreshold(gh<_i25.YoloRepository>()),
+    () => _i965.SetNumItemsThreshold(yoloRepository: gh<_i25.YoloRepository>()),
+  );
+  gh.factory<_i390.SetThresholds>(
+    () => _i390.SetThresholds(yoloRepository: gh<_i25.YoloRepository>()),
   );
   gh.factory<_i649.SetZoomLevel>(
-    () => _i649.SetZoomLevel(gh<_i25.YoloRepository>()),
+    () => _i649.SetZoomLevel(yoloRepository: gh<_i25.YoloRepository>()),
   );
   gh.factory<_i655.CameraInferenceBloc>(
-    () => _i655.CameraInferenceBloc(yoloRepository: gh<_i25.YoloRepository>()),
+    () => _i655.CameraInferenceBloc(
+      getModelPath: gh<_i584.GetModelPath>(),
+      flipCamera: gh<_i638.FlipCamera>(),
+      setConfidenceThreshold: gh<_i659.SetConfidenceThreshold>(),
+      setIoUThreshold: gh<_i837.SetIoUThreshold>(),
+      setNumItemsThreshold: gh<_i965.SetNumItemsThreshold>(),
+      setZoomLevel: gh<_i649.SetZoomLevel>(),
+      setThresholds: gh<_i390.SetThresholds>(),
+    ),
   );
   return getIt;
 }

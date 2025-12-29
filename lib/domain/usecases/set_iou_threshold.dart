@@ -4,11 +4,12 @@ import 'package:yolo/domain/repositories/yolo_repository.dart';
 
 @injectable
 class SetIoUThreshold {
-  final YoloRepository repository;
+  final YoloRepository _repository;
 
-  SetIoUThreshold(this.repository);
+  SetIoUThreshold({required YoloRepository yoloRepository})
+    : _repository = yoloRepository;
 
   void call(double threshold) {
-    repository.setIoUThreshold(threshold);
+    _repository.setIoUThreshold(threshold);
   }
 }
