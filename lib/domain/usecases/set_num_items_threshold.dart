@@ -4,11 +4,12 @@ import 'package:yolo/domain/repositories/yolo_repository.dart';
 
 @injectable
 class SetNumItemsThreshold {
-  final YoloRepository repository;
+  final YoloRepository _repository;
 
-  SetNumItemsThreshold(this.repository);
+  SetNumItemsThreshold({required YoloRepository yoloRepository})
+    : _repository = yoloRepository;
 
   void call(int threshold) {
-    repository.setNumItemsThreshold(threshold);
+    _repository.setNumItemsThreshold(threshold);
   }
 }

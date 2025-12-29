@@ -4,11 +4,12 @@ import 'package:yolo/domain/repositories/yolo_repository.dart';
 
 @injectable
 class SetConfidenceThreshold {
-  final YoloRepository repository;
+  final YoloRepository _repository;
 
-  SetConfidenceThreshold(this.repository);
+  SetConfidenceThreshold({required YoloRepository yoloRepository})
+    : _repository = yoloRepository;
 
   void call(double threshold) {
-    repository.setConfidenceThreshold(threshold);
+    _repository.setConfidenceThreshold(threshold);
   }
 }

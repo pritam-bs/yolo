@@ -1,23 +1,50 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:ultralytics_yolo/widgets/yolo_controller.dart';
-import 'package:ultralytics_yolo/yolo_view.dart'; // For LensFacing
-import 'package:yolo/domain/repositories/yolo_repository.dart';
+import 'package:ultralytics_yolo/yolo_view.dart';
 import 'package:yolo/domain/entities/models.dart';
-import 'package:yolo/domain/entities/model_loading_state.dart'; // New import
+import 'package:yolo/domain/entities/model_loading_state.dart';
+import 'package:yolo/domain/usecases/flip_camera.dart';
+import 'package:yolo/domain/usecases/get_model_path.dart';
+import 'package:yolo/domain/usecases/set_confidence_threshold.dart';
+import 'package:yolo/domain/usecases/set_iou_threshold.dart';
+import 'package:yolo/domain/usecases/set_num_items_threshold.dart';
+import 'package:yolo/domain/usecases/set_thresholds.dart';
+import 'package:yolo/domain/usecases/set_zoom_level.dart';
 import 'camera_inference_event.dart' as events;
 import 'camera_inference_state.dart';
 
 @injectable
 class CameraInferenceBloc
     extends Bloc<events.CameraInferenceEvent, CameraInferenceState> {
-  final YoloRepository _yoloRepository;
-  late final YOLOViewController _yoloViewController;
+  final GetModelPath _getModelPath;
+  final FlipCamera _flipCamera;
+  final SetConfidenceThreshold _setConfidenceThreshold;
+  final SetIoUThreshold _setIoUThreshold;
+  final SetNumItemsThreshold _setNumItemsThreshold;
+  final SetZoomLevel _setZoomLevel;
+  final SetThresholds _setThresholds;
 
-  CameraInferenceBloc({required YoloRepository yoloRepository})
-    : _yoloRepository = yoloRepository,
-      super(const CameraInferenceState()) {
-    _yoloViewController = _yoloRepository.yoloViewController;
+  int _detectionCount = 0;
+  int _frameCount = 0;
+  double _currentFps = 0.0;
+  DateTime _lastFpsUpdate = DateTime.now();
+
+  CameraInferenceBloc({
+    required GetModelPath getModelPath,
+    required FlipCamera flipCamera,
+    required SetConfidenceThreshold setConfidenceThreshold,
+    required SetIoUThreshold setIoUThreshold,
+    required SetNumItemsThreshold setNumItemsThreshold,
+    required SetZoomLevel setZoomLevel,
+    required SetThresholds setThresholds,
+  }) : _getModelPath = getModelPath,
+       _flipCamera = flipCamera,
+       _setConfidenceThreshold = setConfidenceThreshold,
+       _setIoUThreshold = setIoUThreshold,
+       _setNumItemsThreshold = setNumItemsThreshold,
+       _setZoomLevel = setZoomLevel,
+       _setThresholds = setThresholds,
+       super(const CameraInferenceState()) {
     on<events.InitializeCamera>(_onInitializeCamera);
     on<events.ChangeModel>(_onChangeModel);
     on<events.FlipCamera>(_onFlipCamera);
@@ -31,13 +58,17 @@ class CameraInferenceBloc
     on<events.UpdateLensFacing>(_onUpdateLensFacing);
     on<events.RetryModelDownload>(_onRetryModelDownload);
     on<events.ResumeCamera>(_onResumeLayoutCamera);
+    on<events.SetInitialConfig>(_onSetInitialConfig);
   }
 
   void _onUpdateFps(
     events.UpdateFps event,
     Emitter<CameraInferenceState> emit,
   ) {
-    emit(state.copyWith(currentFps: event.fps));
+    if ((_currentFps - event.fps).abs() > 0.1) {
+      _currentFps = event.fps;
+      emit(state.copyWith(currentFps: _currentFps));
+    }
   }
 
   void _onUpdateLensFacing(
@@ -52,6 +83,13 @@ class CameraInferenceBloc
     Emitter<CameraInferenceState> emit,
   ) async {
     emit(state.copyWith(status: const CameraInferenceStatus.loading()));
+
+    _setThresholds(
+      confidenceThreshold: state.confidenceThreshold,
+      iouThreshold: state.iouThreshold,
+      numItemsThreshold: state.numItemsThreshold,
+    );
+
     await _downloadModel(state.modelType, emit);
   }
 
@@ -65,6 +103,13 @@ class CameraInferenceBloc
         modelType: event.model,
       ),
     );
+
+    _setThresholds(
+      confidenceThreshold: state.confidenceThreshold,
+      iouThreshold: state.iouThreshold,
+      numItemsThreshold: state.numItemsThreshold,
+    );
+
     await _downloadModel(event.model, emit);
   }
 
@@ -91,36 +136,66 @@ class CameraInferenceBloc
     ModelType modelType,
     Emitter<CameraInferenceState> emit,
   ) async {
-    await emit.forEach(
-      _yoloRepository.getModelPath(modelType),
+    // Use onEach instead of forEach
+    await emit.onEach<ModelLoadingState>(
+      _getModelPath(modelType),
       onData: (modelLoadingState) {
-        return modelLoadingState.when(
-          initial: () => state, // Should not happen after initial loading
-          loading: (progress) => state.copyWith(
-            status: CameraInferenceStatus.modelLoading(progress),
-          ),
-          ready: (modelPath) => state.copyWith(
-            status: const CameraInferenceStatus.success(),
-            modelPath: modelPath,
-          ),
-          error: (message) => state.copyWith(
-            status: CameraInferenceStatus.failure(message),
-            errorMessage: message,
+        modelLoadingState.when(
+          initial: () {}, // No-op
+          loading: (progress) {
+            emit(
+              state.copyWith(
+                status: CameraInferenceStatus.modelDownloading(progress),
+              ),
+            );
+          },
+          ready: (modelPath) {
+            // Update the state to success/ready
+            emit(
+              state.copyWith(
+                status: const CameraInferenceStatus.success(),
+                modelPath: modelPath,
+              ),
+            );
+
+            // TRIGGER INTERNAL EVENT
+            add(const events.CameraInferenceEvent.setInitialConfig());
+          },
+          error: (message) {
+            emit(
+              state.copyWith(status: CameraInferenceStatus.failure(message)),
+            );
+          },
+        );
+      },
+      onError: (error, stackTrace) {
+        emit(
+          state.copyWith(
+            status: CameraInferenceStatus.failure(error.toString()),
           ),
         );
       },
-      onError: (error, stackTrace) => state.copyWith(
-        status: CameraInferenceStatus.failure(error.toString()),
-        errorMessage: error.toString(),
-      ),
     );
+  }
+
+  void _onSetInitialConfig(
+    events.SetInitialConfig event,
+    Emitter<CameraInferenceState> emit,
+  ) {
+    _setThresholds(
+      confidenceThreshold: state.confidenceThreshold,
+      iouThreshold: state.iouThreshold,
+      numItemsThreshold: state.numItemsThreshold,
+    );
+
+    _setZoomLevel(state.currentZoomLevel);
   }
 
   void _onFlipCamera(
     events.FlipCamera event,
     Emitter<CameraInferenceState> emit,
   ) {
-    _yoloViewController.switchCamera();
+    _flipCamera();
     emit(
       state.copyWith(
         currentLensFacing: state.currentLensFacing == LensFacing.front
@@ -134,7 +209,7 @@ class CameraInferenceBloc
     events.SetZoomLevel event,
     Emitter<CameraInferenceState> emit,
   ) {
-    _yoloViewController.setZoomLevel(event.zoomLevel);
+    _setZoomLevel(event.zoomLevel);
     emit(state.copyWith(currentZoomLevel: event.zoomLevel));
   }
 
@@ -142,7 +217,7 @@ class CameraInferenceBloc
     events.UpdateConfidenceThreshold event,
     Emitter<CameraInferenceState> emit,
   ) {
-    _yoloViewController.setConfidenceThreshold(event.threshold);
+    _setConfidenceThreshold(event.threshold);
     emit(state.copyWith(confidenceThreshold: event.threshold));
   }
 
@@ -150,7 +225,7 @@ class CameraInferenceBloc
     events.UpdateIouThreshold event,
     Emitter<CameraInferenceState> emit,
   ) {
-    _yoloViewController.setIoUThreshold(event.threshold);
+    _setIoUThreshold(event.threshold);
     emit(state.copyWith(iouThreshold: event.threshold));
   }
 
@@ -158,7 +233,7 @@ class CameraInferenceBloc
     events.UpdateNumItemsThreshold event,
     Emitter<CameraInferenceState> emit,
   ) {
-    _yoloViewController.setNumItemsThreshold(event.threshold);
+    _setNumItemsThreshold(event.threshold);
     emit(state.copyWith(numItemsThreshold: event.threshold));
   }
 
@@ -166,8 +241,22 @@ class CameraInferenceBloc
     events.DetectionsOccurred event,
     Emitter<CameraInferenceState> emit,
   ) {
-    // FPS calculation logic will be handled here
-    emit(state.copyWith(detections: event.detections));
+    _frameCount++;
+    final now = DateTime.now();
+    final elapsed = now.difference(_lastFpsUpdate).inMilliseconds;
+
+    if (elapsed >= 1000) {
+      _currentFps = _frameCount * 1000 / elapsed;
+      _frameCount = 0;
+      _lastFpsUpdate = now;
+    }
+
+    if (_detectionCount != event.detections.length) {
+      _detectionCount = event.detections.length;
+      emit(
+        state.copyWith(currentFps: _currentFps, detections: event.detections),
+      );
+    }
   }
 
   void _onToggleSlider(

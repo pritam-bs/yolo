@@ -21,9 +21,19 @@ class LocalModelDataSourceImpl implements LocalModelDataSource {
   @override
   Future<String?> getModelPath(ModelType modelType) async {
     final dir = await getApplicationDocumentsDirectory();
-    final modelPath = Platform.isIOS
-        ? _getIOSModelDirPath(modelType, dir.path)
-        : _getAndroidModelFilePath(modelType, dir.path);
+    final String modelPath;
+
+    if (Platform.isIOS) {
+      modelPath = _getIOSModelDirPath(modelType, dir.path);
+    } else if (Platform.isAndroid) {
+      modelPath = _getAndroidModelFilePath(modelType, dir.path);
+    } else {
+      // This will crash the app with a clear message if run on Web, Windows, Mac, or Linux
+      throw UnsupportedError(
+        'The ultralytics_yolo package only supports iOS and Android. '
+        'Current platform: ${Platform.operatingSystem}',
+      );
+    }
 
     if (Platform.isIOS) {
       final modelDir = _fileSystem.directory(modelPath);
@@ -71,7 +81,7 @@ class LocalModelDataSourceImpl implements LocalModelDataSource {
         // Should not happen for iOS mlpackage, but as a fallback
         throw Exception('iOS models (.mlpackage) should be provided as a zip.');
       }
-    } else {
+    } else if (Platform.isAndroid) {
       // Android .tflite model
       targetPath = _getAndroidModelFilePath(modelType, dir.path);
       final modelFile = _fileSystem.file(targetPath);
@@ -82,6 +92,12 @@ class LocalModelDataSourceImpl implements LocalModelDataSource {
 
       await modelFile.writeAsBytes(bytes);
       return modelFile.path;
+    } else {
+      // This will crash the app with a clear message if run on Web, Windows, Mac, or Linux
+      throw UnsupportedError(
+        'The ultralytics_yolo package only supports iOS and Android. '
+        'Current platform: ${Platform.operatingSystem}',
+      );
     }
   }
 

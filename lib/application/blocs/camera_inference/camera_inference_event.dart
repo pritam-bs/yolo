@@ -24,18 +24,10 @@ abstract class CameraInferenceEvent with _$CameraInferenceEvent {
   ) = DetectionsOccurred;
   const factory CameraInferenceEvent.toggleSlider(SliderType type) =
       ToggleSlider;
-  const factory CameraInferenceEvent.updateFps(double fps) =
-      UpdateFps; // New event
+  const factory CameraInferenceEvent.updateFps(double fps) = UpdateFps;
   const factory CameraInferenceEvent.updateLensFacing(LensFacing lensFacing) =
-      UpdateLensFacing; // New event
-  const factory CameraInferenceEvent.modelDownloadStarted() =
-      ModelDownloadStarted;
-  const factory CameraInferenceEvent.modelDownloadProgressed(double progress) =
-      ModelDownloadProgressed;
-  const factory CameraInferenceEvent.modelDownloadCompleted() =
-      ModelDownloadCompleted;
-  const factory CameraInferenceEvent.modelDownloadFailed(String errorMessage) =
-      ModelDownloadFailed;
+      UpdateLensFacing;
   const factory CameraInferenceEvent.retryModelDownload() = RetryModelDownload;
   const factory CameraInferenceEvent.resumeCamera() = ResumeCamera;
+  const factory CameraInferenceEvent.setInitialConfig() = SetInitialConfig;
 }

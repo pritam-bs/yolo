@@ -16,7 +16,7 @@ class CameraLogoOverlay extends StatelessWidget {
         if (state.status.when(
           initial: () => false,
           loading: () => false,
-          modelLoading: (progress) => false,
+          modelDownloading: (progress) => false,
           success: () => true,
           failure: (message) => false,
         )) {

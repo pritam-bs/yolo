@@ -20,7 +20,6 @@ abstract class CameraInferenceState with _$CameraInferenceState {
     @Default([]) List<DetectionResult> detections,
     @Default(0.0) double currentFps,
     @Default(LensFacing.back) LensFacing currentLensFacing,
-    String? errorMessage,
   }) = _CameraInferenceState;
 }
 
@@ -28,7 +27,7 @@ abstract class CameraInferenceState with _$CameraInferenceState {
 abstract class CameraInferenceStatus with _$CameraInferenceStatus {
   const factory CameraInferenceStatus.initial() = _Initial;
   const factory CameraInferenceStatus.loading() = _Loading;
-  const factory CameraInferenceStatus.modelLoading(double progress) =
+  const factory CameraInferenceStatus.modelDownloading(double progress) =
       _ModelLoading;
   const factory CameraInferenceStatus.success() = _Success;
   const factory CameraInferenceStatus.failure(String message) = _Failure;

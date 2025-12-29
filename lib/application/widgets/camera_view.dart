@@ -6,7 +6,6 @@ import 'package:ultralytics_yolo/widgets/yolo_overlay.dart';
 
 import 'package:yolo/application/blocs/camera_inference/camera_inference_bloc.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_event.dart';
-import 'package:yolo/application/mappers/detection_mapper.dart';
 import 'package:yolo/domain/entities/models.dart';
 import 'package:yolo/domain/repositories/yolo_repository.dart';
 import 'camera_controls.dart';
@@ -34,6 +33,8 @@ class CameraView extends StatelessWidget {
           ),
           yoloViewController: getIt<YoloRepository>().yoloViewController,
           currentLensFacing: state.currentLensFacing,
+          confidenceThreshold: state.confidenceThreshold,
+          iouThreshold: state.iouThreshold,
         ),
         // YOLOOverlay(
         //   detections: state.detections

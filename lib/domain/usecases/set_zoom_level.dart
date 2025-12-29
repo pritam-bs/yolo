@@ -5,11 +5,12 @@ import 'package:yolo/domain/repositories/yolo_repository.dart';
 
 @injectable
 class SetZoomLevel {
-  final YoloRepository repository;
+  final YoloRepository _repository;
 
-  SetZoomLevel(this.repository);
+  SetZoomLevel({required YoloRepository yoloRepository})
+    : _repository = yoloRepository;
 
   void call(double zoomLevel) {
-    repository.setZoomLevel(zoomLevel);
+    _repository.setZoomLevel(zoomLevel);
   }
 }
