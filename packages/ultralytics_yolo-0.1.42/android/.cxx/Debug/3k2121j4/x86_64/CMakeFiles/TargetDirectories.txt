@@ -1,0 +1,3 @@
+/Users/pritam/.pub-cache/hosted/pub.dev/ultralytics_yolo-0.1.42/android/.cxx/Debug/3k2121j4/x86_64/CMakeFiles/ultralytics.dir
+/Users/pritam/.pub-cache/hosted/pub.dev/ultralytics_yolo-0.1.42/android/.cxx/Debug/3k2121j4/x86_64/CMakeFiles/edit_cache.dir
+/Users/pritam/.pub-cache/hosted/pub.dev/ultralytics_yolo-0.1.42/android/.cxx/Debug/3k2121j4/x86_64/CMakeFiles/rebuild_cache.dir
