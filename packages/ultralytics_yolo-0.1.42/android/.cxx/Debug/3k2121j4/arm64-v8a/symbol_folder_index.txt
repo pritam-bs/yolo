@@ -1,1 +1,0 @@
-/Users/pritam/flutter_projects/yolo-flutter-app/example/build/ultralytics_yolo/intermediates/cxx/Debug/3k2121j4/obj/arm64-v8a

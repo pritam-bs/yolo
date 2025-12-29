@@ -49,9 +49,6 @@ _i174.GetIt initGetIt(
       remoteModelDataSource: gh<_i992.RemoteModelDataSource>(),
     ),
   );
-  gh.factory<_i655.CameraInferenceBloc>(
-    () => _i655.CameraInferenceBloc(yoloRepository: gh<_i25.YoloRepository>()),
-  );
   gh.factory<_i638.FlipCamera>(
     () => _i638.FlipCamera(gh<_i25.YoloRepository>()),
   );
@@ -69,6 +66,9 @@ _i174.GetIt initGetIt(
   );
   gh.factory<_i649.SetZoomLevel>(
     () => _i649.SetZoomLevel(gh<_i25.YoloRepository>()),
+  );
+  gh.factory<_i655.CameraInferenceBloc>(
+    () => _i655.CameraInferenceBloc(yoloRepository: gh<_i25.YoloRepository>()),
   );
   return getIt;
 }

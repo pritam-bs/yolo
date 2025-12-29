@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DetectionResult {
 
- Size get imageSize; Rect get box; Rect get normalizedBox; double get score; String get label; int get classId;
+// required Size imageSize,
+ Rect get box; Rect get normalizedBox; double get score; String get label; int get classId;
 /// Create a copy of DetectionResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +26,16 @@ $DetectionResultCopyWith<DetectionResult> get copyWith => _$DetectionResultCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DetectionResult&&(identical(other.imageSize, imageSize) || other.imageSize == imageSize)&&(identical(other.box, box) || other.box == box)&&(identical(other.normalizedBox, normalizedBox) || other.normalizedBox == normalizedBox)&&(identical(other.score, score) || other.score == score)&&(identical(other.label, label) || other.label == label)&&(identical(other.classId, classId) || other.classId == classId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DetectionResult&&(identical(other.box, box) || other.box == box)&&(identical(other.normalizedBox, normalizedBox) || other.normalizedBox == normalizedBox)&&(identical(other.score, score) || other.score == score)&&(identical(other.label, label) || other.label == label)&&(identical(other.classId, classId) || other.classId == classId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,imageSize,box,normalizedBox,score,label,classId);
+int get hashCode => Object.hash(runtimeType,box,normalizedBox,score,label,classId);
 
 @override
 String toString() {
-  return 'DetectionResult(imageSize: $imageSize, box: $box, normalizedBox: $normalizedBox, score: $score, label: $label, classId: $classId)';
+  return 'DetectionResult(box: $box, normalizedBox: $normalizedBox, score: $score, label: $label, classId: $classId)';
 }
 
 
@@ -45,7 +46,7 @@ abstract mixin class $DetectionResultCopyWith<$Res>  {
   factory $DetectionResultCopyWith(DetectionResult value, $Res Function(DetectionResult) _then) = _$DetectionResultCopyWithImpl;
 @useResult
 $Res call({
- Size imageSize, Rect box, Rect normalizedBox, double score, String label, int classId
+ Rect box, Rect normalizedBox, double score, String label, int classId
 });
 
 
@@ -62,10 +63,9 @@ class _$DetectionResultCopyWithImpl<$Res>
 
 /// Create a copy of DetectionResult
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? imageSize = null,Object? box = null,Object? normalizedBox = null,Object? score = null,Object? label = null,Object? classId = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? box = null,Object? normalizedBox = null,Object? score = null,Object? label = null,Object? classId = null,}) {
   return _then(_self.copyWith(
-imageSize: null == imageSize ? _self.imageSize : imageSize // ignore: cast_nullable_to_non_nullable
-as Size,box: null == box ? _self.box : box // ignore: cast_nullable_to_non_nullable
+box: null == box ? _self.box : box // ignore: cast_nullable_to_non_nullable
 as Rect,normalizedBox: null == normalizedBox ? _self.normalizedBox : normalizedBox // ignore: cast_nullable_to_non_nullable
 as Rect,score: null == score ? _self.score : score // ignore: cast_nullable_to_non_nullable
 as double,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
@@ -155,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Size imageSize,  Rect box,  Rect normalizedBox,  double score,  String label,  int classId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Rect box,  Rect normalizedBox,  double score,  String label,  int classId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DetectionResult() when $default != null:
-return $default(_that.imageSize,_that.box,_that.normalizedBox,_that.score,_that.label,_that.classId);case _:
+return $default(_that.box,_that.normalizedBox,_that.score,_that.label,_that.classId);case _:
   return orElse();
 
 }
@@ -176,10 +176,10 @@ return $default(_that.imageSize,_that.box,_that.normalizedBox,_that.score,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Size imageSize,  Rect box,  Rect normalizedBox,  double score,  String label,  int classId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Rect box,  Rect normalizedBox,  double score,  String label,  int classId)  $default,) {final _that = this;
 switch (_that) {
 case _DetectionResult():
-return $default(_that.imageSize,_that.box,_that.normalizedBox,_that.score,_that.label,_that.classId);case _:
+return $default(_that.box,_that.normalizedBox,_that.score,_that.label,_that.classId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +196,10 @@ return $default(_that.imageSize,_that.box,_that.normalizedBox,_that.score,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Size imageSize,  Rect box,  Rect normalizedBox,  double score,  String label,  int classId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Rect box,  Rect normalizedBox,  double score,  String label,  int classId)?  $default,) {final _that = this;
 switch (_that) {
 case _DetectionResult() when $default != null:
-return $default(_that.imageSize,_that.box,_that.normalizedBox,_that.score,_that.label,_that.classId);case _:
+return $default(_that.box,_that.normalizedBox,_that.score,_that.label,_that.classId);case _:
   return null;
 
 }
@@ -211,10 +211,10 @@ return $default(_that.imageSize,_that.box,_that.normalizedBox,_that.score,_that.
 
 
 class _DetectionResult implements DetectionResult {
-  const _DetectionResult({required this.imageSize, required this.box, required this.normalizedBox, required this.score, required this.label, required this.classId});
+  const _DetectionResult({required this.box, required this.normalizedBox, required this.score, required this.label, required this.classId});
   
 
-@override final  Size imageSize;
+// required Size imageSize,
 @override final  Rect box;
 @override final  Rect normalizedBox;
 @override final  double score;
@@ -231,16 +231,16 @@ _$DetectionResultCopyWith<_DetectionResult> get copyWith => __$DetectionResultCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DetectionResult&&(identical(other.imageSize, imageSize) || other.imageSize == imageSize)&&(identical(other.box, box) || other.box == box)&&(identical(other.normalizedBox, normalizedBox) || other.normalizedBox == normalizedBox)&&(identical(other.score, score) || other.score == score)&&(identical(other.label, label) || other.label == label)&&(identical(other.classId, classId) || other.classId == classId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DetectionResult&&(identical(other.box, box) || other.box == box)&&(identical(other.normalizedBox, normalizedBox) || other.normalizedBox == normalizedBox)&&(identical(other.score, score) || other.score == score)&&(identical(other.label, label) || other.label == label)&&(identical(other.classId, classId) || other.classId == classId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,imageSize,box,normalizedBox,score,label,classId);
+int get hashCode => Object.hash(runtimeType,box,normalizedBox,score,label,classId);
 
 @override
 String toString() {
-  return 'DetectionResult(imageSize: $imageSize, box: $box, normalizedBox: $normalizedBox, score: $score, label: $label, classId: $classId)';
+  return 'DetectionResult(box: $box, normalizedBox: $normalizedBox, score: $score, label: $label, classId: $classId)';
 }
 
 
@@ -251,7 +251,7 @@ abstract mixin class _$DetectionResultCopyWith<$Res> implements $DetectionResult
   factory _$DetectionResultCopyWith(_DetectionResult value, $Res Function(_DetectionResult) _then) = __$DetectionResultCopyWithImpl;
 @override @useResult
 $Res call({
- Size imageSize, Rect box, Rect normalizedBox, double score, String label, int classId
+ Rect box, Rect normalizedBox, double score, String label, int classId
 });
 
 
@@ -268,10 +268,9 @@ class __$DetectionResultCopyWithImpl<$Res>
 
 /// Create a copy of DetectionResult
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? imageSize = null,Object? box = null,Object? normalizedBox = null,Object? score = null,Object? label = null,Object? classId = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? box = null,Object? normalizedBox = null,Object? score = null,Object? label = null,Object? classId = null,}) {
   return _then(_DetectionResult(
-imageSize: null == imageSize ? _self.imageSize : imageSize // ignore: cast_nullable_to_non_nullable
-as Size,box: null == box ? _self.box : box // ignore: cast_nullable_to_non_nullable
+box: null == box ? _self.box : box // ignore: cast_nullable_to_non_nullable
 as Rect,normalizedBox: null == normalizedBox ? _self.normalizedBox : normalizedBox // ignore: cast_nullable_to_non_nullable
 as Rect,score: null == score ? _self.score : score // ignore: cast_nullable_to_non_nullable
 as double,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable

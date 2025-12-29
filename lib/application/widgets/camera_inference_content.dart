@@ -5,6 +5,7 @@ import 'package:ultralytics_yolo/yolo_view.dart';
 import 'package:ultralytics_yolo/widgets/yolo_controller.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_bloc.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_event.dart';
+import 'package:yolo/application/mappers/yolo_result_mapper.dart';
 import 'package:yolo/domain/entities/detection_result.dart';
 import 'package:yolo/domain/entities/models.dart';
 
@@ -40,24 +41,7 @@ class CameraInferenceContent extends StatelessWidget {
         onResult: (results) {
           final detections = results
               .map(
-                (e) => DetectionResult(
-                  box: Rect.fromLTWH(
-                    e.boundingBox.left,
-                    e.boundingBox.top,
-                    e.boundingBox.width,
-                    e.boundingBox.height,
-                  ),
-                  normalizedBox: Rect.fromLTWH(
-                    e.normalizedBox.left,
-                    e.normalizedBox.top,
-                    e.normalizedBox.width,
-                    e.normalizedBox.height,
-                  ),
-                  score: e.confidence,
-                  label: e.className,
-                  classId: e.classIndex,
-                  imageSize: Size(e.originalImageWidth, e.originalImageHeight),
-                ),
+                (e) => e.toDetectionResult(),
               )
               .toList();
           onResult(detections);

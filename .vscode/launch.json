@@ -1,0 +1,46 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    
+        {
+            "name": "yolo",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "yolo (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "yolo (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "ultralytics_yolo-0.1.42",
+            "cwd": "packages/ultralytics_yolo-0.1.42",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "ultralytics_yolo-0.1.42 (profile mode)",
+            "cwd": "packages/ultralytics_yolo-0.1.42",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "ultralytics_yolo-0.1.42 (release mode)",
+            "cwd": "packages/ultralytics_yolo-0.1.42",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
