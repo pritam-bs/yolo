@@ -6,7 +6,7 @@ part 'detection_result.freezed.dart';
 @freezed
 abstract class DetectionResult with _$DetectionResult {
   const factory DetectionResult({
-    // required Size imageSize,
+    required Size imageSize,
     required Rect box,
     required Rect normalizedBox,
     required double score,

@@ -152,8 +152,8 @@ class SystemMonitor {
           onError: (error) {
             _controller.addError(error);
           },
-          onDone: () {
-            stop();
+          onDone: () async {
+            await stop();
           },
         );
   }
@@ -161,14 +161,14 @@ class SystemMonitor {
   /// Stops the system monitoring service.
   ///
   /// This method cancels the internal platform subscription.
-  void stop() {
-    _platformSubscription?.cancel();
+  Future<void> stop() async {
+    await _platformSubscription?.cancel();
     _platformSubscription = null;
   }
 
   /// Disposes the SystemMonitor instance and closes the stream.
-  void dispose() {
-    stop();
-    _controller.close();
+  Future<void> dispose() async {
+    await stop();
+    await _controller.close();
   }
 }

@@ -22,39 +22,67 @@ class YOLOOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: YOLODetectionPainter(
-        detections: detections,
-        showConfidence: showConfidence,
-        showClassName: showClassName,
-        theme: theme,
-      ),
-      child: GestureDetector(
-        onTapDown: (details) => _handleTap(details, context),
-        child: Container(),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return GestureDetector(
+          onTapDown: (details) =>
+              _handleTap(details, context, constraints.biggest),
+          child: CustomPaint(
+            size: Size.infinite,
+            painter: YOLODetectionPainter(
+              detections: detections,
+              showConfidence: showConfidence,
+              showClassName: showClassName,
+              theme: theme,
+            ),
+          ),
+        );
+      },
     );
   }
 
-  void _handleTap(TapDownDetails details, BuildContext context) {
+  void _handleTap(TapDownDetails details, BuildContext context, Size size) {
     if (onDetectionTap == null) return;
 
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
-    final localPosition = renderBox.globalToLocal(details.globalPosition);
+    final localPosition = details.localPosition;
 
     for (final detection in detections) {
-      if (_isPointInBoundingBox(localPosition, detection)) {
+      // We must use the exact same scaling math used in the Painter
+      final rect = _getMappedRect(detection, size);
+      if (rect.contains(localPosition)) {
         onDetectionTap!(detection);
         break;
       }
     }
   }
 
-  bool _isPointInBoundingBox(Offset point, YOLOResult detection) {
-    return point.dx >= detection.boundingBox.left &&
-        point.dx <= detection.boundingBox.right &&
-        point.dy >= detection.boundingBox.top &&
-        point.dy <= detection.boundingBox.bottom;
+  /// Centralized scaling logic to ensure Painter and Tap logic are in sync.
+  Rect _getMappedRect(YOLOResult detection, Size size) {
+    final double imgW = detection.originalImageWidth;
+    final double imgH = detection.originalImageHeight;
+    if (imgW <= 0 || imgH <= 0) return Rect.zero;
+
+    final deviceRatio = size.width / size.height;
+    final cameraRatio = imgW / imgH;
+
+    double scale;
+    double dx = 0;
+    double dy = 0;
+
+    if (deviceRatio > cameraRatio) {
+      scale = size.width / imgW;
+      dy = (size.height - imgH * scale) / 2;
+    } else {
+      scale = size.height / imgH;
+      dx = (size.width - imgW * scale) / 2;
+    }
+
+    return Rect.fromLTRB(
+      (detection.normalizedBox.left * imgW * scale) + dx,
+      (detection.normalizedBox.top * imgH * scale) + dy,
+      (detection.normalizedBox.right * imgW * scale) + dx,
+      (detection.normalizedBox.bottom * imgH * scale) + dy,
+    );
   }
 }
 
@@ -75,63 +103,96 @@ class YOLODetectionPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     for (final detection in detections) {
-      _drawBoundingBox(canvas, detection);
-      if (showClassName || showConfidence) {
-        _drawLabel(canvas, detection);
-      }
+      final rect = _getMappedRect(detection, size);
+      if (rect == Rect.zero) continue;
+
+      _drawDetection(canvas, rect, detection, size);
     }
   }
 
-  void _drawBoundingBox(Canvas canvas, YOLOResult detection) {
-    final paint = Paint()
+  /// Helper to calculate the screen rect (Matches the logic in the Widget)
+  Rect _getMappedRect(YOLOResult detection, Size size) {
+    final double imgW = detection.originalImageWidth;
+    final double imgH = detection.originalImageHeight;
+    if (imgW <= 0 || imgH <= 0) return Rect.zero;
+
+    final deviceRatio = size.width / size.height;
+    final cameraRatio = imgW / imgH;
+
+    double scale;
+    double dx = 0;
+    double dy = 0;
+
+    if (deviceRatio > cameraRatio) {
+      scale = size.width / imgW;
+      dy = (size.height - imgH * scale) / 2;
+    } else {
+      scale = size.height / imgH;
+      dx = (size.width - imgW * scale) / 2;
+    }
+
+    return Rect.fromLTRB(
+      (detection.normalizedBox.left * imgW * scale) + dx,
+      (detection.normalizedBox.top * imgH * scale) + dy,
+      (detection.normalizedBox.right * imgW * scale) + dx,
+      (detection.normalizedBox.bottom * imgH * scale) + dy,
+    );
+  }
+
+  void _drawDetection(
+    Canvas canvas,
+    Rect rect,
+    YOLOResult detection,
+    Size size,
+  ) {
+    // 1. Draw Bounding Box (Natural clipping, no shifting)
+    final boxPaint = Paint()
       ..color = theme.boundingBoxColor
       ..strokeWidth = theme.boundingBoxWidth
       ..style = PaintingStyle.stroke;
 
-    final rect = Rect.fromLTRB(
-      detection.boundingBox.left,
-      detection.boundingBox.top,
-      detection.boundingBox.right,
-      detection.boundingBox.bottom,
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(4)),
+      boxPaint,
     );
 
-    canvas.drawRect(rect, paint);
-  }
-
-  void _drawLabel(Canvas canvas, YOLOResult detection) {
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: _buildLabelText(detection),
-        style: TextStyle(
-          color: theme.textColor,
-          fontSize: theme.textSize,
-          fontWeight: theme.textWeight,
+    // 2. Prepare Label Text
+    if (showClassName || showConfidence) {
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: _buildLabelText(detection),
+          style: TextStyle(
+            color: theme.textColor,
+            fontSize: theme.textSize,
+            fontWeight: theme.textWeight,
+          ),
         ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
+        textDirection: TextDirection.ltr,
+      )..layout();
 
-    textPainter.layout();
+      const double padding = 4.0;
+      final double lbWidth = textPainter.width + (padding * 2);
+      final double lbHeight = textPainter.height + (padding * 2);
 
-    final labelRect = Rect.fromLTRB(
-      detection.boundingBox.left,
-      detection.boundingBox.top - textPainter.height - 4,
-      detection.boundingBox.left + textPainter.width + 8,
-      detection.boundingBox.top,
-    );
+      // 3. Sticky Label Logic (Clamp to screen bounds)
+      double lbLeft = rect.left;
+      double lbTop = rect.top - lbHeight;
 
-    // Draw background
-    final backgroundPaint = Paint()..color = theme.labelBackgroundColor;
-    canvas.drawRect(labelRect, backgroundPaint);
+      // Handle vertical overflow: flip label inside box if it hits top of screen
+      if (lbTop < 0) lbTop = rect.top.clamp(0, size.height);
 
-    // Draw text
-    textPainter.paint(
-      canvas,
-      Offset(
-        detection.boundingBox.left + 4,
-        detection.boundingBox.top - textPainter.height,
-      ),
-    );
+      // Handle horizontal overflow: slide label left/right to stay on screen
+      lbLeft = lbLeft.clamp(0, (size.width - lbWidth).clamp(0, size.width));
+
+      final labelRect = Rect.fromLTWH(lbLeft, lbTop, lbWidth, lbHeight);
+
+      // 4. Draw Label Background
+      final bgPaint = Paint()..color = theme.labelBackgroundColor;
+      canvas.drawRect(labelRect, bgPaint);
+
+      // 5. Draw Label Text
+      textPainter.paint(canvas, Offset(lbLeft + padding, lbTop + padding));
+    }
   }
 
   String _buildLabelText(YOLOResult detection) {
@@ -144,13 +205,7 @@ class YOLODetectionPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return oldDelegate is YOLODetectionPainter &&
-        (oldDelegate.detections != detections ||
-            oldDelegate.showConfidence != showConfidence ||
-            oldDelegate.showClassName != showClassName ||
-            oldDelegate.theme != theme);
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 /// Theme configuration for YOLO overlays.
@@ -170,28 +225,4 @@ class YOLOOverlayTheme {
     this.textWeight = FontWeight.bold,
     this.labelBackgroundColor = Colors.black54,
   });
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is YOLOOverlayTheme &&
-        other.boundingBoxColor == boundingBoxColor &&
-        other.boundingBoxWidth == boundingBoxWidth &&
-        other.textColor == textColor &&
-        other.textSize == textSize &&
-        other.textWeight == textWeight &&
-        other.labelBackgroundColor == labelBackgroundColor;
-  }
-
-  @override
-  int get hashCode {
-    return Object.hash(
-      boundingBoxColor,
-      boundingBoxWidth,
-      textColor,
-      textSize,
-      textWeight,
-      labelBackgroundColor,
-    );
-  }
 }

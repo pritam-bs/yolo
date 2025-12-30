@@ -4,8 +4,8 @@ import 'package:yolo/domain/entities/detection_result.dart';
 class DetectionMapper {
   static YOLOResult toYOLOResult(DetectionResult detection) {
     return YOLOResult(
-      // originalImageWidth: detection.imageSize.width,
-      // originalImageHeight: detection.imageSize.height,
+      originalImageWidth: detection.imageSize.width,
+      originalImageHeight: detection.imageSize.height,
       classIndex: detection.classId,
       className: detection.label,
       confidence: detection.score,

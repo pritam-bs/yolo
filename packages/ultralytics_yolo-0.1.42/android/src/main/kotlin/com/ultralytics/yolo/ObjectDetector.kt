@@ -23,6 +23,7 @@ import java.nio.ByteOrder
 import android.content.res.AssetManager
 
 import org.json.JSONObject
+import org.tensorflow.lite.gpu.CompatibilityList
 
 import java.io.ByteArrayInputStream
 import java.nio.MappedByteBuffer
@@ -40,7 +41,6 @@ class ObjectDetector(
     context: Context,
     modelPath: String,
     override var labels: List<String>,
-    private val useGpu: Boolean = true,
     private val customOptions: Interpreter.Options? = null
 ) : BasePredictor() {
     // Inference output dimensions
@@ -73,22 +73,10 @@ class ObjectDetector(
     private lateinit var inputBuffer: ByteBuffer
 
     // Options for TensorFlow Lite Interpreter
-    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options()).apply {
-        // If no custom options provided, use default threads
-        if (customOptions == null) {
-            setNumThreads(Runtime.getRuntime().availableProcessors())
-        }
-        
-        // If customOptions is provided, only add GPU delegate if requested
-        if (useGpu) {
-            try {
-                addDelegate(GpuDelegate())
-                Log.d("ObjectDetector", "GPU delegate is used.")
-            } catch (e: Exception) {
-                Log.e("ObjectDetector", "GPU delegate error: ${e.message}")
-            }
-        }
-    }
+    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
+        setNumThreads(4) // More stable than availableProcessors()
+        setUseXNNPACK(true) // Crucial for CPU efficiency
+    })
 
     // ========== TFLite Interpreter ==========
     // Use protected var interpreter: Interpreter? = null from BasePredictor if available
@@ -124,10 +112,38 @@ class ObjectDetector(
             }
         }
 
-        interpreter = Interpreter(modelBuffer, interpreterOptions)
+        try {
+            // --- ATTEMPT 1: Best Case (Hardware Acceleration for useGpu = true) ---
+            interpreter = Interpreter(modelBuffer, interpreterOptions)
+            Log.i(TAG, "TFLite: Success with hardware acceleration.")
+        } catch (hardwareError: Exception) {
+            Log.e(TAG, "TFLite: Hardware acceleration failed: ${hardwareError.message}")
+
+            try {
+                // --- ATTEMPT 2: Safe Case (CPU Only) ---
+                Log.i(TAG, "TFLite: Retrying with safe CPU-only options...")
+
+                val safeOptions = Interpreter.Options().apply {
+                    setNumThreads(4)
+                    setUseXNNPACK(true)
+                }
+
+                // Re-attempt creation with clean options
+                interpreter = Interpreter(modelBuffer, safeOptions)
+                Log.i(TAG, "TFLite: Successfully fell back to CPU.")
+
+            } catch (cpuError: Exception) {
+                // --- FINAL FAILURE: Fatal Error ---
+                Log.e(TAG, "TFLite: Fatal error - CPU initialization failed.")
+                // Throw the error or notify the UI that the model is unusable
+                throw cpuError
+            }
+        }
+
+
         // Call allocateTensors() once during initialization, not in the inference loop
         interpreter.allocateTensors()
-        Log.d("TAG", "TFLite model loaded: $modelPath, tensors allocated")
+        Log.d(TAG, "TFLite model loaded: $modelPath, tensors allocated")
 
         // Check input shape (example: [1, inHeight, inWidth, 3])
         val inputShape = interpreter.getInputTensor(0).shape()
@@ -140,14 +156,14 @@ class ObjectDetector(
         }
         inputSize = Size(inWidth, inHeight) // Set variable in BasePredictor
         modelInputSize = Pair(inWidth, inHeight)
-        Log.d("TAG", "Model input size = $inWidth x $inHeight")
+        Log.d(TAG, "Model input size = $inWidth x $inHeight")
 
         // Output shape (varies by model, modify as needed)
         // Example: [1, 84, 2100] = [batch, outHeight, outWidth]
         val outputShape = interpreter.getOutputTensor(0).shape()
         out1 = outputShape[1] // 84
         out2 = outputShape[2] // 2100
-        Log.d("TAG", "Model output shape = [1, $out1, $out2]")
+        Log.d(TAG, "Model output shape = [1, $out1, $out2]")
 
         // Allocate preprocessing resources
         initPreprocessingResources(inWidth, inHeight)
@@ -188,7 +204,7 @@ class ObjectDetector(
             .add(CastOp(INPUT_IMAGE_TYPE))
             .build()
             
-        Log.d("TAG", "ObjectDetector initialized.")
+        Log.d(TAG, "ObjectDetector initialized.")
     }
 
     /* =================================================================== */

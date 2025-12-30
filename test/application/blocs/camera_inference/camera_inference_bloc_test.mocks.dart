@@ -212,7 +212,7 @@ class MockSystemMetricsMonitorStart extends _i1.Mock
           as _i2.SystemMonitorRepository);
 
   @override
-  void call({Duration? interval = const Duration(seconds: 5)}) =>
+  void call({Duration? interval = const Duration(minutes: 5)}) =>
       super.noSuchMethod(
         Invocation.method(#call, [], {#interval: interval}),
         returnValueForMissingStub: null,
@@ -240,10 +240,13 @@ class MockSystemMetricsMonitorDispose extends _i1.Mock
           as _i2.SystemMonitorRepository);
 
   @override
-  void call() => super.noSuchMethod(
-    Invocation.method(#call, []),
-    returnValueForMissingStub: null,
-  );
+  _i4.Future<void> call() =>
+      (super.noSuchMethod(
+            Invocation.method(#call, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 }
 
 /// A class which mocks [SystemMetricsMonitorStop].
@@ -267,10 +270,13 @@ class MockSystemMetricsMonitorStop extends _i1.Mock
           as _i2.SystemMonitorRepository);
 
   @override
-  void call() => super.noSuchMethod(
-    Invocation.method(#call, []),
-    returnValueForMissingStub: null,
-  );
+  _i4.Future<void> call() =>
+      (super.noSuchMethod(
+            Invocation.method(#call, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 }
 
 /// A class which mocks [SetStreamingConfig].

@@ -6,7 +6,7 @@ import 'package:ultralytics_yolo/widgets/yolo_controller.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_bloc.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_event.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_state.dart';
-import 'package:yolo/application/mappers/yolo_result_mapper.dart';
+import 'package:yolo/data/mappers/yolo_result_mapper.dart';
 import 'package:yolo/domain/entities/detection_result.dart';
 import 'package:yolo/domain/entities/models.dart';
 import 'package:yolo/domain/entities/system_health_state.dart';

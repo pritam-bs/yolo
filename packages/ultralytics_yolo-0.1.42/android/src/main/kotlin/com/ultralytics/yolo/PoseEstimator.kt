@@ -25,12 +25,12 @@ import java.nio.MappedByteBuffer
 import kotlin.math.max
 import kotlin.math.min
 import androidx.collection.ArrayMap
+import org.tensorflow.lite.gpu.CompatibilityList
 
 class PoseEstimator(
     context: Context,
     modelPath: String,
     override var labels: List<String>,
-    private val useGpu: Boolean = true,
     private var confidenceThreshold: Float = 0.25f,   // Can be changed as needed
     private var iouThreshold: Float = 0.45f,          // Can be changed as needed
     private val customOptions: Interpreter.Options? = null
@@ -85,21 +85,10 @@ class PoseEstimator(
         }
     }
 
-    private val interpreterOptions = (customOptions ?: Interpreter.Options()).apply {
-        // If no custom options provided, use default threads
-        if (customOptions == null) {
-            setNumThreads(Runtime.getRuntime().availableProcessors())
-        }
-        
-        if (useGpu) {
-            try {
-                addDelegate(GpuDelegate())
-                Log.d("PoseEstimator", "GPU delegate is used.")
-            } catch (e: Exception) {
-                Log.e("PoseEstimator", "GPU delegate error: ${e.message}")
-            }
-        }
-    }
+    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
+        setNumThreads(4) // More stable than availableProcessors()
+        setUseXNNPACK(true) // Crucial for CPU efficiency
+    })
 
     private lateinit var imageProcessorCameraPortrait: ImageProcessor
     private lateinit var imageProcessorCameraPortraitFront: ImageProcessor
@@ -142,7 +131,34 @@ class PoseEstimator(
             }
         }
 
-        interpreter = Interpreter(modelBuffer, interpreterOptions)
+        try {
+            // --- ATTEMPT 1: Best Case (Hardware Acceleration for useGpu = true) ---
+            interpreter = Interpreter(modelBuffer, interpreterOptions)
+            Log.i("PoseEstimator", "TFLite: Success with hardware acceleration.")
+        } catch (hardwareError: Exception) {
+            Log.e("PoseEstimator", "TFLite: Hardware acceleration failed: ${hardwareError.message}")
+
+            try {
+                // --- ATTEMPT 2: Safe Case (CPU Only) ---
+                Log.i("PoseEstimator", "TFLite: Retrying with safe CPU-only options...")
+
+                val safeOptions = Interpreter.Options().apply {
+                    setNumThreads(4)
+                    setUseXNNPACK(true)
+                }
+
+                // Re-attempt creation with clean options
+                interpreter = Interpreter(modelBuffer, safeOptions)
+                Log.i("PoseEstimator", "TFLite: Successfully fell back to CPU.")
+
+            } catch (cpuError: Exception) {
+                // --- FINAL FAILURE: Fatal Error ---
+                Log.e("PoseEstimator", "TFLite: Fatal error - CPU initialization failed.")
+                // Throw the error or notify the UI that the model is unusable
+                throw cpuError
+            }
+        }
+
         // Call allocateTensors() once during initialization
         interpreter.allocateTensors()
         Log.d("PoseEstimator", "TFLite model loaded and tensors allocated")
