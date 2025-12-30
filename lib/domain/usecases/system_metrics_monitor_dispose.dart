@@ -7,7 +7,7 @@ class SystemMetricsMonitorDispose {
 
   SystemMetricsMonitorDispose(this.repository);
 
-  void call() {
-    return repository.dispose();
+  Future<void> call() async {
+    await repository.dispose();
   }
 }

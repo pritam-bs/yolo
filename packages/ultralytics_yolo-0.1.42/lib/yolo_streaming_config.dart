@@ -331,23 +331,19 @@ class YOLOStreamingConfig {
   /// // Custom power saving with 5 inferences per second
   /// final config = YOLOStreamingConfig.powerSaving(inferenceFrequency: 5);
   /// ```
-  factory YOLOStreamingConfig.powerSaving({
-    int inferenceFrequency = 10,
-    int maxFPS = 15,
-  }) {
-    return YOLOStreamingConfig(
-      includeDetections: true,
-      includeClassifications: true,
-      includeProcessingTimeMs: true,
-      includeFps: true,
-      includeMasks: false,
-      includePoses: false,
-      includeOBB: false,
-      includeOriginalImage: false,
-      maxFPS: maxFPS,
-      inferenceFrequency: inferenceFrequency,
-    );
-  }
+  const YOLOStreamingConfig.powerSaving({
+    this.inferenceFrequency = 10,
+    this.maxFPS = 15,
+  }) : includeDetections = true,
+       includeClassifications = true,
+       includeProcessingTimeMs = true,
+       includeFps = true,
+       includeMasks = false,
+       includePoses = false,
+       includeOBB = false,
+       includeOriginalImage = false,
+       throttleInterval = null,
+       skipFrames = null;
 
   /// Creates a performance configuration optimized for high frame rates.
   ///
@@ -359,19 +355,18 @@ class YOLOStreamingConfig {
   /// // High performance: 30 inferences per second
   /// final config = YOLOStreamingConfig.highPerformance();
   /// ```
-  factory YOLOStreamingConfig.highPerformance({int inferenceFrequency = 30}) {
-    return YOLOStreamingConfig(
-      includeDetections: true,
-      includeClassifications: true,
-      includeProcessingTimeMs: true,
-      includeFps: true,
-      includeMasks: false,
-      includePoses: false,
-      includeOBB: false,
-      includeOriginalImage: false,
-      inferenceFrequency: inferenceFrequency,
-    );
-  }
+  const YOLOStreamingConfig.highPerformance({this.inferenceFrequency = 30})
+    : includeDetections = true,
+      includeClassifications = true,
+      includeProcessingTimeMs = true,
+      includeFps = true,
+      includeMasks = false,
+      includePoses = false,
+      includeOBB = false,
+      includeOriginalImage = false,
+      maxFPS = null,
+      throttleInterval = null,
+      skipFrames = null;
 
   @override
   String toString() {

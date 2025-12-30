@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_bloc.dart';
@@ -23,11 +21,11 @@ class ModelLoadingOverlay extends StatelessWidget {
           success: () => null,
           failure: (message) => _buildErrorWidget(context, message),
         );
-    
+
         if (contentWidget == null) {
           return const SizedBox.shrink();
         }
-    
+
         return Container(
           color: Colors.black,
           alignment: Alignment.center,

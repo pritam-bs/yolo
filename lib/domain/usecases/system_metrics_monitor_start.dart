@@ -7,7 +7,7 @@ class SystemMetricsMonitorStart {
 
   SystemMetricsMonitorStart(this.repository);
 
-  void call({Duration interval = const Duration(seconds: 5)}) {
+  void call({Duration interval = const Duration(minutes: 5)}) {
     return repository.start(interval: interval);
   }
 }

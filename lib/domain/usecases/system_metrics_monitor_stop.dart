@@ -7,7 +7,7 @@ class SystemMetricsMonitorStop {
 
   SystemMetricsMonitorStop(this.repository);
 
-  void call() {
-    return repository.stop();
+  Future<void> call() async {
+    await repository.stop();
   }
 }

@@ -29,12 +29,12 @@ class SystemMonitorRepositoryImpl implements SystemMonitorRepository {
   }
 
   @override
-  void stop() {
-    _systemMonitor.stop();
+  Future<void> stop() async{
+    await _systemMonitor.stop();
   }
 
   @override
-  void dispose() {
-    _systemMonitor.dispose();
+  Future<void> dispose() async{
+    await _systemMonitor.dispose();
   }
 }
