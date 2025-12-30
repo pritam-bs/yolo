@@ -7,6 +7,7 @@ import android.graphics.*
 import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
@@ -29,27 +30,14 @@ class ObbDetector(
     context: Context,
     modelPath: String,
     override var labels: List<String>,
-    private val useGpu: Boolean = true,
-    private val customOptions: Interpreter.Options? = null
+    customOptions: Interpreter.Options? = null
 ) : BasePredictor() {
     
     private var numItemsThreshold = 30
-
-    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options()).apply {
-        // If no custom options provided, use default threads
-        if (customOptions == null) {
-            setNumThreads(Runtime.getRuntime().availableProcessors())
-        }
-        
-        if (useGpu) {
-            try {
-                addDelegate(GpuDelegate())
-                Log.d("ObbDetector", "GPU delegate is used.")
-            } catch (e: Exception) {
-                Log.e("ObbDetector", "GPU delegate error: ${e.message}")
-            }
-        }
-    }
+    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
+        setNumThreads(4) // More stable than availableProcessors()
+        setUseXNNPACK(true) // Crucial for CPU efficiency
+    })
 
     // Similar to PoseEstimator, use ImageProcessor - separate ones for camera portrait/landscape and single images
     private lateinit var imageProcessorCameraPortrait: ImageProcessor
@@ -97,7 +85,34 @@ class ObbDetector(
             }
         }
 
-        interpreter = Interpreter(modelBuffer, interpreterOptions)
+        try {
+            // --- ATTEMPT 1: Best Case (Hardware Acceleration for useGpu = true) ---
+            interpreter = Interpreter(modelBuffer, interpreterOptions)
+            Log.i("ObbDetector", "TFLite: Success with hardware acceleration.")
+        } catch (hardwareError: Exception) {
+            Log.e("ObbDetector", "TFLite: Hardware acceleration failed: ${hardwareError.message}")
+
+            try {
+                // --- ATTEMPT 2: Safe Case (CPU Only) ---
+                Log.i("ObbDetector", "TFLite: Retrying with safe CPU-only options...")
+
+                val safeOptions = Interpreter.Options().apply {
+                    setNumThreads(4)
+                    setUseXNNPACK(true)
+                }
+
+                // Re-attempt creation with clean options
+                interpreter = Interpreter(modelBuffer, safeOptions)
+                Log.i("ObbDetector", "TFLite: Successfully fell back to CPU.")
+
+            } catch (cpuError: Exception) {
+                // --- FINAL FAILURE: Fatal Error ---
+                Log.e("ObbDetector", "TFLite: Fatal error - CPU initialization failed.")
+                // Throw the error or notify the UI that the model is unusable
+                throw cpuError
+            }
+        }
+
         // Call allocateTensors() once during initialization, not in the inference loop
         interpreter.allocateTensors()
         Log.d("ObbDetector", "TFLite model loaded and tensors allocated")

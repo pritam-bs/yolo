@@ -10,11 +10,13 @@ import '../utils/map_converter.dart';
 ///
 /// This class encapsulates all the information returned by YOLO models
 /// for a single detected object, including its location, classification,
-/// and task-specific data like segmentation masks or pose keypoints.
+/// and dimensions of the source image for accurate coordinate mapping.
 ///
 /// Example:
 /// ```dart
 /// final result = YOLOResult(
+///   originalImageWidth: 1920,
+///   originalImageHeight: 1080,
 ///   classIndex: 0,
 ///   className: 'person',
 ///   confidence: 0.95,
@@ -23,6 +25,12 @@ import '../utils/map_converter.dart';
 /// );
 /// ```
 class YOLOResult {
+  /// The width of the original image/frame processed by the model.
+  final double originalImageWidth;
+
+  /// The height of the original image/frame processed by the model.
+  final double originalImageHeight;
+
   /// The index of the detected class in the model's class list.
   ///
   /// This corresponds to the position of the class in the model's
@@ -75,6 +83,8 @@ class YOLOResult {
   final List<double>? keypointConfidences;
 
   YOLOResult({
+    required this.originalImageWidth,
+    required this.originalImageHeight,
     required this.classIndex,
     required this.className,
     required this.confidence,
@@ -88,7 +98,7 @@ class YOLOResult {
   /// Creates a [YOLOResult] from a map representation.
   ///
   /// This factory constructor is primarily used for deserializing results
-  /// received from the platform channel. The map should contain keys:
+  /// received from the platform channel. The detectionMap should contain keys:
   /// - 'classIndex': int
   /// - 'className': String
   /// - 'confidence': double
@@ -96,41 +106,54 @@ class YOLOResult {
   /// - 'normalizedBox': Map with 'left', 'top', 'right', 'bottom'
   /// - 'mask': (optional) List of List of double
   /// - 'keypoints': (optional) List of double in x,y,confidence triplets
-  factory YOLOResult.fromMap(Map<dynamic, dynamic> map) {
-    final classIndex = MapConverter.safeGetInt(map, 'classIndex');
-    final className = MapConverter.safeGetString(map, 'className');
-    final confidence = MapConverter.safeGetDouble(map, 'confidence');
+  /// and the imageMetaMap should contain keys:
+  /// - width: The width of the original image that fit to YOLO model
+  /// - height: The height of the original image that fit to YOLO model
+  factory YOLOResult.fromMap(
+    Map<dynamic, dynamic> detectionMap,
+    Map<dynamic, dynamic> imageMetaMap,
+  ) {
+    // Extract dimensions from the passed metadata map
+    final double width = (imageMetaMap['width'] ?? 0.0).toDouble();
+    final double height = (imageMetaMap['height'] ?? 0.0).toDouble();
+
+    final classIndex = MapConverter.safeGetInt(detectionMap, 'classIndex');
+    final className = MapConverter.safeGetString(detectionMap, 'className');
+    final confidence = MapConverter.safeGetDouble(detectionMap, 'confidence');
 
     final boxMap = MapConverter.convertToTypedMapSafe(
-      map['boundingBox'] as Map<dynamic, dynamic>?,
+      detectionMap['boundingBox'] as Map<dynamic, dynamic>?,
     );
     final boundingBox = boxMap != null
         ? MapConverter.convertBoundingBox(boxMap)
         : Rect.zero;
 
     final normalizedBoxMap = MapConverter.convertToTypedMapSafe(
-      map['normalizedBox'] as Map<dynamic, dynamic>?,
+      detectionMap['normalizedBox'] as Map<dynamic, dynamic>?,
     );
     final normalizedBox = normalizedBoxMap != null
         ? MapConverter.convertBoundingBox(normalizedBoxMap)
         : Rect.zero;
 
     List<List<double>>? mask;
-    if (map.containsKey('mask') && map['mask'] != null) {
-      final maskData = map['mask'] as List<dynamic>;
+    if (detectionMap.containsKey('mask') && detectionMap['mask'] != null) {
+      final maskData = detectionMap['mask'] as List<dynamic>;
       mask = MapConverter.convertMaskData(maskData);
     }
 
     List<Point>? keypoints;
     List<double>? keypointConfidences;
-    if (map.containsKey('keypoints') && map['keypoints'] != null) {
-      final keypointsData = map['keypoints'] as List<dynamic>;
+    if (detectionMap.containsKey('keypoints') &&
+        detectionMap['keypoints'] != null) {
+      final keypointsData = detectionMap['keypoints'] as List<dynamic>;
       final keypointResult = MapConverter.convertKeypoints(keypointsData);
       keypoints = keypointResult.keypoints;
       keypointConfidences = keypointResult.confidences;
     }
 
     return YOLOResult(
+      originalImageWidth: width,
+      originalImageHeight: height,
       classIndex: classIndex,
       className: className,
       confidence: confidence,
@@ -144,6 +167,8 @@ class YOLOResult {
 
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{
+      'originalImageWidth': originalImageWidth,
+      'originalImageHeight': originalImageHeight,
       'classIndex': classIndex,
       'className': className,
       'confidence': confidence,
@@ -180,7 +205,7 @@ class YOLOResult {
 
   @override
   String toString() {
-    return 'YOLOResult{classIndex: $classIndex, className: $className, confidence: $confidence, boundingBox: $boundingBox}';
+    return 'YOLOResult{className: $className, confidence: $confidence, img: ${originalImageWidth.toInt()}x${originalImageHeight.toInt()}}';
   }
 }
 
@@ -234,9 +259,11 @@ class YOLODetectionResults {
   /// - 'processingTimeMs': double representing processing time
   factory YOLODetectionResults.fromMap(Map<dynamic, dynamic> map) {
     final detectionsData = map['detections'] as List<dynamic>?;
+    // Extract the metadata map from the root event
+    final Map<dynamic, dynamic> imageMeta = map['originalImageSize'] ?? {};
     final detections = detectionsData != null
         ? detectionsData
-              .map((detection) => YOLOResult.fromMap(detection))
+              .map((detection) => YOLOResult.fromMap(detection, imageMeta))
               .toList()
         : <YOLOResult>[];
 
@@ -259,6 +286,14 @@ class YOLODetectionResults {
       'detections': detections.map((detection) => detection.toMap()).toList(),
       'annotatedImage': annotatedImage,
       'processingTimeMs': processingTimeMs,
+      'originalImageSize': {
+        'width': detections.isNotEmpty
+            ? detections.first.originalImageWidth
+            : 0.0,
+        'height': detections.isNotEmpty
+            ? detections.first.originalImageHeight
+            : 0.0,
+      },
     };
   }
 }

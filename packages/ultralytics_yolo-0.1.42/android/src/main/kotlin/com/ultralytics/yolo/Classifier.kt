@@ -7,8 +7,6 @@ import android.graphics.Bitmap
 import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.GpuDelegate
-import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
@@ -16,37 +14,23 @@ import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.image.ops.Rot90Op
 import org.tensorflow.lite.support.metadata.MetadataExtractor
-import org.tensorflow.lite.support.metadata.schema.ModelMetadata
 import org.yaml.snakeyaml.Yaml
 import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
 
 class Classifier(
     context: Context,
     modelPath: String,
     override var labels: List<String> = emptyList(),
-    private val useGpu: Boolean = true,
-    private val customOptions: Interpreter.Options? = null,
+    customOptions: Interpreter.Options? = null,
     private val classifierOptions: Map<String, Any>? = null
 ) : BasePredictor() {
 
-    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options()).apply {
-        // If no custom options provided, use default threads
-        if (customOptions == null) {
-            setNumThreads(4)
-        }
-        
-        // Add GPU delegate if requested
-        if (useGpu) {
-            try {
-                addDelegate(GpuDelegate())
-                Log.d(TAG, "GPU delegate is used.")
-            } catch (e: Exception) {
-                Log.e(TAG, "GPU delegate error: ${e.message}")
-            }
-        }
-    }
+    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
+        setNumThreads(4) // More stable than availableProcessors()
+        setUseXNNPACK(true) // Crucial for CPU efficiency
+    })
+    
 
     var numClass: Int = 0
     private var modelInputChannels: Int = 3  // Default to 3-channel, will be detected
@@ -89,7 +73,33 @@ class Classifier(
             }
         }
 
-        interpreter = Interpreter(modelBuffer, interpreterOptions)
+        try {
+            // --- ATTEMPT 1: Best Case (Hardware Acceleration for useGpu = true) ---
+            interpreter = Interpreter(modelBuffer, interpreterOptions)
+            Log.i(TAG, "TFLite: Success with hardware acceleration.")
+        } catch (hardwareError: Exception) {
+            Log.e(TAG, "TFLite: Hardware acceleration failed: ${hardwareError.message}")
+
+            try {
+                // --- ATTEMPT 2: Safe Case (CPU Only) ---
+                Log.i(TAG, "TFLite: Retrying with safe CPU-only options...")
+
+                val safeOptions = Interpreter.Options().apply {
+                    setNumThreads(4)
+                    setUseXNNPACK(true)
+                }
+
+                // Re-attempt creation with clean options
+                interpreter = Interpreter(modelBuffer, safeOptions)
+                Log.i(TAG, "TFLite: Successfully fell back to CPU.")
+
+            } catch (cpuError: Exception) {
+                // --- FINAL FAILURE: Fatal Error ---
+                Log.e(TAG, "TFLite: Fatal error - CPU initialization failed.")
+                // Throw the error or notify the UI that the model is unusable
+                throw cpuError
+            }
+        }
 
         val inputShape = interpreter.getInputTensor(0).shape()
         val inBatch = inputShape[0]

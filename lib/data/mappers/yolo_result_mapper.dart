@@ -1,10 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:ultralytics_yolo/models/yolo_result.dart';
 import 'package:yolo/domain/entities/detection_result.dart';
 
 extension YOLOResultMapper on YOLOResult {
   DetectionResult toDetectionResult() {
     return DetectionResult(
-      // imageSize: imageSize,
+      imageSize: Size(originalImageWidth, originalImageHeight),
       box: boundingBox,
       normalizedBox: normalizedBox,
       score: confidence,

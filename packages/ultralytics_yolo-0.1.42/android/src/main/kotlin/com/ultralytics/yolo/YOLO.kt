@@ -11,6 +11,9 @@ import androidx.camera.core.ImageProxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.gpu.CompatibilityList
+import org.tensorflow.lite.gpu.GpuDelegate
+import org.tensorflow.lite.nnapi.NnApiDelegate
 import java.io.IOException
 import java.net.URL
 import kotlin.math.max
@@ -36,32 +39,44 @@ class YOLO(
      * Create custom options for TFLite interpreters
      * Note: each predictor will handle these options differently
      */
-    private fun createCustomOptions(): Interpreter.Options? {
-        return try {
-            Interpreter.Options().apply {
-                // Use all available CPU cores for maximum parallelism
-                setNumThreads(Runtime.getRuntime().availableProcessors())
-                
-                // Allow FP16 precision for faster computation
-                setAllowFp16PrecisionForFp32(true)
-                
-                // Log configuration
-                Log.d(TAG, "Interpreter options: threads=${Runtime.getRuntime().availableProcessors()}, FP16 enabled")
+    private fun createCustomOptions(useGpu: Boolean = true): Interpreter.Options {
+        val options = Interpreter.Options().apply {
+            // Optimized CPU fallback with XNNPACK
+            setNumThreads(4)  // Sweet spot for mobile thermal performance
+            setUseXNNPACK(true)
+        }
+
+        // GPU Delegate
+        var compatList: CompatibilityList? = null
+        try {
+            compatList = CompatibilityList()
+
+            if (useGpu && compatList.isDelegateSupportedOnThisDevice) {
+                val gpuOptions = compatList.bestOptionsForThisDevice.apply {
+                    isPrecisionLossAllowed = true  // Enables FP16 for YOLO models
+                }
+                options.addDelegate(GpuDelegate(gpuOptions))
+                Log.d(TAG, "GPU Delegate enabled")
+                return options
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error creating interpreter options: ${e.message}")
-            null
+            Log.w(TAG, "GPU Delegate unavailable: ${e.message}")
+        } finally {
+            compatList?.close()  // Proper resource cleanup
         }
+
+        Log.d(TAG, "Using optimized CPU (4 threads + XNNPACK)")
+        return options
     }
 
     private val predictor: Predictor by lazy {
-        val options = createCustomOptions()
+        val options = createCustomOptions(useGpu)
         when (task) {
-            YOLOTask.DETECT -> ObjectDetector(context, modelPath, labels, useGpu, options)
-            YOLOTask.SEGMENT -> Segmenter(context, modelPath, labels, useGpu, options)
-            YOLOTask.CLASSIFY -> Classifier(context, modelPath, labels, useGpu, options, classifierOptions)
-            YOLOTask.POSE -> PoseEstimator(context, modelPath, labels, useGpu, customOptions = options)
-            YOLOTask.OBB -> ObbDetector(context, modelPath, labels, useGpu, options)
+            YOLOTask.DETECT -> ObjectDetector(context, modelPath, labels,  options)
+            YOLOTask.SEGMENT -> Segmenter(context, modelPath, labels, options)
+            YOLOTask.CLASSIFY -> Classifier(context, modelPath, labels, options, classifierOptions)
+            YOLOTask.POSE -> PoseEstimator(context, modelPath, labels, customOptions = options)
+            YOLOTask.OBB -> ObbDetector(context, modelPath, labels, customOptions = options)
         }
     }
 

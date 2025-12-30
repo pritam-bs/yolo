@@ -7,6 +7,10 @@ import 'package:ultralytics_yolo/models/yolo_task.dart';
 import 'package:ultralytics_yolo/widgets/yolo_controller.dart';
 
 class YOLOTestHelpers {
+  /// Default image dimensions used for mock data.
+  static const double mockImageWidth = 1920.0;
+  static const double mockImageHeight = 1080.0;
+
   static MethodChannel setupMockChannel({
     String channelName = 'yolo_single_image_channel',
     Map<String, dynamic Function(MethodCall)?>? customResponses,
@@ -86,10 +90,13 @@ class YOLOTestHelpers {
     return channel;
   }
 
+  /// Creates a mock detection result map, including the mandatory [originalImageSize].
   static Map<String, dynamic> createMockDetectionResult({
     int numDetections = 1,
     bool includeKeypoints = false,
     bool includeMask = false,
+    double width = mockImageWidth,
+    double height = mockImageHeight,
   }) {
     final boxes = <Map<String, dynamic>>[];
     final detections = <Map<String, dynamic>>[];
@@ -141,6 +148,7 @@ class YOLOTestHelpers {
     return {
       'boxes': boxes,
       'detections': detections,
+      'originalImageSize': {'width': width, 'height': height},
       'annotatedImage': Uint8List.fromList(List.filled(100, 0)),
       'processingTimeMs': 50.0,
     };
@@ -209,17 +217,22 @@ class YOLOTestHelpers {
     );
   }
 
+  /// Creates a mock [YOLOResult] with required image dimensions.
   static YOLOResult createMockYOLOResult({
     String className = 'person',
     double confidence = 0.95,
     bool includeKeypoints = false,
     bool includeMask = false,
+    double width = mockImageWidth,
+    double height = mockImageHeight,
   }) {
     final keypoints = includeKeypoints ? _createMockKeypoints() : null;
     final keypointConfidences = includeKeypoints ? List.filled(17, 0.8) : null;
     final mask = includeMask ? _createMockMask() : null;
 
     return YOLOResult(
+      originalImageWidth: width,
+      originalImageHeight: height,
       classIndex: 0,
       className: className,
       confidence: confidence,
@@ -252,19 +265,29 @@ class YOLOTestHelpers {
     };
   }
 
+  /// Creates mock streaming data including mandatory image metadata.
   static Map<String, dynamic> createMockStreamingData({
     bool includeDetections = true,
     bool includePerformance = true,
     bool includeOriginalImage = false,
+    double width = mockImageWidth,
+    double height = mockImageHeight,
   }) {
     final data = <String, dynamic>{};
 
     if (includeDetections) {
-      data['detections'] = createMockDetectionResult()['detections'];
+      final mockDetections = createMockDetectionResult(
+        width: width,
+        height: height,
+      );
+      data['detections'] = mockDetections['detections'];
+      data['originalImageSize'] = mockDetections['originalImageSize'];
     }
 
     if (includePerformance) {
       data['performance'] = createMockPerformanceMetrics();
+      // Also include root-level processing time if required by the parser
+      data['processingTimeMs'] = 50.0;
     }
 
     if (includeOriginalImage) {

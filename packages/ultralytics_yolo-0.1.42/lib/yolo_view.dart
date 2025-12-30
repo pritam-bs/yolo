@@ -68,7 +68,6 @@ class _YOLOViewState extends State<YOLOView> {
 
   final String _viewId = UniqueKey().toString();
   int? _platformViewId;
-  List<YOLOResult> _currentDetections = [];
 
   @override
   void initState() {
@@ -131,23 +130,14 @@ class _YOLOViewState extends State<YOLOView> {
   }
 
   void _handleDetectionResults(Map<dynamic, dynamic> event) {
-    if (widget.onResult == null || !event.containsKey('detections')) return;
+    if (widget.onResult == null ||
+        !event.containsKey('detections') ||
+        !event.containsKey('originalImageSize')) {
+      return;
+    }
 
     try {
       final results = _parseDetectionResults(event);
-
-      if (widget.showOverlays && widget.onResult != null) {
-        if (_currentDetections.isNotEmpty) {
-          setState(() {
-            _currentDetections = [];
-          });
-        }
-      } else {
-        setState(() {
-          _currentDetections = results;
-        });
-      }
-
       widget.onResult!(results);
     } catch (e) {
       logInfo('YOLOView: Error parsing detection results: $e');
@@ -169,6 +159,8 @@ class _YOLOViewState extends State<YOLOView> {
 
   List<YOLOResult> _parseDetectionResults(Map<dynamic, dynamic> event) {
     final List<dynamic> detectionsData = event['detections'] ?? [];
+    // Extract the metadata map from the root event
+    final Map<dynamic, dynamic> imageMetaMap = event['originalImageSize'] ?? {};
     final results = <YOLOResult>[];
 
     for (final detection in detectionsData) {
@@ -193,7 +185,7 @@ class _YOLOViewState extends State<YOLOView> {
       }
 
       try {
-        final result = YOLOResult.fromMap(detection);
+        final result = YOLOResult.fromMap(detection, imageMetaMap);
         results.add(result);
       } catch (e) {
         logInfo('YOLOView: Error parsing detection: $e');
@@ -225,22 +217,6 @@ class _YOLOViewState extends State<YOLOView> {
       _subscribeToResults();
     }
 
-    if (!oldWidget.showOverlays &&
-        widget.showOverlays &&
-        widget.onResult != null) {
-      setState(() {
-        _currentDetections = [];
-      });
-    }
-
-    if (oldWidget.onResult == null &&
-        widget.onResult != null &&
-        widget.showOverlays) {
-      setState(() {
-        _currentDetections = [];
-      });
-    }
-
     // Handle model or task changes
     if (_platformViewId != null &&
         (oldWidget.modelPath != widget.modelPath ||
@@ -266,22 +242,7 @@ class _YOLOViewState extends State<YOLOView> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        _buildCameraView(),
-
-        if (widget.showOverlays && _currentDetections.isNotEmpty)
-          YOLOOverlay(
-            detections: _currentDetections,
-            showConfidence: true,
-            showClassName: true,
-            theme: widget.overlayTheme,
-            onDetectionTap: (detection) {
-              logInfo('YOLOView: Detection tapped: ${detection.className}');
-            },
-          ),
-      ],
-    );
+    return _buildCameraView();
   }
 
   Widget _buildCameraView() {
