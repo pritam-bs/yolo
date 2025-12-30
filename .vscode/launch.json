@@ -21,26 +21,6 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
-        },
-        {
-            "name": "ultralytics_yolo-0.1.42",
-            "cwd": "packages/ultralytics_yolo-0.1.42",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "ultralytics_yolo-0.1.42 (profile mode)",
-            "cwd": "packages/ultralytics_yolo-0.1.42",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "ultralytics_yolo-0.1.42 (release mode)",
-            "cwd": "packages/ultralytics_yolo-0.1.42",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
         }
     ]
 }

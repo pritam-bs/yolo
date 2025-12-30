@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_bloc.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_event.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_state.dart';
+import 'package:yolo/application/widgets/system_stat_display.dart';
 import 'package:yolo/domain/entities/models.dart';
 import 'detection_stats_display.dart';
 import 'model_selector.dart';
@@ -47,6 +48,8 @@ class CameraInferenceOverlay extends StatelessWidget {
                 detectionCount: state.detections.length,
                 currentFps: currentFps,
               ),
+              const SizedBox(height: 8),
+              SystemStatDisplay(systemStatus: state.systemHealthState),
               const SizedBox(height: 8),
               _buildThresholdPills(state),
             ],

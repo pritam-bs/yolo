@@ -163,11 +163,13 @@ class CameraInferenceBloc
   }
 
   SystemHealthState _determineHealthState(SystemMetrics metrics) {
-    if (metrics.ramUsage > 85 ||
-        metrics.thermalState == ThermalState.critical) {
+    if (metrics.ramUsage > 0.95 ||
+        metrics.thermalState == ThermalState.critical ||
+        metrics.batteryLevel < 10) {
       return SystemHealthState.critical;
-    } else if (metrics.ramUsage > 70 ||
-        metrics.thermalState == ThermalState.serious) {
+    } else if (metrics.ramUsage > 0.85 ||
+        metrics.thermalState == ThermalState.serious ||
+        metrics.batteryLevel < 30) {
       return SystemHealthState.warning;
     } else {
       return SystemHealthState.normal;

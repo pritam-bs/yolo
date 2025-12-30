@@ -105,12 +105,12 @@ class YoloRepositoryImpl implements YoloRepository {
     switch (healthState) {
       case SystemHealthState.normal:
         await _yoloViewController.setStreamingConfig(
-          const YOLOStreamingConfig.minimal(),
+          const YOLOStreamingConfig.highPerformance(),
         );
         break;
       case SystemHealthState.warning:
         await _yoloViewController.setStreamingConfig(
-          const YOLOStreamingConfig.powerSaving(),
+          const YOLOStreamingConfig.lowPerformance(),
         );
         break;
       case SystemHealthState.critical:
