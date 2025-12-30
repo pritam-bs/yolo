@@ -1,8 +1,5 @@
 # System Monitor
 
-[![pub version](https://img.shields.io/pub/v/system_monitor)](https://pub.dev/packages/system_monitor)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-
 A Flutter plugin to monitor device hardware metrics like RAM, battery, and thermal state for performance-adaptive applications.
 
 ## Supported Platforms
