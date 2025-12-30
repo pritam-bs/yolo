@@ -48,6 +48,8 @@ dependencies:
   file: ^7.0.1
   ultralytics_yolo:
     path: packages/ultralytics_yolo-0.1.42
+  system_monitor:
+    path: packages/system_monitor
 
 dev_dependencies:
   flutter_test:

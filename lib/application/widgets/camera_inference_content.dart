@@ -39,7 +39,7 @@ class CameraInferenceContent extends StatelessWidget {
         modelPath: modelPath!,
         task: modelType.task,
         streamingConfig: const YOLOStreamingConfig.minimal(),
-        useGpu: true,
+        useGpu: false,
         lensFacing: currentLensFacing,
         showOverlays: true,
         confidenceThreshold: confidenceThreshold,
