@@ -2,6 +2,7 @@ import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
+import 'package:system_monitor/system_monitor.dart' as plugin;
 
 @module
 abstract class AppModule {
@@ -10,4 +11,7 @@ abstract class AppModule {
 
   @lazySingleton
   FileSystem get fileSystem => const LocalFileSystem();
+
+  @lazySingleton
+  plugin.SystemMonitor get systemMonitor => plugin.SystemMonitor();
 }

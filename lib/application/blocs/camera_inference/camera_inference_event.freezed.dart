@@ -55,7 +55,7 @@ extension CameraInferenceEventPatterns on CameraInferenceEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( InitializeCamera value)?  initializeCamera,TResult Function( ChangeModel value)?  changeModel,TResult Function( FlipCamera value)?  flipCamera,TResult Function( SetZoomLevel value)?  setZoomLevel,TResult Function( UpdateConfidenceThreshold value)?  updateConfidenceThreshold,TResult Function( UpdateIouThreshold value)?  updateIouThreshold,TResult Function( UpdateNumItemsThreshold value)?  updateNumItemsThreshold,TResult Function( DetectionsOccurred value)?  detectionsOccurred,TResult Function( ToggleSlider value)?  toggleSlider,TResult Function( UpdateFps value)?  updateFps,TResult Function( UpdateLensFacing value)?  updateLensFacing,TResult Function( RetryModelDownload value)?  retryModelDownload,TResult Function( ResumeCamera value)?  resumeCamera,TResult Function( SetInitialConfig value)?  setInitialConfig,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( InitializeCamera value)?  initializeCamera,TResult Function( ChangeModel value)?  changeModel,TResult Function( FlipCamera value)?  flipCamera,TResult Function( SetZoomLevel value)?  setZoomLevel,TResult Function( UpdateConfidenceThreshold value)?  updateConfidenceThreshold,TResult Function( UpdateIouThreshold value)?  updateIouThreshold,TResult Function( UpdateNumItemsThreshold value)?  updateNumItemsThreshold,TResult Function( DetectionsOccurred value)?  detectionsOccurred,TResult Function( ToggleSlider value)?  toggleSlider,TResult Function( UpdateFps value)?  updateFps,TResult Function( UpdateLensFacing value)?  updateLensFacing,TResult Function( RetryModelDownload value)?  retryModelDownload,TResult Function( ResumeCamera value)?  resumeCamera,TResult Function( SetInitialConfig value)?  setInitialConfig,TResult Function( StartSystemMonitor value)?  startSystemMonitor,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
@@ -72,7 +72,8 @@ return updateFps(_that);case UpdateLensFacing() when updateLensFacing != null:
 return updateLensFacing(_that);case RetryModelDownload() when retryModelDownload != null:
 return retryModelDownload(_that);case ResumeCamera() when resumeCamera != null:
 return resumeCamera(_that);case SetInitialConfig() when setInitialConfig != null:
-return setInitialConfig(_that);case _:
+return setInitialConfig(_that);case StartSystemMonitor() when startSystemMonitor != null:
+return startSystemMonitor(_that);case _:
   return orElse();
 
 }
@@ -90,7 +91,7 @@ return setInitialConfig(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( InitializeCamera value)  initializeCamera,required TResult Function( ChangeModel value)  changeModel,required TResult Function( FlipCamera value)  flipCamera,required TResult Function( SetZoomLevel value)  setZoomLevel,required TResult Function( UpdateConfidenceThreshold value)  updateConfidenceThreshold,required TResult Function( UpdateIouThreshold value)  updateIouThreshold,required TResult Function( UpdateNumItemsThreshold value)  updateNumItemsThreshold,required TResult Function( DetectionsOccurred value)  detectionsOccurred,required TResult Function( ToggleSlider value)  toggleSlider,required TResult Function( UpdateFps value)  updateFps,required TResult Function( UpdateLensFacing value)  updateLensFacing,required TResult Function( RetryModelDownload value)  retryModelDownload,required TResult Function( ResumeCamera value)  resumeCamera,required TResult Function( SetInitialConfig value)  setInitialConfig,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( InitializeCamera value)  initializeCamera,required TResult Function( ChangeModel value)  changeModel,required TResult Function( FlipCamera value)  flipCamera,required TResult Function( SetZoomLevel value)  setZoomLevel,required TResult Function( UpdateConfidenceThreshold value)  updateConfidenceThreshold,required TResult Function( UpdateIouThreshold value)  updateIouThreshold,required TResult Function( UpdateNumItemsThreshold value)  updateNumItemsThreshold,required TResult Function( DetectionsOccurred value)  detectionsOccurred,required TResult Function( ToggleSlider value)  toggleSlider,required TResult Function( UpdateFps value)  updateFps,required TResult Function( UpdateLensFacing value)  updateLensFacing,required TResult Function( RetryModelDownload value)  retryModelDownload,required TResult Function( ResumeCamera value)  resumeCamera,required TResult Function( SetInitialConfig value)  setInitialConfig,required TResult Function( StartSystemMonitor value)  startSystemMonitor,}){
 final _that = this;
 switch (_that) {
 case InitializeCamera():
@@ -107,7 +108,8 @@ return updateFps(_that);case UpdateLensFacing():
 return updateLensFacing(_that);case RetryModelDownload():
 return retryModelDownload(_that);case ResumeCamera():
 return resumeCamera(_that);case SetInitialConfig():
-return setInitialConfig(_that);case _:
+return setInitialConfig(_that);case StartSystemMonitor():
+return startSystemMonitor(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -124,7 +126,7 @@ return setInitialConfig(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( InitializeCamera value)?  initializeCamera,TResult? Function( ChangeModel value)?  changeModel,TResult? Function( FlipCamera value)?  flipCamera,TResult? Function( SetZoomLevel value)?  setZoomLevel,TResult? Function( UpdateConfidenceThreshold value)?  updateConfidenceThreshold,TResult? Function( UpdateIouThreshold value)?  updateIouThreshold,TResult? Function( UpdateNumItemsThreshold value)?  updateNumItemsThreshold,TResult? Function( DetectionsOccurred value)?  detectionsOccurred,TResult? Function( ToggleSlider value)?  toggleSlider,TResult? Function( UpdateFps value)?  updateFps,TResult? Function( UpdateLensFacing value)?  updateLensFacing,TResult? Function( RetryModelDownload value)?  retryModelDownload,TResult? Function( ResumeCamera value)?  resumeCamera,TResult? Function( SetInitialConfig value)?  setInitialConfig,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( InitializeCamera value)?  initializeCamera,TResult? Function( ChangeModel value)?  changeModel,TResult? Function( FlipCamera value)?  flipCamera,TResult? Function( SetZoomLevel value)?  setZoomLevel,TResult? Function( UpdateConfidenceThreshold value)?  updateConfidenceThreshold,TResult? Function( UpdateIouThreshold value)?  updateIouThreshold,TResult? Function( UpdateNumItemsThreshold value)?  updateNumItemsThreshold,TResult? Function( DetectionsOccurred value)?  detectionsOccurred,TResult? Function( ToggleSlider value)?  toggleSlider,TResult? Function( UpdateFps value)?  updateFps,TResult? Function( UpdateLensFacing value)?  updateLensFacing,TResult? Function( RetryModelDownload value)?  retryModelDownload,TResult? Function( ResumeCamera value)?  resumeCamera,TResult? Function( SetInitialConfig value)?  setInitialConfig,TResult? Function( StartSystemMonitor value)?  startSystemMonitor,}){
 final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
@@ -141,7 +143,8 @@ return updateFps(_that);case UpdateLensFacing() when updateLensFacing != null:
 return updateLensFacing(_that);case RetryModelDownload() when retryModelDownload != null:
 return retryModelDownload(_that);case ResumeCamera() when resumeCamera != null:
 return resumeCamera(_that);case SetInitialConfig() when setInitialConfig != null:
-return setInitialConfig(_that);case _:
+return setInitialConfig(_that);case StartSystemMonitor() when startSystemMonitor != null:
+return startSystemMonitor(_that);case _:
   return null;
 
 }
@@ -158,7 +161,7 @@ return setInitialConfig(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initializeCamera,TResult Function( ModelType model)?  changeModel,TResult Function()?  flipCamera,TResult Function( double zoomLevel)?  setZoomLevel,TResult Function( double threshold)?  updateConfidenceThreshold,TResult Function( double threshold)?  updateIouThreshold,TResult Function( int threshold)?  updateNumItemsThreshold,TResult Function( List<DetectionResult> detections)?  detectionsOccurred,TResult Function( SliderType type)?  toggleSlider,TResult Function( double fps)?  updateFps,TResult Function( LensFacing lensFacing)?  updateLensFacing,TResult Function()?  retryModelDownload,TResult Function()?  resumeCamera,TResult Function()?  setInitialConfig,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initializeCamera,TResult Function( ModelType model)?  changeModel,TResult Function()?  flipCamera,TResult Function( double zoomLevel)?  setZoomLevel,TResult Function( double threshold)?  updateConfidenceThreshold,TResult Function( double threshold)?  updateIouThreshold,TResult Function( int threshold)?  updateNumItemsThreshold,TResult Function( List<DetectionResult> detections)?  detectionsOccurred,TResult Function( SliderType type)?  toggleSlider,TResult Function( double fps)?  updateFps,TResult Function( LensFacing lensFacing)?  updateLensFacing,TResult Function()?  retryModelDownload,TResult Function()?  resumeCamera,TResult Function()?  setInitialConfig,TResult Function()?  startSystemMonitor,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
 return initializeCamera();case ChangeModel() when changeModel != null:
@@ -174,7 +177,8 @@ return updateFps(_that.fps);case UpdateLensFacing() when updateLensFacing != nul
 return updateLensFacing(_that.lensFacing);case RetryModelDownload() when retryModelDownload != null:
 return retryModelDownload();case ResumeCamera() when resumeCamera != null:
 return resumeCamera();case SetInitialConfig() when setInitialConfig != null:
-return setInitialConfig();case _:
+return setInitialConfig();case StartSystemMonitor() when startSystemMonitor != null:
+return startSystemMonitor();case _:
   return orElse();
 
 }
@@ -192,7 +196,7 @@ return setInitialConfig();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initializeCamera,required TResult Function( ModelType model)  changeModel,required TResult Function()  flipCamera,required TResult Function( double zoomLevel)  setZoomLevel,required TResult Function( double threshold)  updateConfidenceThreshold,required TResult Function( double threshold)  updateIouThreshold,required TResult Function( int threshold)  updateNumItemsThreshold,required TResult Function( List<DetectionResult> detections)  detectionsOccurred,required TResult Function( SliderType type)  toggleSlider,required TResult Function( double fps)  updateFps,required TResult Function( LensFacing lensFacing)  updateLensFacing,required TResult Function()  retryModelDownload,required TResult Function()  resumeCamera,required TResult Function()  setInitialConfig,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initializeCamera,required TResult Function( ModelType model)  changeModel,required TResult Function()  flipCamera,required TResult Function( double zoomLevel)  setZoomLevel,required TResult Function( double threshold)  updateConfidenceThreshold,required TResult Function( double threshold)  updateIouThreshold,required TResult Function( int threshold)  updateNumItemsThreshold,required TResult Function( List<DetectionResult> detections)  detectionsOccurred,required TResult Function( SliderType type)  toggleSlider,required TResult Function( double fps)  updateFps,required TResult Function( LensFacing lensFacing)  updateLensFacing,required TResult Function()  retryModelDownload,required TResult Function()  resumeCamera,required TResult Function()  setInitialConfig,required TResult Function()  startSystemMonitor,}) {final _that = this;
 switch (_that) {
 case InitializeCamera():
 return initializeCamera();case ChangeModel():
@@ -208,7 +212,8 @@ return updateFps(_that.fps);case UpdateLensFacing():
 return updateLensFacing(_that.lensFacing);case RetryModelDownload():
 return retryModelDownload();case ResumeCamera():
 return resumeCamera();case SetInitialConfig():
-return setInitialConfig();case _:
+return setInitialConfig();case StartSystemMonitor():
+return startSystemMonitor();case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -225,7 +230,7 @@ return setInitialConfig();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initializeCamera,TResult? Function( ModelType model)?  changeModel,TResult? Function()?  flipCamera,TResult? Function( double zoomLevel)?  setZoomLevel,TResult? Function( double threshold)?  updateConfidenceThreshold,TResult? Function( double threshold)?  updateIouThreshold,TResult? Function( int threshold)?  updateNumItemsThreshold,TResult? Function( List<DetectionResult> detections)?  detectionsOccurred,TResult? Function( SliderType type)?  toggleSlider,TResult? Function( double fps)?  updateFps,TResult? Function( LensFacing lensFacing)?  updateLensFacing,TResult? Function()?  retryModelDownload,TResult? Function()?  resumeCamera,TResult? Function()?  setInitialConfig,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initializeCamera,TResult? Function( ModelType model)?  changeModel,TResult? Function()?  flipCamera,TResult? Function( double zoomLevel)?  setZoomLevel,TResult? Function( double threshold)?  updateConfidenceThreshold,TResult? Function( double threshold)?  updateIouThreshold,TResult? Function( int threshold)?  updateNumItemsThreshold,TResult? Function( List<DetectionResult> detections)?  detectionsOccurred,TResult? Function( SliderType type)?  toggleSlider,TResult? Function( double fps)?  updateFps,TResult? Function( LensFacing lensFacing)?  updateLensFacing,TResult? Function()?  retryModelDownload,TResult? Function()?  resumeCamera,TResult? Function()?  setInitialConfig,TResult? Function()?  startSystemMonitor,}) {final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
 return initializeCamera();case ChangeModel() when changeModel != null:
@@ -241,7 +246,8 @@ return updateFps(_that.fps);case UpdateLensFacing() when updateLensFacing != nul
 return updateLensFacing(_that.lensFacing);case RetryModelDownload() when retryModelDownload != null:
 return retryModelDownload();case ResumeCamera() when resumeCamera != null:
 return resumeCamera();case SetInitialConfig() when setInitialConfig != null:
-return setInitialConfig();case _:
+return setInitialConfig();case StartSystemMonitor() when startSystemMonitor != null:
+return startSystemMonitor();case _:
   return null;
 
 }
@@ -1001,6 +1007,38 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'CameraInferenceEvent.setInitialConfig()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class StartSystemMonitor implements CameraInferenceEvent {
+  const StartSystemMonitor();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StartSystemMonitor);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'CameraInferenceEvent.startSystemMonitor()';
 }
 
 

@@ -48,12 +48,14 @@ dependencies:
   file: ^7.0.1
   ultralytics_yolo:
     path: packages/ultralytics_yolo-0.1.42
+  system_monitor:
+    path: packages/system_monitor
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: ^2.10.4
-  injectable_generator: ^2.7.1+4
+  injectable_generator: ^2.9.1
   mockito: ^5.6.1
   bloc_test: ^10.0.0
   path_provider_platform_interface: ^2.1.2
@@ -65,6 +67,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  rxdart: ^0.28.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -325,29 +325,46 @@ class YOLOStreamingConfig {
   ///
   /// Example:
   /// ```dart
-  /// // Low power mode: 10 inference per second, 15 max output FPS
+  /// // Low power mode: 5 inference per second, 5 max output FPS
   /// final config = YOLOStreamingConfig.powerSaving();
-  ///
-  /// // Custom power saving with 5 inferences per second
-  /// final config = YOLOStreamingConfig.powerSaving(inferenceFrequency: 5);
   /// ```
-  factory YOLOStreamingConfig.powerSaving({
-    int inferenceFrequency = 10,
-    int maxFPS = 15,
-  }) {
-    return YOLOStreamingConfig(
-      includeDetections: true,
-      includeClassifications: true,
-      includeProcessingTimeMs: true,
-      includeFps: true,
-      includeMasks: false,
-      includePoses: false,
-      includeOBB: false,
-      includeOriginalImage: false,
-      maxFPS: maxFPS,
-      inferenceFrequency: inferenceFrequency,
-    );
-  }
+  const YOLOStreamingConfig.powerSaving()
+    : inferenceFrequency = 5,
+      maxFPS = 5,
+      includeDetections = true,
+      includeClassifications = true,
+      includeProcessingTimeMs = true,
+      includeFps = true,
+      includeMasks = false,
+      includePoses = false,
+      includeOBB = false,
+      includeOriginalImage = false,
+      throttleInterval = null,
+      skipFrames = null;
+
+  /// Creates a low performance configuration with reduced inference frequency.
+  ///
+  /// This configuration reduces both output FPS and inference frequency
+  /// to minimize battery drain and heat generation.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Low power mode: 10 inference per second, 10 max output FPS
+  /// final config = YOLOStreamingConfig.lowPerformance();
+  /// ```
+  const YOLOStreamingConfig.lowPerformance()
+    : inferenceFrequency = 10,
+      maxFPS = 10,
+      includeDetections = true,
+      includeClassifications = true,
+      includeProcessingTimeMs = true,
+      includeFps = true,
+      includeMasks = false,
+      includePoses = false,
+      includeOBB = false,
+      includeOriginalImage = false,
+      throttleInterval = null,
+      skipFrames = null;
 
   /// Creates a performance configuration optimized for high frame rates.
   ///
@@ -359,19 +376,19 @@ class YOLOStreamingConfig {
   /// // High performance: 30 inferences per second
   /// final config = YOLOStreamingConfig.highPerformance();
   /// ```
-  factory YOLOStreamingConfig.highPerformance({int inferenceFrequency = 30}) {
-    return YOLOStreamingConfig(
-      includeDetections: true,
-      includeClassifications: true,
-      includeProcessingTimeMs: true,
-      includeFps: true,
-      includeMasks: false,
-      includePoses: false,
-      includeOBB: false,
-      includeOriginalImage: false,
-      inferenceFrequency: inferenceFrequency,
-    );
-  }
+  const YOLOStreamingConfig.highPerformance()
+    : inferenceFrequency = null,
+      maxFPS = null,
+      includeDetections = true,
+      includeClassifications = true,
+      includeProcessingTimeMs = true,
+      includeFps = true,
+      includeMasks = false,
+      includePoses = false,
+      includeOBB = false,
+      includeOriginalImage = false,
+      throttleInterval = null,
+      skipFrames = null;
 
   @override
   String toString() {

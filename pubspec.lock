@@ -760,6 +760,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
+  rxdart:
+    dependency: "direct dev"
+    description:
+      name: rxdart
+      sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.28.0"
   shelf:
     dependency: transitive
     description:
@@ -861,6 +869,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  system_monitor:
+    dependency: "direct main"
+    description:
+      path: "packages/system_monitor"
+      relative: true
+    source: path
+    version: "0.1.0"
   term_glyph:
     dependency: transitive
     description:

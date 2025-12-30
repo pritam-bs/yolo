@@ -1,6 +1,8 @@
 import 'package:ultralytics_yolo/widgets/yolo_controller.dart';
+import 'package:ultralytics_yolo/yolo_streaming_config.dart';
 import 'dart:io';
 import 'package:yolo/domain/entities/models.dart';
+import 'package:yolo/domain/entities/system_health_state.dart';
 import 'package:yolo/domain/repositories/yolo_repository.dart';
 import 'package:yolo/domain/entities/model_loading_state.dart';
 import 'package:yolo/data/datasources/local_model_data_source.dart';
@@ -61,40 +63,61 @@ class YoloRepositoryImpl implements YoloRepository {
   }
 
   @override
-  void setZoomLevel(double zoomLevel) {
-    _yoloViewController.setZoomLevel(zoomLevel);
+  Future<void> setZoomLevel(double zoomLevel) async {
+    await _yoloViewController.setZoomLevel(zoomLevel);
   }
 
   @override
-  void flipCamera() {
-    _yoloViewController.switchCamera();
+  Future<void> flipCamera() async {
+    await _yoloViewController.switchCamera();
   }
 
   @override
-  void setConfidenceThreshold(double threshold) {
+  Future<void> setConfidenceThreshold(double threshold) async {
     _yoloViewController.setConfidenceThreshold(threshold);
   }
 
   @override
-  void setIoUThreshold(double threshold) {
-    _yoloViewController.setIoUThreshold(threshold);
+  Future<void> setIoUThreshold(double threshold) async {
+    await _yoloViewController.setIoUThreshold(threshold);
   }
 
   @override
-  void setNumItemsThreshold(int threshold) {
-    _yoloViewController.setNumItemsThreshold(threshold);
+  Future<void> setNumItemsThreshold(int threshold) async {
+    await _yoloViewController.setNumItemsThreshold(threshold);
   }
 
   @override
-  void setThresholds({
+  Future<void> setThresholds({
     required double confidenceThreshold,
     required double iouThreshold,
     required int numItemsThreshold,
-  }) {
-    _yoloViewController.setThresholds(
+  }) async {
+    await _yoloViewController.setThresholds(
       confidenceThreshold: confidenceThreshold,
       iouThreshold: iouThreshold,
       numItemsThreshold: numItemsThreshold,
     );
+  }
+
+  @override
+  Future<void> setStreamingConfig(SystemHealthState healthState) async {
+    switch (healthState) {
+      case SystemHealthState.normal:
+        await _yoloViewController.setStreamingConfig(
+          const YOLOStreamingConfig.highPerformance(),
+        );
+        break;
+      case SystemHealthState.warning:
+        await _yoloViewController.setStreamingConfig(
+          const YOLOStreamingConfig.lowPerformance(),
+        );
+        break;
+      case SystemHealthState.critical:
+        await _yoloViewController.setStreamingConfig(
+          const YOLOStreamingConfig.powerSaving(),
+        );
+        break;
+    }
   }
 }

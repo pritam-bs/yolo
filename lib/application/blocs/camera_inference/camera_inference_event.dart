@@ -30,4 +30,5 @@ abstract class CameraInferenceEvent with _$CameraInferenceEvent {
   const factory CameraInferenceEvent.retryModelDownload() = RetryModelDownload;
   const factory CameraInferenceEvent.resumeCamera() = ResumeCamera;
   const factory CameraInferenceEvent.setInitialConfig() = SetInitialConfig;
+  const factory CameraInferenceEvent.startSystemMonitor() = StartSystemMonitor;
 }

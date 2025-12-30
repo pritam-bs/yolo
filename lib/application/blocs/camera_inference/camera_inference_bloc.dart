@@ -1,15 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:ultralytics_yolo/yolo_view.dart';
 import 'package:yolo/domain/entities/models.dart';
 import 'package:yolo/domain/entities/model_loading_state.dart';
+import 'package:yolo/domain/entities/system_health_state.dart';
+import 'package:yolo/domain/entities/system_metrics.dart';
 import 'package:yolo/domain/usecases/flip_camera.dart';
 import 'package:yolo/domain/usecases/get_model_path.dart';
+import 'package:yolo/domain/usecases/get_system_metrics.dart';
 import 'package:yolo/domain/usecases/set_confidence_threshold.dart';
 import 'package:yolo/domain/usecases/set_iou_threshold.dart';
 import 'package:yolo/domain/usecases/set_num_items_threshold.dart';
 import 'package:yolo/domain/usecases/set_thresholds.dart';
 import 'package:yolo/domain/usecases/set_zoom_level.dart';
+import 'package:yolo/domain/usecases/system_metrics_monitor_dispose.dart';
+import 'package:yolo/domain/usecases/system_metrics_monitor_start.dart';
+import 'package:yolo/domain/usecases/system_metrics_monitor_stop.dart';
+import 'package:yolo/domain/usecases/set_streaming_config.dart';
 import 'camera_inference_event.dart' as events;
 import 'camera_inference_state.dart';
 
@@ -23,6 +32,11 @@ class CameraInferenceBloc
   final SetNumItemsThreshold _setNumItemsThreshold;
   final SetZoomLevel _setZoomLevel;
   final SetThresholds _setThresholds;
+  final SetStreamingConfig _setStreamingConfig;
+  final GetSystemMetrics _getSystemMetrics;
+  final SystemMetricsMonitorStart _systemMetricsMonitorStart;
+  final SystemMetricsMonitorStop _systemMetricsMonitorStop;
+  final SystemMetricsMonitorDispose _systemMetricsMonitorDispose;
 
   int _detectionCount = 0;
   int _frameCount = 0;
@@ -37,6 +51,11 @@ class CameraInferenceBloc
     required SetNumItemsThreshold setNumItemsThreshold,
     required SetZoomLevel setZoomLevel,
     required SetThresholds setThresholds,
+    required SetStreamingConfig setStreamingConfig,
+    required GetSystemMetrics getSystemMetrics,
+    required SystemMetricsMonitorStart systemMetricsMonitorStart,
+    required SystemMetricsMonitorStop systemMetricsMonitorStop,
+    required SystemMetricsMonitorDispose systemMetricsMonitorDispose,
   }) : _getModelPath = getModelPath,
        _flipCamera = flipCamera,
        _setConfidenceThreshold = setConfidenceThreshold,
@@ -44,6 +63,11 @@ class CameraInferenceBloc
        _setNumItemsThreshold = setNumItemsThreshold,
        _setZoomLevel = setZoomLevel,
        _setThresholds = setThresholds,
+       _setStreamingConfig = setStreamingConfig,
+       _getSystemMetrics = getSystemMetrics,
+       _systemMetricsMonitorStart = systemMetricsMonitorStart,
+       _systemMetricsMonitorStop = systemMetricsMonitorStop,
+       _systemMetricsMonitorDispose = systemMetricsMonitorDispose,
        super(const CameraInferenceState()) {
     on<events.InitializeCamera>(_onInitializeCamera);
     on<events.ChangeModel>(_onChangeModel);
@@ -59,6 +83,97 @@ class CameraInferenceBloc
     on<events.RetryModelDownload>(_onRetryModelDownload);
     on<events.ResumeCamera>(_onResumeLayoutCamera);
     on<events.SetInitialConfig>(_onSetInitialConfig);
+    on<events.StartSystemMonitor>(_onStartSystemMonitor);
+  }
+
+  @override
+  Future<void> close() async {
+    await _systemMetricsMonitorStop();
+    await _systemMetricsMonitorDispose();
+    return super.close();
+  }
+
+  Future<void> _onStartSystemMonitor(
+    events.StartSystemMonitor event,
+    Emitter<CameraInferenceState> emit,
+  ) async {
+    // Start monitoring
+    _systemMetricsMonitorStart(interval: Duration(minutes: 5));
+
+    await emit.onEach<SystemMetrics>(
+      _getSystemMetrics(),
+      onData: (metrics) async {
+        final healthState = _determineHealthState(metrics);
+        if (healthState != state.systemHealthState) {
+          await _setStreamingConfig(healthState);
+
+          switch (healthState) {
+            case SystemHealthState.normal:
+              _setThresholds(
+                confidenceThreshold: 0.5,
+                iouThreshold: 0.45,
+                numItemsThreshold: 30,
+              );
+
+              emit(
+                state.copyWith(
+                  systemHealthState: healthState,
+                  confidenceThreshold: 0.5,
+                  iouThreshold: 0.45,
+                  numItemsThreshold: 30,
+                ),
+              );
+              break;
+            case SystemHealthState.warning:
+              _setThresholds(
+                confidenceThreshold: 0.4,
+                iouThreshold: 0.5,
+                numItemsThreshold: 20,
+              );
+
+              emit(
+                state.copyWith(
+                  systemHealthState: healthState,
+                  confidenceThreshold: 0.4,
+                  iouThreshold: 0.5,
+                  numItemsThreshold: 20,
+                ),
+              );
+              break;
+            case SystemHealthState.critical:
+              _setThresholds(
+                confidenceThreshold: 0.3,
+                iouThreshold: 0.6,
+                numItemsThreshold: 10,
+              );
+
+              emit(
+                state.copyWith(
+                  systemHealthState: healthState,
+                  confidenceThreshold: 0.3,
+                  iouThreshold: 0.6,
+                  numItemsThreshold: 10,
+                ),
+              );
+              break;
+          }
+        }
+      },
+    );
+  }
+
+  SystemHealthState _determineHealthState(SystemMetrics metrics) {
+    if (metrics.ramUsage > 0.95 ||
+        metrics.thermalState == ThermalState.critical ||
+        metrics.batteryLevel < 10) {
+      return SystemHealthState.critical;
+    } else if (metrics.ramUsage > 0.85 ||
+        metrics.thermalState == ThermalState.serious ||
+        metrics.batteryLevel < 30) {
+      return SystemHealthState.warning;
+    } else {
+      return SystemHealthState.normal;
+    }
   }
 
   void _onUpdateFps(
@@ -160,6 +275,7 @@ class CameraInferenceBloc
 
             // TRIGGER INTERNAL EVENT
             add(const events.CameraInferenceEvent.setInitialConfig());
+            add(const events.CameraInferenceEvent.startSystemMonitor());
           },
           error: (message) {
             emit(

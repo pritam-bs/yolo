@@ -2,6 +2,7 @@ import 'package:ultralytics_yolo/yolo_view.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:yolo/domain/entities/models.dart';
 import 'package:yolo/domain/entities/detection_result.dart';
+import 'package:yolo/domain/entities/system_health_state.dart';
 
 part 'camera_inference_state.freezed.dart';
 
@@ -20,6 +21,7 @@ abstract class CameraInferenceState with _$CameraInferenceState {
     @Default([]) List<DetectionResult> detections,
     @Default(0.0) double currentFps,
     @Default(LensFacing.back) LensFacing currentLensFacing,
+    @Default(SystemHealthState.normal) SystemHealthState systemHealthState,
   }) = _CameraInferenceState;
 }
 
