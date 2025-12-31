@@ -1,3 +1,7 @@
 {
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "problems.decorations.enabled": true,
+  "terminal.integrated.env.osx": {
+    "ANDROID_HOME": "/Users/pritam/Library/Android/sdk",
+    "PATH": "/Users/pritam/Library/Android/sdk/platform-tools:$PATH"
+  }
 }
