@@ -161,7 +161,7 @@ return startSystemMonitor(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initializeCamera,TResult Function( ModelType model)?  changeModel,TResult Function()?  flipCamera,TResult Function( double zoomLevel)?  setZoomLevel,TResult Function( double threshold)?  updateConfidenceThreshold,TResult Function( double threshold)?  updateIouThreshold,TResult Function( int threshold)?  updateNumItemsThreshold,TResult Function( List<DetectionResult> detections)?  detectionsOccurred,TResult Function( SliderType type)?  toggleSlider,TResult Function( double fps)?  updateFps,TResult Function( LensFacing lensFacing)?  updateLensFacing,TResult Function()?  retryModelDownload,TResult Function()?  resumeCamera,TResult Function()?  setInitialConfig,TResult Function()?  startSystemMonitor,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initializeCamera,TResult Function( ModelType model)?  changeModel,TResult Function()?  flipCamera,TResult Function( double zoomLevel)?  setZoomLevel,TResult Function( double threshold)?  updateConfidenceThreshold,TResult Function( double threshold)?  updateIouThreshold,TResult Function( int threshold)?  updateNumItemsThreshold,TResult Function( List<DetectionResult> detections)?  detectionsOccurred,TResult Function( InferenceParameter type)?  toggleSlider,TResult Function( double fps)?  updateFps,TResult Function( LensFacing lensFacing)?  updateLensFacing,TResult Function()?  retryModelDownload,TResult Function()?  resumeCamera,TResult Function()?  setInitialConfig,TResult Function()?  startSystemMonitor,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
 return initializeCamera();case ChangeModel() when changeModel != null:
@@ -196,7 +196,7 @@ return startSystemMonitor();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initializeCamera,required TResult Function( ModelType model)  changeModel,required TResult Function()  flipCamera,required TResult Function( double zoomLevel)  setZoomLevel,required TResult Function( double threshold)  updateConfidenceThreshold,required TResult Function( double threshold)  updateIouThreshold,required TResult Function( int threshold)  updateNumItemsThreshold,required TResult Function( List<DetectionResult> detections)  detectionsOccurred,required TResult Function( SliderType type)  toggleSlider,required TResult Function( double fps)  updateFps,required TResult Function( LensFacing lensFacing)  updateLensFacing,required TResult Function()  retryModelDownload,required TResult Function()  resumeCamera,required TResult Function()  setInitialConfig,required TResult Function()  startSystemMonitor,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initializeCamera,required TResult Function( ModelType model)  changeModel,required TResult Function()  flipCamera,required TResult Function( double zoomLevel)  setZoomLevel,required TResult Function( double threshold)  updateConfidenceThreshold,required TResult Function( double threshold)  updateIouThreshold,required TResult Function( int threshold)  updateNumItemsThreshold,required TResult Function( List<DetectionResult> detections)  detectionsOccurred,required TResult Function( InferenceParameter type)  toggleSlider,required TResult Function( double fps)  updateFps,required TResult Function( LensFacing lensFacing)  updateLensFacing,required TResult Function()  retryModelDownload,required TResult Function()  resumeCamera,required TResult Function()  setInitialConfig,required TResult Function()  startSystemMonitor,}) {final _that = this;
 switch (_that) {
 case InitializeCamera():
 return initializeCamera();case ChangeModel():
@@ -230,7 +230,7 @@ return startSystemMonitor();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initializeCamera,TResult? Function( ModelType model)?  changeModel,TResult? Function()?  flipCamera,TResult? Function( double zoomLevel)?  setZoomLevel,TResult? Function( double threshold)?  updateConfidenceThreshold,TResult? Function( double threshold)?  updateIouThreshold,TResult? Function( int threshold)?  updateNumItemsThreshold,TResult? Function( List<DetectionResult> detections)?  detectionsOccurred,TResult? Function( SliderType type)?  toggleSlider,TResult? Function( double fps)?  updateFps,TResult? Function( LensFacing lensFacing)?  updateLensFacing,TResult? Function()?  retryModelDownload,TResult? Function()?  resumeCamera,TResult? Function()?  setInitialConfig,TResult? Function()?  startSystemMonitor,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initializeCamera,TResult? Function( ModelType model)?  changeModel,TResult? Function()?  flipCamera,TResult? Function( double zoomLevel)?  setZoomLevel,TResult? Function( double threshold)?  updateConfidenceThreshold,TResult? Function( double threshold)?  updateIouThreshold,TResult? Function( int threshold)?  updateNumItemsThreshold,TResult? Function( List<DetectionResult> detections)?  detectionsOccurred,TResult? Function( InferenceParameter type)?  toggleSlider,TResult? Function( double fps)?  updateFps,TResult? Function( LensFacing lensFacing)?  updateLensFacing,TResult? Function()?  retryModelDownload,TResult? Function()?  resumeCamera,TResult? Function()?  setInitialConfig,TResult? Function()?  startSystemMonitor,}) {final _that = this;
 switch (_that) {
 case InitializeCamera() when initializeCamera != null:
 return initializeCamera();case ChangeModel() when changeModel != null:
@@ -728,7 +728,7 @@ class ToggleSlider implements CameraInferenceEvent {
   const ToggleSlider(this.type);
   
 
- final  SliderType type;
+ final  InferenceParameter type;
 
 /// Create a copy of CameraInferenceEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -760,7 +760,7 @@ abstract mixin class $ToggleSliderCopyWith<$Res> implements $CameraInferenceEven
   factory $ToggleSliderCopyWith(ToggleSlider value, $Res Function(ToggleSlider) _then) = _$ToggleSliderCopyWithImpl;
 @useResult
 $Res call({
- SliderType type
+ InferenceParameter type
 });
 
 
@@ -780,7 +780,7 @@ class _$ToggleSliderCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') $Res call({Object? type = null,}) {
   return _then(ToggleSlider(
 null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as SliderType,
+as InferenceParameter,
   ));
 }
 

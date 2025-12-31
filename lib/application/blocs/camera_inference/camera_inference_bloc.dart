@@ -378,7 +378,7 @@ class CameraInferenceBloc
     Emitter<CameraInferenceState> emit,
   ) {
     if (state.activeSlider == event.type) {
-      emit(state.copyWith(activeSlider: SliderType.none));
+      emit(state.copyWith(activeSlider: InferenceParameter.none));
     } else {
       emit(state.copyWith(activeSlider: event.type));
     }

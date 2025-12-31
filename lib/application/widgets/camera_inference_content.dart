@@ -6,6 +6,7 @@ import 'package:ultralytics_yolo/widgets/yolo_controller.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_bloc.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_event.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_state.dart';
+import 'package:yolo/application/mappers/model_type_ui_mapper.dart';
 import 'package:yolo/data/mappers/yolo_result_mapper.dart';
 import 'package:yolo/domain/entities/detection_result.dart';
 import 'package:yolo/domain/entities/models.dart';
@@ -53,10 +54,10 @@ class CameraInferenceContent extends StatelessWidget {
         },
         builder: (context, state) {
           return YOLOView(
-            key: ValueKey('yolo_view_${modelPath}_${modelType.task.name}'),
+            key: ValueKey('yolo_view_${modelPath}_${modelType.name}'),
             controller: getIt<YOLOViewController>(), // Shared Singleton
             modelPath: modelPath!,
-            task: modelType.task,
+            task: modelType.toYoloTask,
             streamingConfig: const YOLOStreamingConfig.highPerformance(),
             useGpu: true,
             lensFacing: currentLensFacing,

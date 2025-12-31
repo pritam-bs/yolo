@@ -60,16 +60,16 @@ class CameraInferenceOverlay extends StatelessWidget {
   }
 
   Widget _buildThresholdPills(CameraInferenceState state) {
-    if (state.activeSlider == SliderType.confidence) {
+    if (state.activeSlider == InferenceParameter.confidence) {
       return ThresholdPill(
         label:
             'CONFIDENCE THRESHOLD: ${state.confidenceThreshold.toStringAsFixed(2)}',
       );
-    } else if (state.activeSlider == SliderType.iou) {
+    } else if (state.activeSlider == InferenceParameter.iou) {
       return ThresholdPill(
         label: 'IOU THRESHOLD: ${state.iouThreshold.toStringAsFixed(2)}',
       );
-    } else if (state.activeSlider == SliderType.numItems) {
+    } else if (state.activeSlider == InferenceParameter.numItems) {
       return ThresholdPill(label: 'ITEMS MAX: ${state.numItemsThreshold}');
     }
     return const SizedBox.shrink();

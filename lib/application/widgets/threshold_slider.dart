@@ -15,7 +15,7 @@ class ThresholdSlider extends StatelessWidget {
     required this.isLandscape,
   });
 
-  final SliderType activeSlider;
+  final InferenceParameter activeSlider;
   final double confidenceThreshold;
   final double iouThreshold;
   final int numItemsThreshold;
@@ -24,7 +24,7 @@ class ThresholdSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (activeSlider == SliderType.none) {
+    if (activeSlider == InferenceParameter.none) {
       return const SizedBox.shrink();
     }
 
@@ -59,19 +59,22 @@ class ThresholdSlider extends StatelessWidget {
   }
 
   double _getSliderValue() => switch (activeSlider) {
-    SliderType.numItems => numItemsThreshold.toDouble(),
-    SliderType.confidence => confidenceThreshold,
-    SliderType.iou => iouThreshold,
+    InferenceParameter.numItems => numItemsThreshold.toDouble(),
+    InferenceParameter.confidence => confidenceThreshold,
+    InferenceParameter.iou => iouThreshold,
     _ => 0,
   };
 
-  double _getSliderMin() => activeSlider == SliderType.numItems ? 5 : 0.1;
-  double _getSliderMax() => activeSlider == SliderType.numItems ? 50 : 0.9;
-  int _getSliderDivisions() => activeSlider == SliderType.numItems ? 9 : 8;
+  double _getSliderMin() =>
+      activeSlider == InferenceParameter.numItems ? 5 : 0.1;
+  double _getSliderMax() =>
+      activeSlider == InferenceParameter.numItems ? 50 : 0.9;
+  int _getSliderDivisions() =>
+      activeSlider == InferenceParameter.numItems ? 9 : 8;
   String _getSliderLabel() => switch (activeSlider) {
-    SliderType.numItems => '$numItemsThreshold',
-    SliderType.confidence => confidenceThreshold.toStringAsFixed(1),
-    SliderType.iou => iouThreshold.toStringAsFixed(1),
+    InferenceParameter.numItems => '$numItemsThreshold',
+    InferenceParameter.confidence => confidenceThreshold.toStringAsFixed(1),
+    InferenceParameter.iou => iouThreshold.toStringAsFixed(1),
     _ => '',
   };
 }

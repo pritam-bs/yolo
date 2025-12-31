@@ -15,7 +15,7 @@ abstract class CameraInferenceState with _$CameraInferenceState {
     @Default(0.5) double confidenceThreshold,
     @Default(0.45) double iouThreshold,
     @Default(30) int numItemsThreshold,
-    @Default(SliderType.none) SliderType activeSlider,
+    @Default(InferenceParameter.none) InferenceParameter activeSlider,
     @Default(false) bool isFrontCamera,
     @Default(1.0) double currentZoomLevel,
     @Default([]) List<DetectionResult> detections,

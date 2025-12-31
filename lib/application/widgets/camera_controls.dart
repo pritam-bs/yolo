@@ -19,9 +19,9 @@ class CameraControls extends StatelessWidget {
 
   final double currentZoomLevel;
   final bool isFrontCamera;
-  final SliderType activeSlider;
+  final InferenceParameter activeSlider;
   final ValueChanged<double> onZoomChanged;
-  final ValueChanged<SliderType> onSliderToggled;
+  final ValueChanged<InferenceParameter> onSliderToggled;
   final VoidCallback onCameraFlipped;
   final bool isLandscape;
 
@@ -48,17 +48,17 @@ class CameraControls extends StatelessWidget {
               SizedBox(height: isLandscape ? 8 : 12),
               ControlButton(
                 content: Icons.layers,
-                onPressed: () => onSliderToggled(SliderType.numItems),
+                onPressed: () => onSliderToggled(InferenceParameter.numItems),
               ),
               SizedBox(height: isLandscape ? 8 : 12),
               ControlButton(
                 content: Icons.adjust,
-                onPressed: () => onSliderToggled(SliderType.confidence),
+                onPressed: () => onSliderToggled(InferenceParameter.confidence),
               ),
               SizedBox(height: isLandscape ? 8 : 12),
               ControlButton(
                 content: 'assets/iou.png',
-                onPressed: () => onSliderToggled(SliderType.iou),
+                onPressed: () => onSliderToggled(InferenceParameter.iou),
               ),
               SizedBox(height: isLandscape ? 16 : 40),
             ],

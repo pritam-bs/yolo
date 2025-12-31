@@ -58,17 +58,17 @@ class CameraView extends StatelessWidget {
           numItemsThreshold: state.numItemsThreshold,
           onValueChanged: (value) {
             switch (state.activeSlider) {
-              case SliderType.confidence:
+              case InferenceParameter.confidence:
                 context.read<CameraInferenceBloc>().add(
                   UpdateConfidenceThreshold(value),
                 );
                 break;
-              case SliderType.iou:
+              case InferenceParameter.iou:
                 context.read<CameraInferenceBloc>().add(
                   UpdateIouThreshold(value),
                 );
                 break;
-              case SliderType.numItems:
+              case InferenceParameter.numItems:
                 context.read<CameraInferenceBloc>().add(
                   UpdateNumItemsThreshold(value.toInt()),
                 );
