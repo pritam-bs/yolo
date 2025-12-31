@@ -17,7 +17,7 @@ void main() {
 
   testWidgets('Renders CameraInferenceScreen', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const App());
 
     // Verify that CameraInferenceScreen is rendered.
     expect(find.byType(CameraInferenceScreen), findsOneWidget);

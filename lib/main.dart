@@ -9,16 +9,16 @@ import 'injection.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureDependencies();
-  runApp(const MyApp());
+  runApp(const App());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'YOLO Ultralytics Example',
+      title: 'YOLO',
       home: BlocProvider(
         create: (_) =>
             getIt<CameraInferenceBloc>()..add(const InitializeCamera()),
