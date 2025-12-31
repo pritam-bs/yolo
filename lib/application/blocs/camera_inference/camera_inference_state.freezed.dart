@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CameraInferenceState {
 
- CameraInferenceStatus get status; ModelType get modelType; String? get modelPath; double get confidenceThreshold; double get iouThreshold; int get numItemsThreshold; SliderType get activeSlider; bool get isFrontCamera; double get currentZoomLevel; List<DetectionResult> get detections; double get currentFps; LensFacing get currentLensFacing; SystemHealthState get systemHealthState;
+ CameraInferenceStatus get status; ModelType get modelType; String? get modelPath; double get confidenceThreshold; double get iouThreshold; int get numItemsThreshold; InferenceParameter get activeSlider; bool get isFrontCamera; double get currentZoomLevel; List<DetectionResult> get detections; double get currentFps; LensFacing get currentLensFacing; SystemHealthState get systemHealthState;
 /// Create a copy of CameraInferenceState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,7 +45,7 @@ abstract mixin class $CameraInferenceStateCopyWith<$Res>  {
   factory $CameraInferenceStateCopyWith(CameraInferenceState value, $Res Function(CameraInferenceState) _then) = _$CameraInferenceStateCopyWithImpl;
 @useResult
 $Res call({
- CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, SliderType activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing, SystemHealthState systemHealthState
+ CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, InferenceParameter activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing, SystemHealthState systemHealthState
 });
 
 
@@ -71,7 +71,7 @@ as String?,confidenceThreshold: null == confidenceThreshold ? _self.confidenceTh
 as double,iouThreshold: null == iouThreshold ? _self.iouThreshold : iouThreshold // ignore: cast_nullable_to_non_nullable
 as double,numItemsThreshold: null == numItemsThreshold ? _self.numItemsThreshold : numItemsThreshold // ignore: cast_nullable_to_non_nullable
 as int,activeSlider: null == activeSlider ? _self.activeSlider : activeSlider // ignore: cast_nullable_to_non_nullable
-as SliderType,isFrontCamera: null == isFrontCamera ? _self.isFrontCamera : isFrontCamera // ignore: cast_nullable_to_non_nullable
+as InferenceParameter,isFrontCamera: null == isFrontCamera ? _self.isFrontCamera : isFrontCamera // ignore: cast_nullable_to_non_nullable
 as bool,currentZoomLevel: null == currentZoomLevel ? _self.currentZoomLevel : currentZoomLevel // ignore: cast_nullable_to_non_nullable
 as double,detections: null == detections ? _self.detections : detections // ignore: cast_nullable_to_non_nullable
 as List<DetectionResult>,currentFps: null == currentFps ? _self.currentFps : currentFps // ignore: cast_nullable_to_non_nullable
@@ -171,7 +171,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  SliderType activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  SystemHealthState systemHealthState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  InferenceParameter activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  SystemHealthState systemHealthState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CameraInferenceState() when $default != null:
 return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing,_that.systemHealthState);case _:
@@ -192,7 +192,7 @@ return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThr
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  SliderType activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  SystemHealthState systemHealthState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  InferenceParameter activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  SystemHealthState systemHealthState)  $default,) {final _that = this;
 switch (_that) {
 case _CameraInferenceState():
 return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing,_that.systemHealthState);case _:
@@ -212,7 +212,7 @@ return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThr
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  SliderType activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  SystemHealthState systemHealthState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  InferenceParameter activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  SystemHealthState systemHealthState)?  $default,) {final _that = this;
 switch (_that) {
 case _CameraInferenceState() when $default != null:
 return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing,_that.systemHealthState);case _:
@@ -227,7 +227,7 @@ return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThr
 
 
 class _CameraInferenceState implements CameraInferenceState {
-  const _CameraInferenceState({this.status = const CameraInferenceStatus.initial(), this.modelType = ModelType.detect, this.modelPath, this.confidenceThreshold = 0.5, this.iouThreshold = 0.45, this.numItemsThreshold = 30, this.activeSlider = SliderType.none, this.isFrontCamera = false, this.currentZoomLevel = 1.0, final  List<DetectionResult> detections = const [], this.currentFps = 0.0, this.currentLensFacing = LensFacing.back, this.systemHealthState = SystemHealthState.normal}): _detections = detections;
+  const _CameraInferenceState({this.status = const CameraInferenceStatus.initial(), this.modelType = ModelType.detect, this.modelPath, this.confidenceThreshold = 0.5, this.iouThreshold = 0.45, this.numItemsThreshold = 30, this.activeSlider = InferenceParameter.none, this.isFrontCamera = false, this.currentZoomLevel = 1.0, final  List<DetectionResult> detections = const [], this.currentFps = 0.0, this.currentLensFacing = LensFacing.back, this.systemHealthState = SystemHealthState.normal}): _detections = detections;
   
 
 @override@JsonKey() final  CameraInferenceStatus status;
@@ -236,7 +236,7 @@ class _CameraInferenceState implements CameraInferenceState {
 @override@JsonKey() final  double confidenceThreshold;
 @override@JsonKey() final  double iouThreshold;
 @override@JsonKey() final  int numItemsThreshold;
-@override@JsonKey() final  SliderType activeSlider;
+@override@JsonKey() final  InferenceParameter activeSlider;
 @override@JsonKey() final  bool isFrontCamera;
 @override@JsonKey() final  double currentZoomLevel;
  final  List<DetectionResult> _detections;
@@ -280,7 +280,7 @@ abstract mixin class _$CameraInferenceStateCopyWith<$Res> implements $CameraInfe
   factory _$CameraInferenceStateCopyWith(_CameraInferenceState value, $Res Function(_CameraInferenceState) _then) = __$CameraInferenceStateCopyWithImpl;
 @override @useResult
 $Res call({
- CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, SliderType activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing, SystemHealthState systemHealthState
+ CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, InferenceParameter activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing, SystemHealthState systemHealthState
 });
 
 
@@ -306,7 +306,7 @@ as String?,confidenceThreshold: null == confidenceThreshold ? _self.confidenceTh
 as double,iouThreshold: null == iouThreshold ? _self.iouThreshold : iouThreshold // ignore: cast_nullable_to_non_nullable
 as double,numItemsThreshold: null == numItemsThreshold ? _self.numItemsThreshold : numItemsThreshold // ignore: cast_nullable_to_non_nullable
 as int,activeSlider: null == activeSlider ? _self.activeSlider : activeSlider // ignore: cast_nullable_to_non_nullable
-as SliderType,isFrontCamera: null == isFrontCamera ? _self.isFrontCamera : isFrontCamera // ignore: cast_nullable_to_non_nullable
+as InferenceParameter,isFrontCamera: null == isFrontCamera ? _self.isFrontCamera : isFrontCamera // ignore: cast_nullable_to_non_nullable
 as bool,currentZoomLevel: null == currentZoomLevel ? _self.currentZoomLevel : currentZoomLevel // ignore: cast_nullable_to_non_nullable
 as double,detections: null == detections ? _self._detections : detections // ignore: cast_nullable_to_non_nullable
 as List<DetectionResult>,currentFps: null == currentFps ? _self.currentFps : currentFps // ignore: cast_nullable_to_non_nullable

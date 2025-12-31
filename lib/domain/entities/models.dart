@@ -1,19 +1,12 @@
-// Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
-
-import 'package:ultralytics_yolo/models/yolo_task.dart';
-
 enum ModelType {
-  detect('yolo11n', YOLOTask.detect),
-  segment('yolo11n-seg', YOLOTask.segment),
-  classify('yolo11n-cls', YOLOTask.classify),
-  pose('yolo11n-pose', YOLOTask.pose),
-  obb('yolo11n-obb', YOLOTask.obb);
+  detect('yolo11n'),
+  segment('yolo11n-seg'),
+  classify('yolo11n-cls'),
+  pose('yolo11n-pose'),
+  obb('yolo11n-obb');
 
   final String modelName;
-
-  final YOLOTask task;
-
-  const ModelType(this.modelName, this.task);
+  const ModelType(this.modelName);
 }
 
-enum SliderType { none, numItems, confidence, iou }
+enum InferenceParameter { none, numItems, confidence, iou }

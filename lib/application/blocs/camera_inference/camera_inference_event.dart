@@ -22,7 +22,7 @@ abstract class CameraInferenceEvent with _$CameraInferenceEvent {
   const factory CameraInferenceEvent.detectionsOccurred(
     List<DetectionResult> detections,
   ) = DetectionsOccurred;
-  const factory CameraInferenceEvent.toggleSlider(SliderType type) =
+  const factory CameraInferenceEvent.toggleSlider(InferenceParameter type) =
       ToggleSlider;
   const factory CameraInferenceEvent.updateFps(double fps) = UpdateFps;
   const factory CameraInferenceEvent.updateLensFacing(LensFacing lensFacing) =
