@@ -315,6 +315,7 @@ class CameraInferenceBloc
         currentLensFacing: state.currentLensFacing == LensFacing.front
             ? LensFacing.back
             : LensFacing.front,
+        currentZoomLevel: 1.0,
       ),
     );
   }
