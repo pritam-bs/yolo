@@ -42,7 +42,11 @@ class YOLO(
     private fun createCustomOptions(useGpu: Boolean = true): Interpreter.Options {
         val options = Interpreter.Options().apply {
             // Optimized CPU fallback with XNNPACK
-            setNumThreads(4)  // Sweet spot for mobile thermal performance
+            // Get available cores, but cap it at 4 for thermal stability
+            val cpuCores = Runtime.getRuntime().availableProcessors()
+            val optimalThreads = if (cpuCores > 4) 4 else cpuCores
+
+            setNumThreads(optimalThreads)
             setUseXNNPACK(true)
         }
 

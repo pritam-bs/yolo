@@ -1,19 +1,14 @@
 package space.prtlab.system_monitor
 
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.app.ActivityManager
 import android.os.PowerManager
-import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
-import java.io.RandomAccessFile
-import java.util.LinkedList
 
 /** SystemMonitorPlugin */
 class SystemMonitorPlugin : FlutterPlugin, EventChannel.StreamHandler {
@@ -23,13 +18,13 @@ class SystemMonitorPlugin : FlutterPlugin, EventChannel.StreamHandler {
     private var runnable: Runnable? = null
     private var eventSink: EventChannel.EventSink? = null
 
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.applicationContext
         channel = EventChannel(flutterPluginBinding.binaryMessenger, "system_monitor/metrics")
         channel.setStreamHandler(this)
     }
 
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setStreamHandler(null)
         stopMonitoring()
     }

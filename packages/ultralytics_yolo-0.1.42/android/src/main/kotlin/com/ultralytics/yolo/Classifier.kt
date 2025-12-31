@@ -27,7 +27,11 @@ class Classifier(
 ) : BasePredictor() {
 
     private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
-        setNumThreads(4) // More stable than availableProcessors()
+        // Get available cores, but cap it at 4 for thermal stability
+        val cpuCores = Runtime.getRuntime().availableProcessors()
+        val optimalThreads = if (cpuCores > 4) 4 else cpuCores
+
+        setNumThreads(optimalThreads)
         setUseXNNPACK(true) // Crucial for CPU efficiency
     })
     
@@ -85,7 +89,11 @@ class Classifier(
                 Log.i(TAG, "TFLite: Retrying with safe CPU-only options...")
 
                 val safeOptions = Interpreter.Options().apply {
-                    setNumThreads(4)
+                    // Get available cores, but cap it at 4 for thermal stability
+                    val cpuCores = Runtime.getRuntime().availableProcessors()
+                    val optimalThreads = if (cpuCores > 4) 4 else cpuCores
+
+                    setNumThreads(optimalThreads)
                     setUseXNNPACK(true)
                 }
 
