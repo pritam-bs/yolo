@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:ultralytics_yolo/yolo_view.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_bloc.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_event.dart';
 import 'package:yolo/domain/entities/models.dart';
-import 'package:yolo/domain/repositories/yolo_repository.dart';
 import 'camera_controls.dart';
 import 'camera_inference_content.dart';
 import 'camera_inference_overlay.dart';
@@ -19,7 +17,6 @@ class CameraView extends StatelessWidget {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final state = context.watch<CameraInferenceBloc>().state;
-    final getIt = GetIt.instance;
 
     return Stack(
       children: [
@@ -29,7 +26,6 @@ class CameraView extends StatelessWidget {
           onResult: (detections) => context.read<CameraInferenceBloc>().add(
             DetectionsOccurred(detections),
           ),
-          yoloViewController: getIt<YoloRepository>().yoloViewController,
           currentLensFacing: state.currentLensFacing,
           confidenceThreshold: state.confidenceThreshold,
           iouThreshold: state.iouThreshold,

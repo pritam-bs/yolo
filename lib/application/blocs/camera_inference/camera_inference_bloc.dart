@@ -2,19 +2,18 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:ultralytics_yolo/widgets/yolo_controller.dart';
 import 'package:ultralytics_yolo/yolo_view.dart';
 import 'package:yolo/domain/entities/models.dart';
 import 'package:yolo/domain/entities/model_loading_state.dart';
 import 'package:yolo/domain/entities/system_health_state.dart';
 import 'package:yolo/domain/entities/system_metrics.dart';
-import 'package:yolo/domain/usecases/flip_camera.dart';
 import 'package:yolo/domain/usecases/get_model_path.dart';
 import 'package:yolo/domain/usecases/get_system_metrics.dart';
 import 'package:yolo/domain/usecases/set_confidence_threshold.dart';
 import 'package:yolo/domain/usecases/set_iou_threshold.dart';
 import 'package:yolo/domain/usecases/set_num_items_threshold.dart';
 import 'package:yolo/domain/usecases/set_thresholds.dart';
-import 'package:yolo/domain/usecases/set_zoom_level.dart';
 import 'package:yolo/domain/usecases/system_metrics_monitor_dispose.dart';
 import 'package:yolo/domain/usecases/system_metrics_monitor_start.dart';
 import 'package:yolo/domain/usecases/system_metrics_monitor_stop.dart';
@@ -26,17 +25,17 @@ import 'camera_inference_state.dart';
 class CameraInferenceBloc
     extends Bloc<events.CameraInferenceEvent, CameraInferenceState> {
   final GetModelPath _getModelPath;
-  final FlipCamera _flipCamera;
   final SetConfidenceThreshold _setConfidenceThreshold;
   final SetIoUThreshold _setIoUThreshold;
   final SetNumItemsThreshold _setNumItemsThreshold;
-  final SetZoomLevel _setZoomLevel;
   final SetThresholds _setThresholds;
   final SetStreamingConfig _setStreamingConfig;
   final GetSystemMetrics _getSystemMetrics;
   final SystemMetricsMonitorStart _systemMetricsMonitorStart;
   final SystemMetricsMonitorStop _systemMetricsMonitorStop;
   final SystemMetricsMonitorDispose _systemMetricsMonitorDispose;
+  // Direct Hardware Control (Shared Singleton)
+  final YOLOViewController _yoloController;
 
   int _detectionCount = 0;
   int _frameCount = 0;
@@ -45,29 +44,27 @@ class CameraInferenceBloc
 
   CameraInferenceBloc({
     required GetModelPath getModelPath,
-    required FlipCamera flipCamera,
     required SetConfidenceThreshold setConfidenceThreshold,
     required SetIoUThreshold setIoUThreshold,
     required SetNumItemsThreshold setNumItemsThreshold,
-    required SetZoomLevel setZoomLevel,
     required SetThresholds setThresholds,
     required SetStreamingConfig setStreamingConfig,
     required GetSystemMetrics getSystemMetrics,
     required SystemMetricsMonitorStart systemMetricsMonitorStart,
     required SystemMetricsMonitorStop systemMetricsMonitorStop,
     required SystemMetricsMonitorDispose systemMetricsMonitorDispose,
+    required YOLOViewController yoloController,
   }) : _getModelPath = getModelPath,
-       _flipCamera = flipCamera,
        _setConfidenceThreshold = setConfidenceThreshold,
        _setIoUThreshold = setIoUThreshold,
        _setNumItemsThreshold = setNumItemsThreshold,
-       _setZoomLevel = setZoomLevel,
        _setThresholds = setThresholds,
        _setStreamingConfig = setStreamingConfig,
        _getSystemMetrics = getSystemMetrics,
        _systemMetricsMonitorStart = systemMetricsMonitorStart,
        _systemMetricsMonitorStop = systemMetricsMonitorStop,
        _systemMetricsMonitorDispose = systemMetricsMonitorDispose,
+       _yoloController = yoloController,
        super(const CameraInferenceState()) {
     on<events.InitializeCamera>(_onInitializeCamera);
     on<events.ChangeModel>(_onChangeModel);
@@ -304,14 +301,15 @@ class CameraInferenceBloc
       numItemsThreshold: state.numItemsThreshold,
     );
 
-    _setZoomLevel(state.currentZoomLevel);
+    _yoloController.setZoomLevel(state.currentZoomLevel);
   }
 
   void _onFlipCamera(
     events.FlipCamera event,
     Emitter<CameraInferenceState> emit,
   ) {
-    _flipCamera();
+    _yoloController.switchCamera();
+
     emit(
       state.copyWith(
         currentLensFacing: state.currentLensFacing == LensFacing.front
@@ -325,7 +323,7 @@ class CameraInferenceBloc
     events.SetZoomLevel event,
     Emitter<CameraInferenceState> emit,
   ) {
-    _setZoomLevel(event.zoomLevel);
+    _yoloController.setZoomLevel(event.zoomLevel);
     emit(state.copyWith(currentZoomLevel: event.zoomLevel));
   }
 

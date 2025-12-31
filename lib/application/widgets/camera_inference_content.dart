@@ -10,6 +10,7 @@ import 'package:yolo/data/mappers/yolo_result_mapper.dart';
 import 'package:yolo/domain/entities/detection_result.dart';
 import 'package:yolo/domain/entities/models.dart';
 import 'package:yolo/domain/entities/system_health_state.dart';
+import 'package:yolo/injection.dart';
 
 /// Main content widget that handles the camera view and loading states
 class CameraInferenceContent extends StatelessWidget {
@@ -18,7 +19,6 @@ class CameraInferenceContent extends StatelessWidget {
     required this.modelPath,
     required this.modelType,
     required this.onResult,
-    required this.yoloViewController,
     required this.currentLensFacing,
     required this.confidenceThreshold,
     required this.iouThreshold,
@@ -27,7 +27,6 @@ class CameraInferenceContent extends StatelessWidget {
   final String? modelPath;
   final ModelType modelType;
   final Function(List<DetectionResult>) onResult;
-  final YOLOViewController yoloViewController;
   final LensFacing currentLensFacing;
   final double confidenceThreshold;
   final double iouThreshold;
@@ -55,7 +54,7 @@ class CameraInferenceContent extends StatelessWidget {
         builder: (context, state) {
           return YOLOView(
             key: ValueKey('yolo_view_${modelPath}_${modelType.task.name}'),
-            controller: yoloViewController,
+            controller: getIt<YOLOViewController>(), // Shared Singleton
             modelPath: modelPath!,
             task: modelType.task,
             streamingConfig: const YOLOStreamingConfig.highPerformance(),

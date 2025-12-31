@@ -11,22 +11,21 @@ import 'package:injectable/injectable.dart';
 
 @LazySingleton(as: YoloRepository)
 class YoloRepositoryImpl implements YoloRepository {
-  final LocalModelDataSource localModelDataSource;
-  final RemoteModelDataSource remoteModelDataSource;
+  final LocalModelDataSource _localModelDataSource;
+  final RemoteModelDataSource _remoteModelDataSource;
+  final YOLOViewController _yoloViewController;
 
   YoloRepositoryImpl({
-    required this.localModelDataSource,
-    required this.remoteModelDataSource,
-  });
-
-  final YOLOViewController _yoloViewController = YOLOViewController();
-
-  @override
-  YOLOViewController get yoloViewController => _yoloViewController;
+    required LocalModelDataSource localModelDataSource,
+    required RemoteModelDataSource remoteModelDataSource,
+    required YOLOViewController yoloViewController,
+  }) : _localModelDataSource = localModelDataSource,
+       _remoteModelDataSource = remoteModelDataSource,
+       _yoloViewController = yoloViewController;
 
   @override
   Stream<ModelLoadingState> getModelPath(ModelType modelType) async* {
-    String? modelPath = await localModelDataSource.getModelPath(modelType);
+    String? modelPath = await _localModelDataSource.getModelPath(modelType);
 
     if (modelPath != null) {
       // Adding a small delay for smooth transition even if model is cached
@@ -36,7 +35,7 @@ class YoloRepositoryImpl implements YoloRepository {
       yield const ModelLoadingState.loading(0.0);
 
       try {
-        final downloadStream = remoteModelDataSource.downloadModel(modelType);
+        final downloadStream = _remoteModelDataSource.downloadModel(modelType);
         await for (final progress in downloadStream) {
           if (progress.error != null) {
             yield ModelLoadingState.error(
@@ -46,7 +45,7 @@ class YoloRepositoryImpl implements YoloRepository {
           }
           if (progress.isCompleted && progress.data != null) {
             final isZip = Platform.isIOS; // iOS mlpackage comes as zip
-            modelPath = await localModelDataSource.saveModel(
+            modelPath = await _localModelDataSource.saveModel(
               modelType,
               progress.data!,
               isZip,
@@ -60,16 +59,6 @@ class YoloRepositoryImpl implements YoloRepository {
         yield ModelLoadingState.error(e.toString());
       }
     }
-  }
-
-  @override
-  Future<void> setZoomLevel(double zoomLevel) async {
-    await _yoloViewController.setZoomLevel(zoomLevel);
-  }
-
-  @override
-  Future<void> flipCamera() async {
-    await _yoloViewController.switchCamera();
   }
 
   @override

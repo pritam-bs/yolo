@@ -3,6 +3,7 @@ import 'package:file/local.dart';
 import 'package:http/http.dart' as http;
 import 'package:injectable/injectable.dart';
 import 'package:system_monitor/system_monitor.dart' as plugin;
+import 'package:ultralytics_yolo/widgets/yolo_controller.dart';
 
 @module
 abstract class AppModule {
@@ -14,4 +15,7 @@ abstract class AppModule {
 
   @lazySingleton
   plugin.SystemMonitor get systemMonitor => plugin.SystemMonitor();
+
+  @lazySingleton
+  YOLOViewController get yoloController => YOLOViewController();
 }
