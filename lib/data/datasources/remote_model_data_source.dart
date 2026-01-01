@@ -1,7 +1,8 @@
-import 'dart:io';
+import 'dart:io' show SocketException;
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+import 'package:platform/platform.dart';
 import 'package:yolo/data/datasources/remote_data_source_exception.dart';
 import 'package:yolo/domain/entities/models.dart';
 
@@ -12,14 +13,15 @@ import 'download_progress.dart';
 @LazySingleton()
 class RemoteModelDataSource {
   final http.Client _client;
+  final Platform _platform;
 
-  RemoteModelDataSource(this._client);
+  RemoteModelDataSource(this._client, this._platform);
 
   static const String _modelDownloadBaseUrl =
       'https://github.com/ultralytics/yolo-flutter-app/releases/download/v0.0.0';
 
   Stream<DownloadProgress> downloadModel(ModelType modelType) async* {
-    final String extension = Platform.isIOS ? '.mlpackage.zip' : '.tflite';
+    final String extension = _platform.isIOS ? '.mlpackage.zip' : '.tflite';
     final String url =
         '$_modelDownloadBaseUrl/${modelType.modelName}$extension';
 

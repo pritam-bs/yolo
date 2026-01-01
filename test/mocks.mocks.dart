@@ -3,46 +3,49 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
-import 'dart:typed_data' as _i14;
+import 'dart:async' as _i5;
+import 'dart:convert' as _i36;
+import 'dart:typed_data' as _i15;
 
-import 'package:flutter/services.dart' as _i11;
-import 'package:flutter_bloc/flutter_bloc.dart' as _i21;
+import 'package:flutter/services.dart' as _i12;
+import 'package:flutter_bloc/flutter_bloc.dart' as _i22;
+import 'package:http/http.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i16;
-import 'package:path_provider/path_provider.dart' as _i34;
+import 'package:mockito/src/dummies.dart' as _i17;
+import 'package:path_provider/path_provider.dart' as _i35;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart'
-    as _i33;
-import 'package:system_monitor/system_monitor.dart' as _i22;
-import 'package:ultralytics_yolo/models/yolo_task.dart' as _i12;
-import 'package:ultralytics_yolo/widgets/yolo_controller.dart' as _i10;
-import 'package:ultralytics_yolo/yolo_streaming_config.dart' as _i13;
+    as _i34;
+import 'package:platform/platform.dart' as _i37;
+import 'package:system_monitor/system_monitor.dart' as _i23;
+import 'package:ultralytics_yolo/models/yolo_task.dart' as _i13;
+import 'package:ultralytics_yolo/widgets/yolo_controller.dart' as _i11;
+import 'package:ultralytics_yolo/yolo_streaming_config.dart' as _i14;
 import 'package:yolo/application/blocs/camera_inference/camera_inference_bloc.dart'
-    as _i19;
-import 'package:yolo/application/blocs/camera_inference/camera_inference_event.dart'
     as _i20;
+import 'package:yolo/application/blocs/camera_inference/camera_inference_event.dart'
+    as _i21;
 import 'package:yolo/application/blocs/camera_inference/camera_inference_state.dart'
     as _i2;
-import 'package:yolo/data/datasources/download_progress.dart' as _i18;
-import 'package:yolo/data/datasources/local_model_data_source.dart' as _i15;
-import 'package:yolo/data/datasources/remote_model_data_source.dart' as _i17;
-import 'package:yolo/domain/entities/model_loading_state.dart' as _i7;
-import 'package:yolo/domain/entities/models.dart' as _i8;
-import 'package:yolo/domain/entities/system_health_state.dart' as _i9;
-import 'package:yolo/domain/entities/system_metrics.dart' as _i5;
+import 'package:yolo/data/datasources/download_progress.dart' as _i19;
+import 'package:yolo/data/datasources/local_model_data_source.dart' as _i16;
+import 'package:yolo/data/datasources/remote_model_data_source.dart' as _i18;
+import 'package:yolo/domain/entities/model_loading_state.dart' as _i8;
+import 'package:yolo/domain/entities/models.dart' as _i9;
+import 'package:yolo/domain/entities/system_health_state.dart' as _i10;
+import 'package:yolo/domain/entities/system_metrics.dart' as _i6;
 import 'package:yolo/domain/repositories/system_monitor_repository.dart' as _i3;
-import 'package:yolo/domain/repositories/yolo_repository.dart' as _i6;
-import 'package:yolo/domain/usecases/get_model_path.dart' as _i23;
-import 'package:yolo/domain/usecases/get_system_metrics.dart' as _i29;
-import 'package:yolo/domain/usecases/set_confidence_threshold.dart' as _i24;
-import 'package:yolo/domain/usecases/set_iou_threshold.dart' as _i25;
-import 'package:yolo/domain/usecases/set_num_items_threshold.dart' as _i26;
-import 'package:yolo/domain/usecases/set_streaming_config.dart' as _i28;
-import 'package:yolo/domain/usecases/set_thresholds.dart' as _i27;
+import 'package:yolo/domain/repositories/yolo_repository.dart' as _i7;
+import 'package:yolo/domain/usecases/get_model_path.dart' as _i24;
+import 'package:yolo/domain/usecases/get_system_metrics.dart' as _i30;
+import 'package:yolo/domain/usecases/set_confidence_threshold.dart' as _i25;
+import 'package:yolo/domain/usecases/set_iou_threshold.dart' as _i26;
+import 'package:yolo/domain/usecases/set_num_items_threshold.dart' as _i27;
+import 'package:yolo/domain/usecases/set_streaming_config.dart' as _i29;
+import 'package:yolo/domain/usecases/set_thresholds.dart' as _i28;
 import 'package:yolo/domain/usecases/system_metrics_monitor_dispose.dart'
-    as _i32;
-import 'package:yolo/domain/usecases/system_metrics_monitor_start.dart' as _i30;
-import 'package:yolo/domain/usecases/system_metrics_monitor_stop.dart' as _i31;
+    as _i33;
+import 'package:yolo/domain/usecases/system_metrics_monitor_start.dart' as _i31;
+import 'package:yolo/domain/usecases/system_metrics_monitor_stop.dart' as _i32;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -71,6 +74,22 @@ class _FakeSystemMonitorRepository_1 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
+class _FakeResponse_2 extends _i1.SmartFake implements _i4.Response {
+  _FakeResponse_2(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeStreamedResponse_3 extends _i1.SmartFake
+    implements _i4.StreamedResponse {
+  _FakeStreamedResponse_3(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeUri_4 extends _i1.SmartFake implements Uri {
+  _FakeUri_4(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [SystemMonitorRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -81,12 +100,12 @@ class MockSystemMonitorRepository extends _i1.Mock
   }
 
   @override
-  _i4.Stream<_i5.SystemMetrics> get metricsStream =>
+  _i5.Stream<_i6.SystemMetrics> get metricsStream =>
       (super.noSuchMethod(
             Invocation.getter(#metricsStream),
-            returnValue: _i4.Stream<_i5.SystemMetrics>.empty(),
+            returnValue: _i5.Stream<_i6.SystemMetrics>.empty(),
           )
-          as _i4.Stream<_i5.SystemMetrics>);
+          as _i5.Stream<_i6.SystemMetrics>);
 
   @override
   void start({Duration? interval = const Duration(minutes: 5)}) =>
@@ -96,69 +115,69 @@ class MockSystemMonitorRepository extends _i1.Mock
       );
 
   @override
-  _i4.Future<void> stop() =>
+  _i5.Future<void> stop() =>
       (super.noSuchMethod(
             Invocation.method(#stop, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> dispose() =>
+  _i5.Future<void> dispose() =>
       (super.noSuchMethod(
             Invocation.method(#dispose, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 }
 
 /// A class which mocks [YoloRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockYoloRepository extends _i1.Mock implements _i6.YoloRepository {
+class MockYoloRepository extends _i1.Mock implements _i7.YoloRepository {
   MockYoloRepository() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Stream<_i7.ModelLoadingState> getModelPath(_i8.ModelType? modelType) =>
+  _i5.Stream<_i8.ModelLoadingState> getModelPath(_i9.ModelType? modelType) =>
       (super.noSuchMethod(
             Invocation.method(#getModelPath, [modelType]),
-            returnValue: _i4.Stream<_i7.ModelLoadingState>.empty(),
+            returnValue: _i5.Stream<_i8.ModelLoadingState>.empty(),
           )
-          as _i4.Stream<_i7.ModelLoadingState>);
+          as _i5.Stream<_i8.ModelLoadingState>);
 
   @override
-  _i4.Future<void> setConfidenceThreshold(double? threshold) =>
+  _i5.Future<void> setConfidenceThreshold(double? threshold) =>
       (super.noSuchMethod(
             Invocation.method(#setConfidenceThreshold, [threshold]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setIoUThreshold(double? threshold) =>
+  _i5.Future<void> setIoUThreshold(double? threshold) =>
       (super.noSuchMethod(
             Invocation.method(#setIoUThreshold, [threshold]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setNumItemsThreshold(int? threshold) =>
+  _i5.Future<void> setNumItemsThreshold(int? threshold) =>
       (super.noSuchMethod(
             Invocation.method(#setNumItemsThreshold, [threshold]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setThresholds({
+  _i5.Future<void> setThresholds({
     required double? confidenceThreshold,
     required double? iouThreshold,
     required int? numItemsThreshold,
@@ -169,26 +188,26 @@ class MockYoloRepository extends _i1.Mock implements _i6.YoloRepository {
               #iouThreshold: iouThreshold,
               #numItemsThreshold: numItemsThreshold,
             }),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setStreamingConfig(_i9.SystemHealthState? healthState) =>
+  _i5.Future<void> setStreamingConfig(_i10.SystemHealthState? healthState) =>
       (super.noSuchMethod(
             Invocation.method(#setStreamingConfig, [healthState]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 }
 
 /// A class which mocks [YOLOViewController].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockYOLOViewController extends _i1.Mock
-    implements _i10.YOLOViewController {
+    implements _i11.YOLOViewController {
   MockYOLOViewController() {
     _i1.throwOnMissingStub(this);
   }
@@ -217,41 +236,41 @@ class MockYOLOViewController extends _i1.Mock
           as bool);
 
   @override
-  void init(_i11.MethodChannel? methodChannel, int? viewId) =>
+  void init(_i12.MethodChannel? methodChannel, int? viewId) =>
       super.noSuchMethod(
         Invocation.method(#init, [methodChannel, viewId]),
         returnValueForMissingStub: null,
       );
 
   @override
-  _i4.Future<void> setConfidenceThreshold(double? threshold) =>
+  _i5.Future<void> setConfidenceThreshold(double? threshold) =>
       (super.noSuchMethod(
             Invocation.method(#setConfidenceThreshold, [threshold]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setIoUThreshold(double? threshold) =>
+  _i5.Future<void> setIoUThreshold(double? threshold) =>
       (super.noSuchMethod(
             Invocation.method(#setIoUThreshold, [threshold]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setNumItemsThreshold(int? numItems) =>
+  _i5.Future<void> setNumItemsThreshold(int? numItems) =>
       (super.noSuchMethod(
             Invocation.method(#setNumItemsThreshold, [numItems]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setThresholds({
+  _i5.Future<void> setThresholds({
     double? confidenceThreshold,
     double? iouThreshold,
     int? numItemsThreshold,
@@ -262,159 +281,159 @@ class MockYOLOViewController extends _i1.Mock
               #iouThreshold: iouThreshold,
               #numItemsThreshold: numItemsThreshold,
             }),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> switchCamera() =>
+  _i5.Future<void> switchCamera() =>
       (super.noSuchMethod(
             Invocation.method(#switchCamera, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> zoomIn() =>
+  _i5.Future<void> zoomIn() =>
       (super.noSuchMethod(
             Invocation.method(#zoomIn, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> zoomOut() =>
+  _i5.Future<void> zoomOut() =>
       (super.noSuchMethod(
             Invocation.method(#zoomOut, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setZoomLevel(double? zoomLevel) =>
+  _i5.Future<void> setZoomLevel(double? zoomLevel) =>
       (super.noSuchMethod(
             Invocation.method(#setZoomLevel, [zoomLevel]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> switchModel(String? modelPath, _i12.YOLOTask? task) =>
+  _i5.Future<void> switchModel(String? modelPath, _i13.YOLOTask? task) =>
       (super.noSuchMethod(
             Invocation.method(#switchModel, [modelPath, task]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setStreamingConfig(_i13.YOLOStreamingConfig? config) =>
+  _i5.Future<void> setStreamingConfig(_i14.YOLOStreamingConfig? config) =>
       (super.noSuchMethod(
             Invocation.method(#setStreamingConfig, [config]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> stop() =>
+  _i5.Future<void> stop() =>
       (super.noSuchMethod(
             Invocation.method(#stop, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setShowUIControls(bool? show) =>
+  _i5.Future<void> setShowUIControls(bool? show) =>
       (super.noSuchMethod(
             Invocation.method(#setShowUIControls, [show]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> setShowOverlays(bool? show) =>
+  _i5.Future<void> setShowOverlays(bool? show) =>
       (super.noSuchMethod(
             Invocation.method(#setShowOverlays, [show]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<_i14.Uint8List?> captureFrame() =>
+  _i5.Future<_i15.Uint8List?> captureFrame() =>
       (super.noSuchMethod(
             Invocation.method(#captureFrame, []),
-            returnValue: _i4.Future<_i14.Uint8List?>.value(),
+            returnValue: _i5.Future<_i15.Uint8List?>.value(),
           )
-          as _i4.Future<_i14.Uint8List?>);
+          as _i5.Future<_i15.Uint8List?>);
 }
 
 /// A class which mocks [LocalModelDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockLocalModelDataSource extends _i1.Mock
-    implements _i15.LocalModelDataSource {
+    implements _i16.LocalModelDataSource {
   MockLocalModelDataSource() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<String?> getModelPath(_i8.ModelType? modelType) =>
+  _i5.Future<String?> getModelPath(_i9.ModelType? modelType) =>
       (super.noSuchMethod(
             Invocation.method(#getModelPath, [modelType]),
-            returnValue: _i4.Future<String?>.value(),
+            returnValue: _i5.Future<String?>.value(),
           )
-          as _i4.Future<String?>);
+          as _i5.Future<String?>);
 
   @override
-  _i4.Future<String> saveModel(
-    _i8.ModelType? modelType,
-    _i14.Uint8List? bytes,
+  _i5.Future<String> saveModel(
+    _i9.ModelType? modelType,
+    _i15.Uint8List? bytes,
     bool? isZip,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#saveModel, [modelType, bytes, isZip]),
-            returnValue: _i4.Future<String>.value(
-              _i16.dummyValue<String>(
+            returnValue: _i5.Future<String>.value(
+              _i17.dummyValue<String>(
                 this,
                 Invocation.method(#saveModel, [modelType, bytes, isZip]),
               ),
             ),
           )
-          as _i4.Future<String>);
+          as _i5.Future<String>);
 }
 
 /// A class which mocks [RemoteModelDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockRemoteModelDataSource extends _i1.Mock
-    implements _i17.RemoteModelDataSource {
+    implements _i18.RemoteModelDataSource {
   MockRemoteModelDataSource() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Stream<_i18.DownloadProgress> downloadModel(_i8.ModelType? modelType) =>
+  _i5.Stream<_i19.DownloadProgress> downloadModel(_i9.ModelType? modelType) =>
       (super.noSuchMethod(
             Invocation.method(#downloadModel, [modelType]),
-            returnValue: _i4.Stream<_i18.DownloadProgress>.empty(),
+            returnValue: _i5.Stream<_i19.DownloadProgress>.empty(),
           )
-          as _i4.Stream<_i18.DownloadProgress>);
+          as _i5.Stream<_i19.DownloadProgress>);
 }
 
 /// A class which mocks [CameraInferenceBloc].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockCameraInferenceBloc extends _i1.Mock
-    implements _i19.CameraInferenceBloc {
+    implements _i20.CameraInferenceBloc {
   MockCameraInferenceBloc() {
     _i1.throwOnMissingStub(this);
   }
@@ -431,12 +450,12 @@ class MockCameraInferenceBloc extends _i1.Mock
           as _i2.CameraInferenceState);
 
   @override
-  _i4.Stream<_i2.CameraInferenceState> get stream =>
+  _i5.Stream<_i2.CameraInferenceState> get stream =>
       (super.noSuchMethod(
             Invocation.getter(#stream),
-            returnValue: _i4.Stream<_i2.CameraInferenceState>.empty(),
+            returnValue: _i5.Stream<_i2.CameraInferenceState>.empty(),
           )
-          as _i4.Stream<_i2.CameraInferenceState>);
+          as _i5.Stream<_i2.CameraInferenceState>);
 
   @override
   bool get isClosed =>
@@ -444,22 +463,22 @@ class MockCameraInferenceBloc extends _i1.Mock
           as bool);
 
   @override
-  _i4.Future<void> close() =>
+  _i5.Future<void> close() =>
       (super.noSuchMethod(
             Invocation.method(#close, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  void add(_i20.CameraInferenceEvent? event) => super.noSuchMethod(
+  void add(_i21.CameraInferenceEvent? event) => super.noSuchMethod(
     Invocation.method(#add, [event]),
     returnValueForMissingStub: null,
   );
 
   @override
-  void onEvent(_i20.CameraInferenceEvent? event) => super.noSuchMethod(
+  void onEvent(_i21.CameraInferenceEvent? event) => super.noSuchMethod(
     Invocation.method(#onEvent, [event]),
     returnValueForMissingStub: null,
   );
@@ -471,9 +490,9 @@ class MockCameraInferenceBloc extends _i1.Mock
   );
 
   @override
-  void on<E extends _i20.CameraInferenceEvent>(
-    _i21.EventHandler<E, _i2.CameraInferenceState>? handler, {
-    _i21.EventTransformer<E>? transformer,
+  void on<E extends _i21.CameraInferenceEvent>(
+    _i22.EventHandler<E, _i2.CameraInferenceState>? handler, {
+    _i22.EventTransformer<E>? transformer,
   }) => super.noSuchMethod(
     Invocation.method(#on, [handler], {#transformer: transformer}),
     returnValueForMissingStub: null,
@@ -481,7 +500,7 @@ class MockCameraInferenceBloc extends _i1.Mock
 
   @override
   void onTransition(
-    _i21.Transition<_i20.CameraInferenceEvent, _i2.CameraInferenceState>?
+    _i22.Transition<_i21.CameraInferenceEvent, _i2.CameraInferenceState>?
     transition,
   ) => super.noSuchMethod(
     Invocation.method(#onTransition, [transition]),
@@ -490,7 +509,7 @@ class MockCameraInferenceBloc extends _i1.Mock
 
   @override
   void onDone(
-    _i20.CameraInferenceEvent? event, [
+    _i21.CameraInferenceEvent? event, [
     Object? error,
     StackTrace? stackTrace,
   ]) => super.noSuchMethod(
@@ -499,7 +518,7 @@ class MockCameraInferenceBloc extends _i1.Mock
   );
 
   @override
-  void onChange(_i21.Change<_i2.CameraInferenceState>? change) =>
+  void onChange(_i22.Change<_i2.CameraInferenceState>? change) =>
       super.noSuchMethod(
         Invocation.method(#onChange, [change]),
         returnValueForMissingStub: null,
@@ -521,21 +540,21 @@ class MockCameraInferenceBloc extends _i1.Mock
 /// A class which mocks [SystemMonitor].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSystemMonitor extends _i1.Mock implements _i22.SystemMonitor {
+class MockSystemMonitor extends _i1.Mock implements _i23.SystemMonitor {
   MockSystemMonitor() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Stream<_i22.SystemMetrics> get metricsStream =>
+  _i5.Stream<_i23.SystemMetrics> get metricsStream =>
       (super.noSuchMethod(
             Invocation.getter(#metricsStream),
-            returnValue: _i4.Stream<_i22.SystemMetrics>.empty(),
+            returnValue: _i5.Stream<_i23.SystemMetrics>.empty(),
           )
-          as _i4.Stream<_i22.SystemMetrics>);
+          as _i5.Stream<_i23.SystemMetrics>);
 
   @override
-  set metricsStream(_i4.Stream<_i22.SystemMetrics>? value) =>
+  set metricsStream(_i5.Stream<_i23.SystemMetrics>? value) =>
       super.noSuchMethod(
         Invocation.setter(#metricsStream, value),
         returnValueForMissingStub: null,
@@ -549,46 +568,46 @@ class MockSystemMonitor extends _i1.Mock implements _i22.SystemMonitor {
       );
 
   @override
-  _i4.Future<void> stop() =>
+  _i5.Future<void> stop() =>
       (super.noSuchMethod(
             Invocation.method(#stop, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 
   @override
-  _i4.Future<void> dispose() =>
+  _i5.Future<void> dispose() =>
       (super.noSuchMethod(
             Invocation.method(#dispose, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 }
 
 /// A class which mocks [GetModelPath].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGetModelPath extends _i1.Mock implements _i23.GetModelPath {
+class MockGetModelPath extends _i1.Mock implements _i24.GetModelPath {
   MockGetModelPath() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Stream<_i7.ModelLoadingState> call(_i8.ModelType? modelType) =>
+  _i5.Stream<_i8.ModelLoadingState> call(_i9.ModelType? modelType) =>
       (super.noSuchMethod(
             Invocation.method(#call, [modelType]),
-            returnValue: _i4.Stream<_i7.ModelLoadingState>.empty(),
+            returnValue: _i5.Stream<_i8.ModelLoadingState>.empty(),
           )
-          as _i4.Stream<_i7.ModelLoadingState>);
+          as _i5.Stream<_i8.ModelLoadingState>);
 }
 
 /// A class which mocks [SetConfidenceThreshold].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSetConfidenceThreshold extends _i1.Mock
-    implements _i24.SetConfidenceThreshold {
+    implements _i25.SetConfidenceThreshold {
   MockSetConfidenceThreshold() {
     _i1.throwOnMissingStub(this);
   }
@@ -603,7 +622,7 @@ class MockSetConfidenceThreshold extends _i1.Mock
 /// A class which mocks [SetIoUThreshold].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSetIoUThreshold extends _i1.Mock implements _i25.SetIoUThreshold {
+class MockSetIoUThreshold extends _i1.Mock implements _i26.SetIoUThreshold {
   MockSetIoUThreshold() {
     _i1.throwOnMissingStub(this);
   }
@@ -619,7 +638,7 @@ class MockSetIoUThreshold extends _i1.Mock implements _i25.SetIoUThreshold {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSetNumItemsThreshold extends _i1.Mock
-    implements _i26.SetNumItemsThreshold {
+    implements _i27.SetNumItemsThreshold {
   MockSetNumItemsThreshold() {
     _i1.throwOnMissingStub(this);
   }
@@ -634,7 +653,7 @@ class MockSetNumItemsThreshold extends _i1.Mock
 /// A class which mocks [SetThresholds].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSetThresholds extends _i1.Mock implements _i27.SetThresholds {
+class MockSetThresholds extends _i1.Mock implements _i28.SetThresholds {
   MockSetThresholds() {
     _i1.throwOnMissingStub(this);
   }
@@ -658,25 +677,25 @@ class MockSetThresholds extends _i1.Mock implements _i27.SetThresholds {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSetStreamingConfig extends _i1.Mock
-    implements _i28.SetStreamingConfig {
+    implements _i29.SetStreamingConfig {
   MockSetStreamingConfig() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<void> call(_i9.SystemHealthState? health) =>
+  _i5.Future<void> call(_i10.SystemHealthState? health) =>
       (super.noSuchMethod(
             Invocation.method(#call, [health]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 }
 
 /// A class which mocks [GetSystemMetrics].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGetSystemMetrics extends _i1.Mock implements _i29.GetSystemMetrics {
+class MockGetSystemMetrics extends _i1.Mock implements _i30.GetSystemMetrics {
   MockGetSystemMetrics() {
     _i1.throwOnMissingStub(this);
   }
@@ -693,19 +712,19 @@ class MockGetSystemMetrics extends _i1.Mock implements _i29.GetSystemMetrics {
           as _i3.SystemMonitorRepository);
 
   @override
-  _i4.Stream<_i5.SystemMetrics> call() =>
+  _i5.Stream<_i6.SystemMetrics> call() =>
       (super.noSuchMethod(
             Invocation.method(#call, []),
-            returnValue: _i4.Stream<_i5.SystemMetrics>.empty(),
+            returnValue: _i5.Stream<_i6.SystemMetrics>.empty(),
           )
-          as _i4.Stream<_i5.SystemMetrics>);
+          as _i5.Stream<_i6.SystemMetrics>);
 }
 
 /// A class which mocks [SystemMetricsMonitorStart].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSystemMetricsMonitorStart extends _i1.Mock
-    implements _i30.SystemMetricsMonitorStart {
+    implements _i31.SystemMetricsMonitorStart {
   MockSystemMetricsMonitorStart() {
     _i1.throwOnMissingStub(this);
   }
@@ -733,7 +752,7 @@ class MockSystemMetricsMonitorStart extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSystemMetricsMonitorStop extends _i1.Mock
-    implements _i31.SystemMetricsMonitorStop {
+    implements _i32.SystemMetricsMonitorStop {
   MockSystemMetricsMonitorStop() {
     _i1.throwOnMissingStub(this);
   }
@@ -750,20 +769,20 @@ class MockSystemMetricsMonitorStop extends _i1.Mock
           as _i3.SystemMonitorRepository);
 
   @override
-  _i4.Future<void> call() =>
+  _i5.Future<void> call() =>
       (super.noSuchMethod(
             Invocation.method(#call, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 }
 
 /// A class which mocks [SystemMetricsMonitorDispose].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSystemMetricsMonitorDispose extends _i1.Mock
-    implements _i32.SystemMetricsMonitorDispose {
+    implements _i33.SystemMetricsMonitorDispose {
   MockSystemMetricsMonitorDispose() {
     _i1.throwOnMissingStub(this);
   }
@@ -780,95 +799,463 @@ class MockSystemMetricsMonitorDispose extends _i1.Mock
           as _i3.SystemMonitorRepository);
 
   @override
-  _i4.Future<void> call() =>
+  _i5.Future<void> call() =>
       (super.noSuchMethod(
             Invocation.method(#call, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i5.Future<void>);
 }
 
 /// A class which mocks [PathProviderPlatform].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockPathProviderPlatform extends _i1.Mock
-    implements _i33.PathProviderPlatform {
+    implements _i34.PathProviderPlatform {
   MockPathProviderPlatform() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<String?> getTemporaryPath() =>
+  _i5.Future<String?> getTemporaryPath() =>
       (super.noSuchMethod(
             Invocation.method(#getTemporaryPath, []),
-            returnValue: _i4.Future<String?>.value(),
+            returnValue: _i5.Future<String?>.value(),
           )
-          as _i4.Future<String?>);
+          as _i5.Future<String?>);
 
   @override
-  _i4.Future<String?> getApplicationSupportPath() =>
+  _i5.Future<String?> getApplicationSupportPath() =>
       (super.noSuchMethod(
             Invocation.method(#getApplicationSupportPath, []),
-            returnValue: _i4.Future<String?>.value(),
+            returnValue: _i5.Future<String?>.value(),
           )
-          as _i4.Future<String?>);
+          as _i5.Future<String?>);
 
   @override
-  _i4.Future<String?> getLibraryPath() =>
+  _i5.Future<String?> getLibraryPath() =>
       (super.noSuchMethod(
             Invocation.method(#getLibraryPath, []),
-            returnValue: _i4.Future<String?>.value(),
+            returnValue: _i5.Future<String?>.value(),
           )
-          as _i4.Future<String?>);
+          as _i5.Future<String?>);
 
   @override
-  _i4.Future<String?> getApplicationDocumentsPath() =>
+  _i5.Future<String?> getApplicationDocumentsPath() =>
       (super.noSuchMethod(
             Invocation.method(#getApplicationDocumentsPath, []),
-            returnValue: _i4.Future<String?>.value(),
+            returnValue: _i5.Future<String?>.value(),
           )
-          as _i4.Future<String?>);
+          as _i5.Future<String?>);
 
   @override
-  _i4.Future<String?> getApplicationCachePath() =>
+  _i5.Future<String?> getApplicationCachePath() =>
       (super.noSuchMethod(
             Invocation.method(#getApplicationCachePath, []),
-            returnValue: _i4.Future<String?>.value(),
+            returnValue: _i5.Future<String?>.value(),
           )
-          as _i4.Future<String?>);
+          as _i5.Future<String?>);
 
   @override
-  _i4.Future<String?> getExternalStoragePath() =>
+  _i5.Future<String?> getExternalStoragePath() =>
       (super.noSuchMethod(
             Invocation.method(#getExternalStoragePath, []),
-            returnValue: _i4.Future<String?>.value(),
+            returnValue: _i5.Future<String?>.value(),
           )
-          as _i4.Future<String?>);
+          as _i5.Future<String?>);
 
   @override
-  _i4.Future<List<String>?> getExternalCachePaths() =>
+  _i5.Future<List<String>?> getExternalCachePaths() =>
       (super.noSuchMethod(
             Invocation.method(#getExternalCachePaths, []),
-            returnValue: _i4.Future<List<String>?>.value(),
+            returnValue: _i5.Future<List<String>?>.value(),
           )
-          as _i4.Future<List<String>?>);
+          as _i5.Future<List<String>?>);
 
   @override
-  _i4.Future<List<String>?> getExternalStoragePaths({
-    _i34.StorageDirectory? type,
+  _i5.Future<List<String>?> getExternalStoragePaths({
+    _i35.StorageDirectory? type,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#getExternalStoragePaths, [], {#type: type}),
-            returnValue: _i4.Future<List<String>?>.value(),
+            returnValue: _i5.Future<List<String>?>.value(),
           )
-          as _i4.Future<List<String>?>);
+          as _i5.Future<List<String>?>);
 
   @override
-  _i4.Future<String?> getDownloadsPath() =>
+  _i5.Future<String?> getDownloadsPath() =>
       (super.noSuchMethod(
             Invocation.method(#getDownloadsPath, []),
-            returnValue: _i4.Future<String?>.value(),
+            returnValue: _i5.Future<String?>.value(),
           )
-          as _i4.Future<String?>);
+          as _i5.Future<String?>);
+}
+
+/// A class which mocks [Client].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockClient extends _i1.Mock implements _i4.Client {
+  MockClient() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.Future<_i4.Response> head(Uri? url, {Map<String, String>? headers}) =>
+      (super.noSuchMethod(
+            Invocation.method(#head, [url], {#headers: headers}),
+            returnValue: _i5.Future<_i4.Response>.value(
+              _FakeResponse_2(
+                this,
+                Invocation.method(#head, [url], {#headers: headers}),
+              ),
+            ),
+          )
+          as _i5.Future<_i4.Response>);
+
+  @override
+  _i5.Future<_i4.Response> get(Uri? url, {Map<String, String>? headers}) =>
+      (super.noSuchMethod(
+            Invocation.method(#get, [url], {#headers: headers}),
+            returnValue: _i5.Future<_i4.Response>.value(
+              _FakeResponse_2(
+                this,
+                Invocation.method(#get, [url], {#headers: headers}),
+              ),
+            ),
+          )
+          as _i5.Future<_i4.Response>);
+
+  @override
+  _i5.Future<_i4.Response> post(
+    Uri? url, {
+    Map<String, String>? headers,
+    Object? body,
+    _i36.Encoding? encoding,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #post,
+              [url],
+              {#headers: headers, #body: body, #encoding: encoding},
+            ),
+            returnValue: _i5.Future<_i4.Response>.value(
+              _FakeResponse_2(
+                this,
+                Invocation.method(
+                  #post,
+                  [url],
+                  {#headers: headers, #body: body, #encoding: encoding},
+                ),
+              ),
+            ),
+          )
+          as _i5.Future<_i4.Response>);
+
+  @override
+  _i5.Future<_i4.Response> put(
+    Uri? url, {
+    Map<String, String>? headers,
+    Object? body,
+    _i36.Encoding? encoding,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #put,
+              [url],
+              {#headers: headers, #body: body, #encoding: encoding},
+            ),
+            returnValue: _i5.Future<_i4.Response>.value(
+              _FakeResponse_2(
+                this,
+                Invocation.method(
+                  #put,
+                  [url],
+                  {#headers: headers, #body: body, #encoding: encoding},
+                ),
+              ),
+            ),
+          )
+          as _i5.Future<_i4.Response>);
+
+  @override
+  _i5.Future<_i4.Response> patch(
+    Uri? url, {
+    Map<String, String>? headers,
+    Object? body,
+    _i36.Encoding? encoding,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #patch,
+              [url],
+              {#headers: headers, #body: body, #encoding: encoding},
+            ),
+            returnValue: _i5.Future<_i4.Response>.value(
+              _FakeResponse_2(
+                this,
+                Invocation.method(
+                  #patch,
+                  [url],
+                  {#headers: headers, #body: body, #encoding: encoding},
+                ),
+              ),
+            ),
+          )
+          as _i5.Future<_i4.Response>);
+
+  @override
+  _i5.Future<_i4.Response> delete(
+    Uri? url, {
+    Map<String, String>? headers,
+    Object? body,
+    _i36.Encoding? encoding,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #delete,
+              [url],
+              {#headers: headers, #body: body, #encoding: encoding},
+            ),
+            returnValue: _i5.Future<_i4.Response>.value(
+              _FakeResponse_2(
+                this,
+                Invocation.method(
+                  #delete,
+                  [url],
+                  {#headers: headers, #body: body, #encoding: encoding},
+                ),
+              ),
+            ),
+          )
+          as _i5.Future<_i4.Response>);
+
+  @override
+  _i5.Future<String> read(Uri? url, {Map<String, String>? headers}) =>
+      (super.noSuchMethod(
+            Invocation.method(#read, [url], {#headers: headers}),
+            returnValue: _i5.Future<String>.value(
+              _i17.dummyValue<String>(
+                this,
+                Invocation.method(#read, [url], {#headers: headers}),
+              ),
+            ),
+          )
+          as _i5.Future<String>);
+
+  @override
+  _i5.Future<_i15.Uint8List> readBytes(
+    Uri? url, {
+    Map<String, String>? headers,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#readBytes, [url], {#headers: headers}),
+            returnValue: _i5.Future<_i15.Uint8List>.value(_i15.Uint8List(0)),
+          )
+          as _i5.Future<_i15.Uint8List>);
+
+  @override
+  _i5.Future<_i4.StreamedResponse> send(_i4.BaseRequest? request) =>
+      (super.noSuchMethod(
+            Invocation.method(#send, [request]),
+            returnValue: _i5.Future<_i4.StreamedResponse>.value(
+              _FakeStreamedResponse_3(
+                this,
+                Invocation.method(#send, [request]),
+              ),
+            ),
+          )
+          as _i5.Future<_i4.StreamedResponse>);
+
+  @override
+  void close() => super.noSuchMethod(
+    Invocation.method(#close, []),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [Platform].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPlatform extends _i1.Mock implements _i37.Platform {
+  MockPlatform() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  int get numberOfProcessors =>
+      (super.noSuchMethod(
+            Invocation.getter(#numberOfProcessors),
+            returnValue: 0,
+          )
+          as int);
+
+  @override
+  String get pathSeparator =>
+      (super.noSuchMethod(
+            Invocation.getter(#pathSeparator),
+            returnValue: _i17.dummyValue<String>(
+              this,
+              Invocation.getter(#pathSeparator),
+            ),
+          )
+          as String);
+
+  @override
+  String get operatingSystem =>
+      (super.noSuchMethod(
+            Invocation.getter(#operatingSystem),
+            returnValue: _i17.dummyValue<String>(
+              this,
+              Invocation.getter(#operatingSystem),
+            ),
+          )
+          as String);
+
+  @override
+  String get operatingSystemVersion =>
+      (super.noSuchMethod(
+            Invocation.getter(#operatingSystemVersion),
+            returnValue: _i17.dummyValue<String>(
+              this,
+              Invocation.getter(#operatingSystemVersion),
+            ),
+          )
+          as String);
+
+  @override
+  String get localHostname =>
+      (super.noSuchMethod(
+            Invocation.getter(#localHostname),
+            returnValue: _i17.dummyValue<String>(
+              this,
+              Invocation.getter(#localHostname),
+            ),
+          )
+          as String);
+
+  @override
+  bool get isLinux =>
+      (super.noSuchMethod(Invocation.getter(#isLinux), returnValue: false)
+          as bool);
+
+  @override
+  bool get isMacOS =>
+      (super.noSuchMethod(Invocation.getter(#isMacOS), returnValue: false)
+          as bool);
+
+  @override
+  bool get isWindows =>
+      (super.noSuchMethod(Invocation.getter(#isWindows), returnValue: false)
+          as bool);
+
+  @override
+  bool get isAndroid =>
+      (super.noSuchMethod(Invocation.getter(#isAndroid), returnValue: false)
+          as bool);
+
+  @override
+  bool get isIOS =>
+      (super.noSuchMethod(Invocation.getter(#isIOS), returnValue: false)
+          as bool);
+
+  @override
+  bool get isFuchsia =>
+      (super.noSuchMethod(Invocation.getter(#isFuchsia), returnValue: false)
+          as bool);
+
+  @override
+  Map<String, String> get environment =>
+      (super.noSuchMethod(
+            Invocation.getter(#environment),
+            returnValue: <String, String>{},
+          )
+          as Map<String, String>);
+
+  @override
+  String get executable =>
+      (super.noSuchMethod(
+            Invocation.getter(#executable),
+            returnValue: _i17.dummyValue<String>(
+              this,
+              Invocation.getter(#executable),
+            ),
+          )
+          as String);
+
+  @override
+  String get resolvedExecutable =>
+      (super.noSuchMethod(
+            Invocation.getter(#resolvedExecutable),
+            returnValue: _i17.dummyValue<String>(
+              this,
+              Invocation.getter(#resolvedExecutable),
+            ),
+          )
+          as String);
+
+  @override
+  Uri get script =>
+      (super.noSuchMethod(
+            Invocation.getter(#script),
+            returnValue: _FakeUri_4(this, Invocation.getter(#script)),
+          )
+          as Uri);
+
+  @override
+  List<String> get executableArguments =>
+      (super.noSuchMethod(
+            Invocation.getter(#executableArguments),
+            returnValue: <String>[],
+          )
+          as List<String>);
+
+  @override
+  String get version =>
+      (super.noSuchMethod(
+            Invocation.getter(#version),
+            returnValue: _i17.dummyValue<String>(
+              this,
+              Invocation.getter(#version),
+            ),
+          )
+          as String);
+
+  @override
+  bool get stdinSupportsAnsi =>
+      (super.noSuchMethod(
+            Invocation.getter(#stdinSupportsAnsi),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  bool get stdoutSupportsAnsi =>
+      (super.noSuchMethod(
+            Invocation.getter(#stdoutSupportsAnsi),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  String get localeName =>
+      (super.noSuchMethod(
+            Invocation.getter(#localeName),
+            returnValue: _i17.dummyValue<String>(
+              this,
+              Invocation.getter(#localeName),
+            ),
+          )
+          as String);
+
+  @override
+  String toJson() =>
+      (super.noSuchMethod(
+            Invocation.method(#toJson, []),
+            returnValue: _i17.dummyValue<String>(
+              this,
+              Invocation.method(#toJson, []),
+            ),
+          )
+          as String);
 }
