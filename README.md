@@ -33,14 +33,6 @@ The project adheres to the principles of Clean Architecture to create a decouple
 - **Data Layer:** Implements the repository interfaces defined in the Domain layer. It is responsible for fetching data from data sources (remote servers, local file system, native plugins).
 - **Application Layer:** Contains the UI (Widgets/Screens) and state management logic (BLoCs). It depends on the Domain layer to execute business logic and orchestrate the presentation of data to the user.
 
-```mermaid
-graph TD
-    A[Application Layer <br/> (UI, BLoCs, Widgets)] --> B[Domain Layer <br/> (Entities, Use Cases, Repositories)];
-    C[Data Layer <br/> (Repositories Impl, Data Sources)] --> B;
-    D[Native Plugins <br/> (YOLO, System Monitor)] --> C;
-    E[Remote Data Source] --> C;
-```
-
 ## Technical Deep Dive
 
 ### Reducing Flutter-to-Native Communication Cost
@@ -82,8 +74,6 @@ The combined adaptive settings are as follows:
 -   **NORMAL:** The app runs with maximum inference frequency for the highest accuracy and real-time responsiveness.
 -   **WARNING (Throttled):** The inference frequency is capped at 10 Hz, and detection thresholds are adjusted to reduce the computational load.
 -   **CRITICAL:** The app enters a `powerSaving` mode, limiting inference to 5 Hz and using the most restrictive thresholds to minimize resource consumption and allow the device to cool down.
-
-![IoU Example](assets/iou.png)
 
 ## Getting Started
 
