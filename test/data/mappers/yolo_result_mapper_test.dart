@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/material.dart'; // Import for Size
-import 'package:ultralytics_yolo/models/yolo_result.dart'; // Assuming YOLOResult is from this package
+import 'package:flutter/material.dart';
+import 'package:ultralytics_yolo/models/yolo_result.dart';
 import 'package:yolo/data/mappers/yolo_result_mapper.dart';
 
 void main() {

@@ -40,7 +40,7 @@ class CameraInferenceBloc
   int _detectionCount = 0;
   int _frameCount = 0;
   double _currentFps = 0.0;
-  DateTime _lastFpsUpdate = DateTime.now();
+  DateTime _lastFpsUpdate;
 
   CameraInferenceBloc({
     required GetModelPath getModelPath,
@@ -65,6 +65,7 @@ class CameraInferenceBloc
        _systemMetricsMonitorStop = systemMetricsMonitorStop,
        _systemMetricsMonitorDispose = systemMetricsMonitorDispose,
        _yoloController = yoloController,
+       _lastFpsUpdate = DateTime.now(),
        super(const CameraInferenceState()) {
     on<events.InitializeCamera>(_onInitializeCamera);
     on<events.ChangeModel>(_onChangeModel);
@@ -357,13 +358,13 @@ class CameraInferenceBloc
     Emitter<CameraInferenceState> emit,
   ) {
     _frameCount++;
-    final now = DateTime.now();
-    final elapsed = now.difference(_lastFpsUpdate).inMilliseconds;
+    final nowTime = DateTime.now();
+    final elapsed = nowTime.difference(_lastFpsUpdate).inMilliseconds;
 
     if (elapsed >= 1000) {
-      _currentFps = _frameCount * 1000 / elapsed;
+      _currentFps = (_frameCount / elapsed) * 1000;
       _frameCount = 0;
-      _lastFpsUpdate = now;
+      _lastFpsUpdate = nowTime;
     }
 
     if (_detectionCount != event.detections.length) {

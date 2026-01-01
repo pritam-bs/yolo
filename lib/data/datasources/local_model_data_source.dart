@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:file/file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:platform/platform.dart';
 import 'package:yolo/domain/entities/models.dart';
 import 'package:injectable/injectable.dart';
 
@@ -15,27 +15,28 @@ abstract class LocalModelDataSource {
 @Injectable(as: LocalModelDataSource)
 class LocalModelDataSourceImpl implements LocalModelDataSource {
   final FileSystem _fileSystem;
+  final Platform _platform;
 
-  LocalModelDataSourceImpl(this._fileSystem);
+  LocalModelDataSourceImpl(this._fileSystem, this._platform);
 
   @override
   Future<String?> getModelPath(ModelType modelType) async {
     final dir = await getApplicationDocumentsDirectory();
     final String modelPath;
 
-    if (Platform.isIOS) {
+    if (_platform.isIOS) {
       modelPath = _getIOSModelDirPath(modelType, dir.path);
-    } else if (Platform.isAndroid) {
+    } else if (_platform.isAndroid) {
       modelPath = _getAndroidModelFilePath(modelType, dir.path);
     } else {
       // This will crash the app with a clear message if run on Web, Windows, Mac, or Linux
       throw UnsupportedError(
         'The ultralytics_yolo package only supports iOS and Android. '
-        'Current platform: ${Platform.operatingSystem}',
+        'Current platform: ${_platform.operatingSystem}',
       );
     }
 
-    if (Platform.isIOS) {
+    if (_platform.isIOS) {
       final modelDir = _fileSystem.directory(modelPath);
       if (await modelDir.exists()) {
         // For iOS, check if Manifest.json exists within the .mlpackage directory
@@ -65,7 +66,7 @@ class LocalModelDataSourceImpl implements LocalModelDataSource {
     final dir = await getApplicationDocumentsDirectory();
     final String targetPath;
 
-    if (Platform.isIOS) {
+    if (_platform.isIOS) {
       final modelDirPath = _getIOSModelDirPath(modelType, dir.path);
       final modelDir = _fileSystem.directory(modelDirPath);
 
@@ -81,7 +82,7 @@ class LocalModelDataSourceImpl implements LocalModelDataSource {
         // Should not happen for iOS mlpackage, but as a fallback
         throw Exception('iOS models (.mlpackage) should be provided as a zip.');
       }
-    } else if (Platform.isAndroid) {
+    } else if (_platform.isAndroid) {
       // Android .tflite model
       targetPath = _getAndroidModelFilePath(modelType, dir.path);
       final modelFile = _fileSystem.file(targetPath);
@@ -90,13 +91,14 @@ class LocalModelDataSourceImpl implements LocalModelDataSource {
         await modelFile.delete(); // Clean up any old partial downloads
       }
 
+      await modelFile.parent.create(recursive: true);
       await modelFile.writeAsBytes(bytes);
       return modelFile.path;
     } else {
       // This will crash the app with a clear message if run on Web, Windows, Mac, or Linux
       throw UnsupportedError(
         'The ultralytics_yolo package only supports iOS and Android. '
-        'Current platform: ${Platform.operatingSystem}',
+        'Current platform: ${_platform.operatingSystem}',
       );
     }
   }
