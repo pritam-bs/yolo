@@ -10,6 +10,10 @@ import 'package:flutter/services.dart' as _i11;
 import 'package:flutter_bloc/flutter_bloc.dart' as _i21;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i16;
+import 'package:path_provider/path_provider.dart' as _i34;
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart'
+    as _i33;
+import 'package:system_monitor/system_monitor.dart' as _i22;
 import 'package:ultralytics_yolo/models/yolo_task.dart' as _i12;
 import 'package:ultralytics_yolo/widgets/yolo_controller.dart' as _i10;
 import 'package:ultralytics_yolo/yolo_streaming_config.dart' as _i13;
@@ -28,6 +32,17 @@ import 'package:yolo/domain/entities/system_health_state.dart' as _i9;
 import 'package:yolo/domain/entities/system_metrics.dart' as _i5;
 import 'package:yolo/domain/repositories/system_monitor_repository.dart' as _i3;
 import 'package:yolo/domain/repositories/yolo_repository.dart' as _i6;
+import 'package:yolo/domain/usecases/get_model_path.dart' as _i23;
+import 'package:yolo/domain/usecases/get_system_metrics.dart' as _i29;
+import 'package:yolo/domain/usecases/set_confidence_threshold.dart' as _i24;
+import 'package:yolo/domain/usecases/set_iou_threshold.dart' as _i25;
+import 'package:yolo/domain/usecases/set_num_items_threshold.dart' as _i26;
+import 'package:yolo/domain/usecases/set_streaming_config.dart' as _i28;
+import 'package:yolo/domain/usecases/set_thresholds.dart' as _i27;
+import 'package:yolo/domain/usecases/system_metrics_monitor_dispose.dart'
+    as _i32;
+import 'package:yolo/domain/usecases/system_metrics_monitor_start.dart' as _i30;
+import 'package:yolo/domain/usecases/system_metrics_monitor_stop.dart' as _i31;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -47,6 +62,12 @@ import 'package:yolo/domain/repositories/yolo_repository.dart' as _i6;
 class _FakeCameraInferenceState_0 extends _i1.SmartFake
     implements _i2.CameraInferenceState {
   _FakeCameraInferenceState_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeSystemMonitorRepository_1 extends _i1.SmartFake
+    implements _i3.SystemMonitorRepository {
+  _FakeSystemMonitorRepository_1(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -495,4 +516,359 @@ class MockCameraInferenceBloc extends _i1.Mock
     Invocation.method(#onError, [error, stackTrace]),
     returnValueForMissingStub: null,
   );
+}
+
+/// A class which mocks [SystemMonitor].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSystemMonitor extends _i1.Mock implements _i22.SystemMonitor {
+  MockSystemMonitor() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Stream<_i22.SystemMetrics> get metricsStream =>
+      (super.noSuchMethod(
+            Invocation.getter(#metricsStream),
+            returnValue: _i4.Stream<_i22.SystemMetrics>.empty(),
+          )
+          as _i4.Stream<_i22.SystemMetrics>);
+
+  @override
+  set metricsStream(_i4.Stream<_i22.SystemMetrics>? value) =>
+      super.noSuchMethod(
+        Invocation.setter(#metricsStream, value),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void start({Duration? interval = const Duration(seconds: 3)}) =>
+      super.noSuchMethod(
+        Invocation.method(#start, [], {#interval: interval}),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i4.Future<void> stop() =>
+      (super.noSuchMethod(
+            Invocation.method(#stop, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> dispose() =>
+      (super.noSuchMethod(
+            Invocation.method(#dispose, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+}
+
+/// A class which mocks [GetModelPath].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetModelPath extends _i1.Mock implements _i23.GetModelPath {
+  MockGetModelPath() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Stream<_i7.ModelLoadingState> call(_i8.ModelType? modelType) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [modelType]),
+            returnValue: _i4.Stream<_i7.ModelLoadingState>.empty(),
+          )
+          as _i4.Stream<_i7.ModelLoadingState>);
+}
+
+/// A class which mocks [SetConfidenceThreshold].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSetConfidenceThreshold extends _i1.Mock
+    implements _i24.SetConfidenceThreshold {
+  MockSetConfidenceThreshold() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  void call(double? threshold) => super.noSuchMethod(
+    Invocation.method(#call, [threshold]),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [SetIoUThreshold].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSetIoUThreshold extends _i1.Mock implements _i25.SetIoUThreshold {
+  MockSetIoUThreshold() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  void call(double? threshold) => super.noSuchMethod(
+    Invocation.method(#call, [threshold]),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [SetNumItemsThreshold].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSetNumItemsThreshold extends _i1.Mock
+    implements _i26.SetNumItemsThreshold {
+  MockSetNumItemsThreshold() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  void call(int? threshold) => super.noSuchMethod(
+    Invocation.method(#call, [threshold]),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [SetThresholds].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSetThresholds extends _i1.Mock implements _i27.SetThresholds {
+  MockSetThresholds() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  void call({
+    required double? confidenceThreshold,
+    required double? iouThreshold,
+    required int? numItemsThreshold,
+  }) => super.noSuchMethod(
+    Invocation.method(#call, [], {
+      #confidenceThreshold: confidenceThreshold,
+      #iouThreshold: iouThreshold,
+      #numItemsThreshold: numItemsThreshold,
+    }),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [SetStreamingConfig].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSetStreamingConfig extends _i1.Mock
+    implements _i28.SetStreamingConfig {
+  MockSetStreamingConfig() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Future<void> call(_i9.SystemHealthState? health) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [health]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+}
+
+/// A class which mocks [GetSystemMetrics].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetSystemMetrics extends _i1.Mock implements _i29.GetSystemMetrics {
+  MockGetSystemMetrics() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.SystemMonitorRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeSystemMonitorRepository_1(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i3.SystemMonitorRepository);
+
+  @override
+  _i4.Stream<_i5.SystemMetrics> call() =>
+      (super.noSuchMethod(
+            Invocation.method(#call, []),
+            returnValue: _i4.Stream<_i5.SystemMetrics>.empty(),
+          )
+          as _i4.Stream<_i5.SystemMetrics>);
+}
+
+/// A class which mocks [SystemMetricsMonitorStart].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSystemMetricsMonitorStart extends _i1.Mock
+    implements _i30.SystemMetricsMonitorStart {
+  MockSystemMetricsMonitorStart() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.SystemMonitorRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeSystemMonitorRepository_1(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i3.SystemMonitorRepository);
+
+  @override
+  void call({Duration? interval = const Duration(minutes: 5)}) =>
+      super.noSuchMethod(
+        Invocation.method(#call, [], {#interval: interval}),
+        returnValueForMissingStub: null,
+      );
+}
+
+/// A class which mocks [SystemMetricsMonitorStop].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSystemMetricsMonitorStop extends _i1.Mock
+    implements _i31.SystemMetricsMonitorStop {
+  MockSystemMetricsMonitorStop() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.SystemMonitorRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeSystemMonitorRepository_1(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i3.SystemMonitorRepository);
+
+  @override
+  _i4.Future<void> call() =>
+      (super.noSuchMethod(
+            Invocation.method(#call, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+}
+
+/// A class which mocks [SystemMetricsMonitorDispose].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSystemMetricsMonitorDispose extends _i1.Mock
+    implements _i32.SystemMetricsMonitorDispose {
+  MockSystemMetricsMonitorDispose() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.SystemMonitorRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeSystemMonitorRepository_1(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i3.SystemMonitorRepository);
+
+  @override
+  _i4.Future<void> call() =>
+      (super.noSuchMethod(
+            Invocation.method(#call, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+}
+
+/// A class which mocks [PathProviderPlatform].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPathProviderPlatform extends _i1.Mock
+    implements _i33.PathProviderPlatform {
+  MockPathProviderPlatform() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Future<String?> getTemporaryPath() =>
+      (super.noSuchMethod(
+            Invocation.method(#getTemporaryPath, []),
+            returnValue: _i4.Future<String?>.value(),
+          )
+          as _i4.Future<String?>);
+
+  @override
+  _i4.Future<String?> getApplicationSupportPath() =>
+      (super.noSuchMethod(
+            Invocation.method(#getApplicationSupportPath, []),
+            returnValue: _i4.Future<String?>.value(),
+          )
+          as _i4.Future<String?>);
+
+  @override
+  _i4.Future<String?> getLibraryPath() =>
+      (super.noSuchMethod(
+            Invocation.method(#getLibraryPath, []),
+            returnValue: _i4.Future<String?>.value(),
+          )
+          as _i4.Future<String?>);
+
+  @override
+  _i4.Future<String?> getApplicationDocumentsPath() =>
+      (super.noSuchMethod(
+            Invocation.method(#getApplicationDocumentsPath, []),
+            returnValue: _i4.Future<String?>.value(),
+          )
+          as _i4.Future<String?>);
+
+  @override
+  _i4.Future<String?> getApplicationCachePath() =>
+      (super.noSuchMethod(
+            Invocation.method(#getApplicationCachePath, []),
+            returnValue: _i4.Future<String?>.value(),
+          )
+          as _i4.Future<String?>);
+
+  @override
+  _i4.Future<String?> getExternalStoragePath() =>
+      (super.noSuchMethod(
+            Invocation.method(#getExternalStoragePath, []),
+            returnValue: _i4.Future<String?>.value(),
+          )
+          as _i4.Future<String?>);
+
+  @override
+  _i4.Future<List<String>?> getExternalCachePaths() =>
+      (super.noSuchMethod(
+            Invocation.method(#getExternalCachePaths, []),
+            returnValue: _i4.Future<List<String>?>.value(),
+          )
+          as _i4.Future<List<String>?>);
+
+  @override
+  _i4.Future<List<String>?> getExternalStoragePaths({
+    _i34.StorageDirectory? type,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getExternalStoragePaths, [], {#type: type}),
+            returnValue: _i4.Future<List<String>?>.value(),
+          )
+          as _i4.Future<List<String>?>);
+
+  @override
+  _i4.Future<String?> getDownloadsPath() =>
+      (super.noSuchMethod(
+            Invocation.method(#getDownloadsPath, []),
+            returnValue: _i4.Future<String?>.value(),
+          )
+          as _i4.Future<String?>);
 }

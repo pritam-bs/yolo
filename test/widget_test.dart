@@ -25,7 +25,7 @@ void main() {
         const CameraInferenceState(
           status: CameraInferenceStatus.initial(),
           detections: [],
-        )
+        ),
       ]),
       initialState: const CameraInferenceState(
         status: CameraInferenceStatus.initial(),
@@ -34,12 +34,14 @@ void main() {
     );
 
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MaterialApp(
-      home: BlocProvider<CameraInferenceBloc>.value(
-        value: mockCameraInferenceBloc,
-        child: const CameraInferenceScreen(),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider<CameraInferenceBloc>.value(
+          value: mockCameraInferenceBloc,
+          child: const CameraInferenceScreen(),
+        ),
       ),
-    ));
+    );
 
     // Verify that CameraInferenceScreen is rendered.
     expect(find.byType(CameraInferenceScreen), findsOneWidget);

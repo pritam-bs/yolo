@@ -13,6 +13,7 @@ import 'package:file/file.dart' as _i303;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:http/http.dart' as _i519;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:platform/platform.dart' as _i678;
 import 'package:system_monitor/system_monitor.dart' as _i407;
 import 'package:ultralytics_yolo/widgets/yolo_controller.dart' as _i344;
 
@@ -47,6 +48,7 @@ _i174.GetIt initGetIt(
   gh.lazySingleton<_i303.FileSystem>(() => appModule.fileSystem);
   gh.lazySingleton<_i407.SystemMonitor>(() => appModule.systemMonitor);
   gh.lazySingleton<_i344.YOLOViewController>(() => appModule.yoloController);
+  gh.lazySingleton<_i678.Platform>(() => appModule.platform);
   gh.lazySingleton<_i992.RemoteModelDataSource>(
     () => _i992.RemoteModelDataSource(gh<_i519.Client>()),
   );
@@ -54,13 +56,9 @@ _i174.GetIt initGetIt(
     () => _i570.SystemMonitorRepositoryImpl(gh<_i407.SystemMonitor>()),
   );
   gh.factory<_i789.LocalModelDataSource>(
-    () => _i789.LocalModelDataSourceImpl(gh<_i303.FileSystem>()),
-  );
-  gh.lazySingleton<_i25.YoloRepository>(
-    () => _i320.YoloRepositoryImpl(
-      localModelDataSource: gh<_i789.LocalModelDataSource>(),
-      remoteModelDataSource: gh<_i992.RemoteModelDataSource>(),
-      yoloViewController: gh<_i344.YOLOViewController>(),
+    () => _i789.LocalModelDataSourceImpl(
+      gh<_i303.FileSystem>(),
+      gh<_i678.Platform>(),
     ),
   );
   gh.lazySingleton<_i619.GetSystemMetrics>(
@@ -75,6 +73,13 @@ _i174.GetIt initGetIt(
   );
   gh.lazySingleton<_i586.SystemMetricsMonitorStop>(
     () => _i586.SystemMetricsMonitorStop(gh<_i222.SystemMonitorRepository>()),
+  );
+  gh.lazySingleton<_i25.YoloRepository>(
+    () => _i320.YoloRepositoryImpl(
+      localModelDataSource: gh<_i789.LocalModelDataSource>(),
+      remoteModelDataSource: gh<_i992.RemoteModelDataSource>(),
+      yoloViewController: gh<_i344.YOLOViewController>(),
+    ),
   );
   gh.factory<_i536.SetStreamingConfig>(
     () => _i536.SetStreamingConfig(gh<_i25.YoloRepository>()),
