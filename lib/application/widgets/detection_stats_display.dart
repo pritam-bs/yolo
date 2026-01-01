@@ -8,10 +8,12 @@ class DetectionStatsDisplay extends StatelessWidget {
     super.key,
     required this.detectionCount,
     required this.currentFps,
+    required this.processingTimeMs,
   });
 
   final int detectionCount;
   final double currentFps;
+  final double processingTimeMs;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,14 @@ class DetectionStatsDisplay extends StatelessWidget {
           const SizedBox(width: 16),
           Text(
             'FPS: ${currentFps.toStringAsFixed(1)}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            'TIME: ${processingTimeMs.toStringAsFixed(1)}ms',
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w600,

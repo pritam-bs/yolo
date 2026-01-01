@@ -41,6 +41,7 @@ class CameraInferenceBloc
   int _frameCount = 0;
   double _currentFps = 0.0;
   DateTime _lastFpsUpdate;
+  Timer? _performanceMonitorTimer;
 
   CameraInferenceBloc({
     required GetModelPath getModelPath,
@@ -76,19 +77,42 @@ class CameraInferenceBloc
     on<events.UpdateNumItemsThreshold>(_onUpdateNumItemsThreshold);
     on<events.DetectionsOccurred>(_onDetectionsOccurred);
     on<events.ToggleSlider>(_onToggleSlider);
-    on<events.UpdateFps>(_onUpdateFps);
     on<events.UpdateLensFacing>(_onUpdateLensFacing);
     on<events.RetryModelDownload>(_onRetryModelDownload);
     on<events.ResumeCamera>(_onResumeLayoutCamera);
     on<events.SetInitialConfig>(_onSetInitialConfig);
     on<events.StartSystemMonitor>(_onStartSystemMonitor);
+    on<events.UpdatePerformanceMetrics>(_onUpdatePerformanceMetrics);
+    on<events.ShowAveragePerformanceAlert>(_onShowAveragePerformanceAlert);
+    on<events.ResetAlert>(_onResetAlert);
   }
 
   @override
   Future<void> close() async {
+    _performanceMonitorTimer?.cancel();
     await _systemMetricsMonitorStop();
     await _systemMetricsMonitorDispose();
     return super.close();
+  }
+
+  void _startPerformanceMonitoring(Emitter<CameraInferenceState> emit) {
+    if (state.monitoringStartTime == null) {
+      emit(
+        state.copyWith(
+          monitoringStartTime: DateTime.now(),
+          processingTimes: [],
+          fpsValues: [],
+          ramUsages: [],
+          averageProcessingTime: null,
+          averageFps: null,
+          averageRamUsage: null,
+          showAlert: false,
+        ),
+      );
+      _performanceMonitorTimer = Timer(const Duration(minutes: 5), () {
+        add(const events.CameraInferenceEvent.showAveragePerformanceAlert());
+      });
+    }
   }
 
   Future<void> _onStartSystemMonitor(
@@ -96,12 +120,15 @@ class CameraInferenceBloc
     Emitter<CameraInferenceState> emit,
   ) async {
     // Start monitoring
-    _systemMetricsMonitorStart(interval: Duration(minutes: 5));
+    _systemMetricsMonitorStart(interval: const Duration(minutes: 5));
 
     await emit.onEach<SystemMetrics>(
       _getSystemMetrics(),
       onData: (metrics) async {
         final healthState = _determineHealthState(metrics);
+        // Always add ramUsage to the list for averaging
+        final newRamUsages = [...state.ramUsages, metrics.ramUsage];
+
         if (healthState != state.systemHealthState) {
           await _setStreamingConfig(healthState);
 
@@ -119,6 +146,7 @@ class CameraInferenceBloc
                   confidenceThreshold: 0.5,
                   iouThreshold: 0.45,
                   numItemsThreshold: 30,
+                  ramUsages: newRamUsages,
                 ),
               );
               break;
@@ -135,6 +163,7 @@ class CameraInferenceBloc
                   confidenceThreshold: 0.4,
                   iouThreshold: 0.5,
                   numItemsThreshold: 20,
+                  ramUsages: newRamUsages,
                 ),
               );
               break;
@@ -151,10 +180,14 @@ class CameraInferenceBloc
                   confidenceThreshold: 0.3,
                   iouThreshold: 0.6,
                   numItemsThreshold: 10,
+                  ramUsages: newRamUsages,
                 ),
               );
               break;
           }
+        } else {
+          // If health state doesn't change, just update ram usage
+          emit(state.copyWith(ramUsages: newRamUsages));
         }
       },
     );
@@ -174,14 +207,81 @@ class CameraInferenceBloc
     }
   }
 
-  void _onUpdateFps(
-    events.UpdateFps event,
+  void _onUpdatePerformanceMetrics(
+    events.UpdatePerformanceMetrics event,
     Emitter<CameraInferenceState> emit,
   ) {
-    if ((_currentFps - event.fps).abs() > 0.1) {
-      _currentFps = event.fps;
-      emit(state.copyWith(currentFps: _currentFps));
+    final newProcessingTimes = [
+      ...state.processingTimes,
+      event.metrics.processingTimeMs,
+    ];
+    final newFpsValues = [...state.fpsValues, event.metrics.fps];
+
+    emit(
+      state.copyWith(
+        currentFps: event.metrics.fps,
+        processingTimeMs: event.metrics.processingTimeMs,
+        processingTimes: newProcessingTimes,
+        fpsValues: newFpsValues,
+      ),
+    );
+  }
+
+  void _onShowAveragePerformanceAlert(
+    events.ShowAveragePerformanceAlert event,
+    Emitter<CameraInferenceState> emit,
+  ) {
+    _performanceMonitorTimer?.cancel(); // Stop the timer
+
+    if (state.processingTimes.isEmpty ||
+        state.fpsValues.isEmpty ||
+        state.ramUsages.isEmpty) {
+      emit(
+        state.copyWith(
+          showAlert: true,
+          averageProcessingTime: 0.0,
+          averageFps: 0.0,
+          averageRamUsage: 0.0,
+        ),
+      );
+      return;
     }
+
+    final averageProcessingTime =
+        state.processingTimes.reduce((a, b) => a + b) /
+        state.processingTimes.length;
+    final averageFps =
+        state.fpsValues.reduce((a, b) => a + b) / state.fpsValues.length;
+    final averageRamUsage =
+        state.ramUsages.reduce((a, b) => a + b) / state.ramUsages.length;
+
+    emit(
+      state.copyWith(
+        showAlert: true,
+        averageProcessingTime: averageProcessingTime,
+        averageFps: averageFps,
+        averageRamUsage: averageRamUsage,
+      ),
+    );
+  }
+
+  void _onResetAlert(
+    events.ResetAlert event,
+    Emitter<CameraInferenceState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        showAlert: false,
+        monitoringStartTime: null,
+        processingTimes: [],
+        fpsValues: [],
+        ramUsages: [],
+        averageProcessingTime: null,
+        averageFps: null,
+        averageRamUsage: null,
+      ),
+    );
+    _performanceMonitorTimer?.cancel(); // Ensure timer is cancelled on reset
   }
 
   void _onUpdateLensFacing(
@@ -196,6 +296,7 @@ class CameraInferenceBloc
     Emitter<CameraInferenceState> emit,
   ) async {
     emit(state.copyWith(status: const CameraInferenceStatus.loading()));
+    _startPerformanceMonitoring(emit); // Start monitoring
 
     _setThresholds(
       confidenceThreshold: state.confidenceThreshold,
@@ -216,6 +317,7 @@ class CameraInferenceBloc
         modelType: event.model,
       ),
     );
+    _startPerformanceMonitoring(emit); // Restart monitoring on model change
 
     _setThresholds(
       confidenceThreshold: state.confidenceThreshold,
@@ -231,6 +333,7 @@ class CameraInferenceBloc
     Emitter<CameraInferenceState> emit,
   ) async {
     emit(state.copyWith(status: const CameraInferenceStatus.loading()));
+    _startPerformanceMonitoring(emit); // Start monitoring
     await _downloadModel(state.modelType, emit);
   }
 
@@ -241,6 +344,7 @@ class CameraInferenceBloc
     if (state.status == const CameraInferenceStatus.initial() ||
         state.status.maybeWhen(failure: (_) => true, orElse: () => false)) {
       emit(state.copyWith(status: const CameraInferenceStatus.loading()));
+      _startPerformanceMonitoring(emit); // Start monitoring
       await _downloadModel(state.modelType, emit);
     }
   }

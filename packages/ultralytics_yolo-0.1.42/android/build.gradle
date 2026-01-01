@@ -66,7 +66,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
         
         // Native library build configuration
         externalNativeBuild {
@@ -103,10 +103,10 @@ android {
             compileOnly 'io.flutter:flutter_embedding_release:1.0.0-1527ae0ec577a4ef50e65f6fefcfc1326707d9bf'
         }
         
-        implementation("com.google.ai.edge.litert:litert:1.4.0")
-        implementation("com.google.ai.edge.litert:litert-gpu:1.4.0")
-        implementation('com.google.ai.edge.litert:litert-support-api:1.4.0')
-        implementation('com.google.ai.edge.litert:litert-metadata:1.4.0')
+        implementation("com.google.ai.edge.litert:litert:1.4.1")
+        implementation("com.google.ai.edge.litert:litert-gpu:1.4.1")
+        implementation('com.google.ai.edge.litert:litert-support-api:1.4.1')
+        implementation('com.google.ai.edge.litert:litert-metadata:1.4.1')
         testImplementation("junit:junit:4.13.2")
         androidTestImplementation("androidx.test.ext:junit:1.1.5")
         androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

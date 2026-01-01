@@ -38,21 +38,62 @@ class _CameraInferenceScreenState extends State<CameraInferenceScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocBuilder<CameraInferenceBloc, CameraInferenceState>(
-        builder: (context, state) {
-          final isModelReady = state.status.maybeWhen(
-            success: () => true,
-            orElse: () => false,
+    return BlocListener<CameraInferenceBloc, CameraInferenceState>(
+      listenWhen: (previous, current) => previous.showAlert != current.showAlert,
+      listener: (context, state) {
+        if (state.showAlert) {
+          final bloc = context.read<CameraInferenceBloc>();
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext dialogContext) {
+              return AlertDialog(
+                title: const Text('Average Performance Metrics'),
+                content: SingleChildScrollView(
+                  child: ListBody(
+                    children: <Widget>[
+                      Text(
+                        'Avg. Processing Time: ${state.averageProcessingTime?.toStringAsFixed(1) ?? 'N/A'}ms',
+                      ),
+                      Text(
+                        'Avg. FPS: ${state.averageFps?.toStringAsFixed(1) ?? 'N/A'}',
+                      ),
+                      Text(
+                        'Avg. RAM Usage: ${(state.averageRamUsage != null ? state.averageRamUsage! * 100 : 0.0).toStringAsFixed(1)}%',
+                      ),
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop();
+                      bloc.add(const ResetAlert());
+                    },
+                  ),
+                ],
+              );
+            },
           );
+        }
+      },
+      child: Scaffold(
+        body: BlocBuilder<CameraInferenceBloc, CameraInferenceState>(
+          builder: (context, state) {
+            final isModelReady = state.status.maybeWhen(
+              success: () => true,
+              orElse: () => false,
+            );
 
-          return Stack(
-            children: [
-              if (isModelReady) const CameraView(),
-              if (!isModelReady) const ModelLoadingOverlay(),
-            ],
-          );
-        },
+            return Stack(
+              children: [
+                if (isModelReady) const CameraView(),
+                if (!isModelReady) const ModelLoadingOverlay(),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

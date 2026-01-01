@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CameraInferenceState {
 
- CameraInferenceStatus get status; ModelType get modelType; String? get modelPath; double get confidenceThreshold; double get iouThreshold; int get numItemsThreshold; InferenceParameter get activeSlider; bool get isFrontCamera; double get currentZoomLevel; List<DetectionResult> get detections; double get currentFps; LensFacing get currentLensFacing; SystemHealthState get systemHealthState;
+ CameraInferenceStatus get status; ModelType get modelType; String? get modelPath; double get confidenceThreshold; double get iouThreshold; int get numItemsThreshold; InferenceParameter get activeSlider; bool get isFrontCamera; double get currentZoomLevel; List<DetectionResult> get detections; double get currentFps; double get processingTimeMs; LensFacing get currentLensFacing; SystemHealthState get systemHealthState; List<double> get processingTimes; List<double> get fpsValues; List<double> get ramUsages; DateTime? get monitoringStartTime; bool get showAlert; double? get averageProcessingTime; double? get averageFps; double? get averageRamUsage;
 /// Create a copy of CameraInferenceState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $CameraInferenceStateCopyWith<CameraInferenceState> get copyWith => _$CameraInfe
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CameraInferenceState&&(identical(other.status, status) || other.status == status)&&(identical(other.modelType, modelType) || other.modelType == modelType)&&(identical(other.modelPath, modelPath) || other.modelPath == modelPath)&&(identical(other.confidenceThreshold, confidenceThreshold) || other.confidenceThreshold == confidenceThreshold)&&(identical(other.iouThreshold, iouThreshold) || other.iouThreshold == iouThreshold)&&(identical(other.numItemsThreshold, numItemsThreshold) || other.numItemsThreshold == numItemsThreshold)&&(identical(other.activeSlider, activeSlider) || other.activeSlider == activeSlider)&&(identical(other.isFrontCamera, isFrontCamera) || other.isFrontCamera == isFrontCamera)&&(identical(other.currentZoomLevel, currentZoomLevel) || other.currentZoomLevel == currentZoomLevel)&&const DeepCollectionEquality().equals(other.detections, detections)&&(identical(other.currentFps, currentFps) || other.currentFps == currentFps)&&(identical(other.currentLensFacing, currentLensFacing) || other.currentLensFacing == currentLensFacing)&&(identical(other.systemHealthState, systemHealthState) || other.systemHealthState == systemHealthState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CameraInferenceState&&(identical(other.status, status) || other.status == status)&&(identical(other.modelType, modelType) || other.modelType == modelType)&&(identical(other.modelPath, modelPath) || other.modelPath == modelPath)&&(identical(other.confidenceThreshold, confidenceThreshold) || other.confidenceThreshold == confidenceThreshold)&&(identical(other.iouThreshold, iouThreshold) || other.iouThreshold == iouThreshold)&&(identical(other.numItemsThreshold, numItemsThreshold) || other.numItemsThreshold == numItemsThreshold)&&(identical(other.activeSlider, activeSlider) || other.activeSlider == activeSlider)&&(identical(other.isFrontCamera, isFrontCamera) || other.isFrontCamera == isFrontCamera)&&(identical(other.currentZoomLevel, currentZoomLevel) || other.currentZoomLevel == currentZoomLevel)&&const DeepCollectionEquality().equals(other.detections, detections)&&(identical(other.currentFps, currentFps) || other.currentFps == currentFps)&&(identical(other.processingTimeMs, processingTimeMs) || other.processingTimeMs == processingTimeMs)&&(identical(other.currentLensFacing, currentLensFacing) || other.currentLensFacing == currentLensFacing)&&(identical(other.systemHealthState, systemHealthState) || other.systemHealthState == systemHealthState)&&const DeepCollectionEquality().equals(other.processingTimes, processingTimes)&&const DeepCollectionEquality().equals(other.fpsValues, fpsValues)&&const DeepCollectionEquality().equals(other.ramUsages, ramUsages)&&(identical(other.monitoringStartTime, monitoringStartTime) || other.monitoringStartTime == monitoringStartTime)&&(identical(other.showAlert, showAlert) || other.showAlert == showAlert)&&(identical(other.averageProcessingTime, averageProcessingTime) || other.averageProcessingTime == averageProcessingTime)&&(identical(other.averageFps, averageFps) || other.averageFps == averageFps)&&(identical(other.averageRamUsage, averageRamUsage) || other.averageRamUsage == averageRamUsage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,modelType,modelPath,confidenceThreshold,iouThreshold,numItemsThreshold,activeSlider,isFrontCamera,currentZoomLevel,const DeepCollectionEquality().hash(detections),currentFps,currentLensFacing,systemHealthState);
+int get hashCode => Object.hashAll([runtimeType,status,modelType,modelPath,confidenceThreshold,iouThreshold,numItemsThreshold,activeSlider,isFrontCamera,currentZoomLevel,const DeepCollectionEquality().hash(detections),currentFps,processingTimeMs,currentLensFacing,systemHealthState,const DeepCollectionEquality().hash(processingTimes),const DeepCollectionEquality().hash(fpsValues),const DeepCollectionEquality().hash(ramUsages),monitoringStartTime,showAlert,averageProcessingTime,averageFps,averageRamUsage]);
 
 @override
 String toString() {
-  return 'CameraInferenceState(status: $status, modelType: $modelType, modelPath: $modelPath, confidenceThreshold: $confidenceThreshold, iouThreshold: $iouThreshold, numItemsThreshold: $numItemsThreshold, activeSlider: $activeSlider, isFrontCamera: $isFrontCamera, currentZoomLevel: $currentZoomLevel, detections: $detections, currentFps: $currentFps, currentLensFacing: $currentLensFacing, systemHealthState: $systemHealthState)';
+  return 'CameraInferenceState(status: $status, modelType: $modelType, modelPath: $modelPath, confidenceThreshold: $confidenceThreshold, iouThreshold: $iouThreshold, numItemsThreshold: $numItemsThreshold, activeSlider: $activeSlider, isFrontCamera: $isFrontCamera, currentZoomLevel: $currentZoomLevel, detections: $detections, currentFps: $currentFps, processingTimeMs: $processingTimeMs, currentLensFacing: $currentLensFacing, systemHealthState: $systemHealthState, processingTimes: $processingTimes, fpsValues: $fpsValues, ramUsages: $ramUsages, monitoringStartTime: $monitoringStartTime, showAlert: $showAlert, averageProcessingTime: $averageProcessingTime, averageFps: $averageFps, averageRamUsage: $averageRamUsage)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $CameraInferenceStateCopyWith<$Res>  {
   factory $CameraInferenceStateCopyWith(CameraInferenceState value, $Res Function(CameraInferenceState) _then) = _$CameraInferenceStateCopyWithImpl;
 @useResult
 $Res call({
- CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, InferenceParameter activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing, SystemHealthState systemHealthState
+ CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, InferenceParameter activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, double processingTimeMs, LensFacing currentLensFacing, SystemHealthState systemHealthState, List<double> processingTimes, List<double> fpsValues, List<double> ramUsages, DateTime? monitoringStartTime, bool showAlert, double? averageProcessingTime, double? averageFps, double? averageRamUsage
 });
 
 
@@ -62,7 +62,7 @@ class _$CameraInferenceStateCopyWithImpl<$Res>
 
 /// Create a copy of CameraInferenceState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? modelType = null,Object? modelPath = freezed,Object? confidenceThreshold = null,Object? iouThreshold = null,Object? numItemsThreshold = null,Object? activeSlider = null,Object? isFrontCamera = null,Object? currentZoomLevel = null,Object? detections = null,Object? currentFps = null,Object? currentLensFacing = null,Object? systemHealthState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? modelType = null,Object? modelPath = freezed,Object? confidenceThreshold = null,Object? iouThreshold = null,Object? numItemsThreshold = null,Object? activeSlider = null,Object? isFrontCamera = null,Object? currentZoomLevel = null,Object? detections = null,Object? currentFps = null,Object? processingTimeMs = null,Object? currentLensFacing = null,Object? systemHealthState = null,Object? processingTimes = null,Object? fpsValues = null,Object? ramUsages = null,Object? monitoringStartTime = freezed,Object? showAlert = null,Object? averageProcessingTime = freezed,Object? averageFps = freezed,Object? averageRamUsage = freezed,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as CameraInferenceStatus,modelType: null == modelType ? _self.modelType : modelType // ignore: cast_nullable_to_non_nullable
@@ -75,9 +75,18 @@ as InferenceParameter,isFrontCamera: null == isFrontCamera ? _self.isFrontCamera
 as bool,currentZoomLevel: null == currentZoomLevel ? _self.currentZoomLevel : currentZoomLevel // ignore: cast_nullable_to_non_nullable
 as double,detections: null == detections ? _self.detections : detections // ignore: cast_nullable_to_non_nullable
 as List<DetectionResult>,currentFps: null == currentFps ? _self.currentFps : currentFps // ignore: cast_nullable_to_non_nullable
+as double,processingTimeMs: null == processingTimeMs ? _self.processingTimeMs : processingTimeMs // ignore: cast_nullable_to_non_nullable
 as double,currentLensFacing: null == currentLensFacing ? _self.currentLensFacing : currentLensFacing // ignore: cast_nullable_to_non_nullable
 as LensFacing,systemHealthState: null == systemHealthState ? _self.systemHealthState : systemHealthState // ignore: cast_nullable_to_non_nullable
-as SystemHealthState,
+as SystemHealthState,processingTimes: null == processingTimes ? _self.processingTimes : processingTimes // ignore: cast_nullable_to_non_nullable
+as List<double>,fpsValues: null == fpsValues ? _self.fpsValues : fpsValues // ignore: cast_nullable_to_non_nullable
+as List<double>,ramUsages: null == ramUsages ? _self.ramUsages : ramUsages // ignore: cast_nullable_to_non_nullable
+as List<double>,monitoringStartTime: freezed == monitoringStartTime ? _self.monitoringStartTime : monitoringStartTime // ignore: cast_nullable_to_non_nullable
+as DateTime?,showAlert: null == showAlert ? _self.showAlert : showAlert // ignore: cast_nullable_to_non_nullable
+as bool,averageProcessingTime: freezed == averageProcessingTime ? _self.averageProcessingTime : averageProcessingTime // ignore: cast_nullable_to_non_nullable
+as double?,averageFps: freezed == averageFps ? _self.averageFps : averageFps // ignore: cast_nullable_to_non_nullable
+as double?,averageRamUsage: freezed == averageRamUsage ? _self.averageRamUsage : averageRamUsage // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 /// Create a copy of CameraInferenceState
@@ -171,10 +180,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  InferenceParameter activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  SystemHealthState systemHealthState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  InferenceParameter activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  double processingTimeMs,  LensFacing currentLensFacing,  SystemHealthState systemHealthState,  List<double> processingTimes,  List<double> fpsValues,  List<double> ramUsages,  DateTime? monitoringStartTime,  bool showAlert,  double? averageProcessingTime,  double? averageFps,  double? averageRamUsage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CameraInferenceState() when $default != null:
-return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing,_that.systemHealthState);case _:
+return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.processingTimeMs,_that.currentLensFacing,_that.systemHealthState,_that.processingTimes,_that.fpsValues,_that.ramUsages,_that.monitoringStartTime,_that.showAlert,_that.averageProcessingTime,_that.averageFps,_that.averageRamUsage);case _:
   return orElse();
 
 }
@@ -192,10 +201,10 @@ return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThr
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  InferenceParameter activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  SystemHealthState systemHealthState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  InferenceParameter activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  double processingTimeMs,  LensFacing currentLensFacing,  SystemHealthState systemHealthState,  List<double> processingTimes,  List<double> fpsValues,  List<double> ramUsages,  DateTime? monitoringStartTime,  bool showAlert,  double? averageProcessingTime,  double? averageFps,  double? averageRamUsage)  $default,) {final _that = this;
 switch (_that) {
 case _CameraInferenceState():
-return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing,_that.systemHealthState);case _:
+return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.processingTimeMs,_that.currentLensFacing,_that.systemHealthState,_that.processingTimes,_that.fpsValues,_that.ramUsages,_that.monitoringStartTime,_that.showAlert,_that.averageProcessingTime,_that.averageFps,_that.averageRamUsage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +221,10 @@ return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThr
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  InferenceParameter activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  LensFacing currentLensFacing,  SystemHealthState systemHealthState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CameraInferenceStatus status,  ModelType modelType,  String? modelPath,  double confidenceThreshold,  double iouThreshold,  int numItemsThreshold,  InferenceParameter activeSlider,  bool isFrontCamera,  double currentZoomLevel,  List<DetectionResult> detections,  double currentFps,  double processingTimeMs,  LensFacing currentLensFacing,  SystemHealthState systemHealthState,  List<double> processingTimes,  List<double> fpsValues,  List<double> ramUsages,  DateTime? monitoringStartTime,  bool showAlert,  double? averageProcessingTime,  double? averageFps,  double? averageRamUsage)?  $default,) {final _that = this;
 switch (_that) {
 case _CameraInferenceState() when $default != null:
-return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.currentLensFacing,_that.systemHealthState);case _:
+return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThreshold,_that.iouThreshold,_that.numItemsThreshold,_that.activeSlider,_that.isFrontCamera,_that.currentZoomLevel,_that.detections,_that.currentFps,_that.processingTimeMs,_that.currentLensFacing,_that.systemHealthState,_that.processingTimes,_that.fpsValues,_that.ramUsages,_that.monitoringStartTime,_that.showAlert,_that.averageProcessingTime,_that.averageFps,_that.averageRamUsage);case _:
   return null;
 
 }
@@ -227,7 +236,7 @@ return $default(_that.status,_that.modelType,_that.modelPath,_that.confidenceThr
 
 
 class _CameraInferenceState implements CameraInferenceState {
-  const _CameraInferenceState({this.status = const CameraInferenceStatus.initial(), this.modelType = ModelType.detect, this.modelPath, this.confidenceThreshold = 0.5, this.iouThreshold = 0.45, this.numItemsThreshold = 30, this.activeSlider = InferenceParameter.none, this.isFrontCamera = false, this.currentZoomLevel = 1.0, final  List<DetectionResult> detections = const [], this.currentFps = 0.0, this.currentLensFacing = LensFacing.back, this.systemHealthState = SystemHealthState.normal}): _detections = detections;
+  const _CameraInferenceState({this.status = const CameraInferenceStatus.initial(), this.modelType = ModelType.detect, this.modelPath, this.confidenceThreshold = 0.5, this.iouThreshold = 0.45, this.numItemsThreshold = 30, this.activeSlider = InferenceParameter.none, this.isFrontCamera = false, this.currentZoomLevel = 1.0, final  List<DetectionResult> detections = const [], this.currentFps = 0.0, this.processingTimeMs = 0.0, this.currentLensFacing = LensFacing.back, this.systemHealthState = SystemHealthState.normal, final  List<double> processingTimes = const [], final  List<double> fpsValues = const [], final  List<double> ramUsages = const [], this.monitoringStartTime, this.showAlert = false, this.averageProcessingTime, this.averageFps, this.averageRamUsage}): _detections = detections,_processingTimes = processingTimes,_fpsValues = fpsValues,_ramUsages = ramUsages;
   
 
 @override@JsonKey() final  CameraInferenceStatus status;
@@ -247,8 +256,35 @@ class _CameraInferenceState implements CameraInferenceState {
 }
 
 @override@JsonKey() final  double currentFps;
+@override@JsonKey() final  double processingTimeMs;
 @override@JsonKey() final  LensFacing currentLensFacing;
 @override@JsonKey() final  SystemHealthState systemHealthState;
+ final  List<double> _processingTimes;
+@override@JsonKey() List<double> get processingTimes {
+  if (_processingTimes is EqualUnmodifiableListView) return _processingTimes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_processingTimes);
+}
+
+ final  List<double> _fpsValues;
+@override@JsonKey() List<double> get fpsValues {
+  if (_fpsValues is EqualUnmodifiableListView) return _fpsValues;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_fpsValues);
+}
+
+ final  List<double> _ramUsages;
+@override@JsonKey() List<double> get ramUsages {
+  if (_ramUsages is EqualUnmodifiableListView) return _ramUsages;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_ramUsages);
+}
+
+@override final  DateTime? monitoringStartTime;
+@override@JsonKey() final  bool showAlert;
+@override final  double? averageProcessingTime;
+@override final  double? averageFps;
+@override final  double? averageRamUsage;
 
 /// Create a copy of CameraInferenceState
 /// with the given fields replaced by the non-null parameter values.
@@ -260,16 +296,16 @@ _$CameraInferenceStateCopyWith<_CameraInferenceState> get copyWith => __$CameraI
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CameraInferenceState&&(identical(other.status, status) || other.status == status)&&(identical(other.modelType, modelType) || other.modelType == modelType)&&(identical(other.modelPath, modelPath) || other.modelPath == modelPath)&&(identical(other.confidenceThreshold, confidenceThreshold) || other.confidenceThreshold == confidenceThreshold)&&(identical(other.iouThreshold, iouThreshold) || other.iouThreshold == iouThreshold)&&(identical(other.numItemsThreshold, numItemsThreshold) || other.numItemsThreshold == numItemsThreshold)&&(identical(other.activeSlider, activeSlider) || other.activeSlider == activeSlider)&&(identical(other.isFrontCamera, isFrontCamera) || other.isFrontCamera == isFrontCamera)&&(identical(other.currentZoomLevel, currentZoomLevel) || other.currentZoomLevel == currentZoomLevel)&&const DeepCollectionEquality().equals(other._detections, _detections)&&(identical(other.currentFps, currentFps) || other.currentFps == currentFps)&&(identical(other.currentLensFacing, currentLensFacing) || other.currentLensFacing == currentLensFacing)&&(identical(other.systemHealthState, systemHealthState) || other.systemHealthState == systemHealthState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CameraInferenceState&&(identical(other.status, status) || other.status == status)&&(identical(other.modelType, modelType) || other.modelType == modelType)&&(identical(other.modelPath, modelPath) || other.modelPath == modelPath)&&(identical(other.confidenceThreshold, confidenceThreshold) || other.confidenceThreshold == confidenceThreshold)&&(identical(other.iouThreshold, iouThreshold) || other.iouThreshold == iouThreshold)&&(identical(other.numItemsThreshold, numItemsThreshold) || other.numItemsThreshold == numItemsThreshold)&&(identical(other.activeSlider, activeSlider) || other.activeSlider == activeSlider)&&(identical(other.isFrontCamera, isFrontCamera) || other.isFrontCamera == isFrontCamera)&&(identical(other.currentZoomLevel, currentZoomLevel) || other.currentZoomLevel == currentZoomLevel)&&const DeepCollectionEquality().equals(other._detections, _detections)&&(identical(other.currentFps, currentFps) || other.currentFps == currentFps)&&(identical(other.processingTimeMs, processingTimeMs) || other.processingTimeMs == processingTimeMs)&&(identical(other.currentLensFacing, currentLensFacing) || other.currentLensFacing == currentLensFacing)&&(identical(other.systemHealthState, systemHealthState) || other.systemHealthState == systemHealthState)&&const DeepCollectionEquality().equals(other._processingTimes, _processingTimes)&&const DeepCollectionEquality().equals(other._fpsValues, _fpsValues)&&const DeepCollectionEquality().equals(other._ramUsages, _ramUsages)&&(identical(other.monitoringStartTime, monitoringStartTime) || other.monitoringStartTime == monitoringStartTime)&&(identical(other.showAlert, showAlert) || other.showAlert == showAlert)&&(identical(other.averageProcessingTime, averageProcessingTime) || other.averageProcessingTime == averageProcessingTime)&&(identical(other.averageFps, averageFps) || other.averageFps == averageFps)&&(identical(other.averageRamUsage, averageRamUsage) || other.averageRamUsage == averageRamUsage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,modelType,modelPath,confidenceThreshold,iouThreshold,numItemsThreshold,activeSlider,isFrontCamera,currentZoomLevel,const DeepCollectionEquality().hash(_detections),currentFps,currentLensFacing,systemHealthState);
+int get hashCode => Object.hashAll([runtimeType,status,modelType,modelPath,confidenceThreshold,iouThreshold,numItemsThreshold,activeSlider,isFrontCamera,currentZoomLevel,const DeepCollectionEquality().hash(_detections),currentFps,processingTimeMs,currentLensFacing,systemHealthState,const DeepCollectionEquality().hash(_processingTimes),const DeepCollectionEquality().hash(_fpsValues),const DeepCollectionEquality().hash(_ramUsages),monitoringStartTime,showAlert,averageProcessingTime,averageFps,averageRamUsage]);
 
 @override
 String toString() {
-  return 'CameraInferenceState(status: $status, modelType: $modelType, modelPath: $modelPath, confidenceThreshold: $confidenceThreshold, iouThreshold: $iouThreshold, numItemsThreshold: $numItemsThreshold, activeSlider: $activeSlider, isFrontCamera: $isFrontCamera, currentZoomLevel: $currentZoomLevel, detections: $detections, currentFps: $currentFps, currentLensFacing: $currentLensFacing, systemHealthState: $systemHealthState)';
+  return 'CameraInferenceState(status: $status, modelType: $modelType, modelPath: $modelPath, confidenceThreshold: $confidenceThreshold, iouThreshold: $iouThreshold, numItemsThreshold: $numItemsThreshold, activeSlider: $activeSlider, isFrontCamera: $isFrontCamera, currentZoomLevel: $currentZoomLevel, detections: $detections, currentFps: $currentFps, processingTimeMs: $processingTimeMs, currentLensFacing: $currentLensFacing, systemHealthState: $systemHealthState, processingTimes: $processingTimes, fpsValues: $fpsValues, ramUsages: $ramUsages, monitoringStartTime: $monitoringStartTime, showAlert: $showAlert, averageProcessingTime: $averageProcessingTime, averageFps: $averageFps, averageRamUsage: $averageRamUsage)';
 }
 
 
@@ -280,7 +316,7 @@ abstract mixin class _$CameraInferenceStateCopyWith<$Res> implements $CameraInfe
   factory _$CameraInferenceStateCopyWith(_CameraInferenceState value, $Res Function(_CameraInferenceState) _then) = __$CameraInferenceStateCopyWithImpl;
 @override @useResult
 $Res call({
- CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, InferenceParameter activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, LensFacing currentLensFacing, SystemHealthState systemHealthState
+ CameraInferenceStatus status, ModelType modelType, String? modelPath, double confidenceThreshold, double iouThreshold, int numItemsThreshold, InferenceParameter activeSlider, bool isFrontCamera, double currentZoomLevel, List<DetectionResult> detections, double currentFps, double processingTimeMs, LensFacing currentLensFacing, SystemHealthState systemHealthState, List<double> processingTimes, List<double> fpsValues, List<double> ramUsages, DateTime? monitoringStartTime, bool showAlert, double? averageProcessingTime, double? averageFps, double? averageRamUsage
 });
 
 
@@ -297,7 +333,7 @@ class __$CameraInferenceStateCopyWithImpl<$Res>
 
 /// Create a copy of CameraInferenceState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? modelType = null,Object? modelPath = freezed,Object? confidenceThreshold = null,Object? iouThreshold = null,Object? numItemsThreshold = null,Object? activeSlider = null,Object? isFrontCamera = null,Object? currentZoomLevel = null,Object? detections = null,Object? currentFps = null,Object? currentLensFacing = null,Object? systemHealthState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? modelType = null,Object? modelPath = freezed,Object? confidenceThreshold = null,Object? iouThreshold = null,Object? numItemsThreshold = null,Object? activeSlider = null,Object? isFrontCamera = null,Object? currentZoomLevel = null,Object? detections = null,Object? currentFps = null,Object? processingTimeMs = null,Object? currentLensFacing = null,Object? systemHealthState = null,Object? processingTimes = null,Object? fpsValues = null,Object? ramUsages = null,Object? monitoringStartTime = freezed,Object? showAlert = null,Object? averageProcessingTime = freezed,Object? averageFps = freezed,Object? averageRamUsage = freezed,}) {
   return _then(_CameraInferenceState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as CameraInferenceStatus,modelType: null == modelType ? _self.modelType : modelType // ignore: cast_nullable_to_non_nullable
@@ -310,9 +346,18 @@ as InferenceParameter,isFrontCamera: null == isFrontCamera ? _self.isFrontCamera
 as bool,currentZoomLevel: null == currentZoomLevel ? _self.currentZoomLevel : currentZoomLevel // ignore: cast_nullable_to_non_nullable
 as double,detections: null == detections ? _self._detections : detections // ignore: cast_nullable_to_non_nullable
 as List<DetectionResult>,currentFps: null == currentFps ? _self.currentFps : currentFps // ignore: cast_nullable_to_non_nullable
+as double,processingTimeMs: null == processingTimeMs ? _self.processingTimeMs : processingTimeMs // ignore: cast_nullable_to_non_nullable
 as double,currentLensFacing: null == currentLensFacing ? _self.currentLensFacing : currentLensFacing // ignore: cast_nullable_to_non_nullable
 as LensFacing,systemHealthState: null == systemHealthState ? _self.systemHealthState : systemHealthState // ignore: cast_nullable_to_non_nullable
-as SystemHealthState,
+as SystemHealthState,processingTimes: null == processingTimes ? _self._processingTimes : processingTimes // ignore: cast_nullable_to_non_nullable
+as List<double>,fpsValues: null == fpsValues ? _self._fpsValues : fpsValues // ignore: cast_nullable_to_non_nullable
+as List<double>,ramUsages: null == ramUsages ? _self._ramUsages : ramUsages // ignore: cast_nullable_to_non_nullable
+as List<double>,monitoringStartTime: freezed == monitoringStartTime ? _self.monitoringStartTime : monitoringStartTime // ignore: cast_nullable_to_non_nullable
+as DateTime?,showAlert: null == showAlert ? _self.showAlert : showAlert // ignore: cast_nullable_to_non_nullable
+as bool,averageProcessingTime: freezed == averageProcessingTime ? _self.averageProcessingTime : averageProcessingTime // ignore: cast_nullable_to_non_nullable
+as double?,averageFps: freezed == averageFps ? _self.averageFps : averageFps // ignore: cast_nullable_to_non_nullable
+as double?,averageRamUsage: freezed == averageRamUsage ? _self.averageRamUsage : averageRamUsage // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 
