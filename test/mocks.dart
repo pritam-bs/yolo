@@ -1,5 +1,7 @@
+import 'package:http/http.dart' as http show Client;
 import 'package:mockito/annotations.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:platform/platform.dart';
 import 'package:yolo/application/blocs/camera_inference/camera_inference_bloc.dart';
 import 'package:yolo/data/datasources/local_model_data_source.dart';
 import 'package:yolo/data/datasources/remote_model_data_source.dart';
@@ -42,5 +44,7 @@ import 'package:yolo/domain/usecases/system_metrics_monitor_stop.dart';
   SystemMetricsMonitorStop,
   SystemMetricsMonitorDispose,
   PathProviderPlatform,
+  http.Client,
+  Platform
 ])
 void main() {}

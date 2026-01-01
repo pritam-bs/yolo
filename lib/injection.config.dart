@@ -49,11 +49,11 @@ _i174.GetIt initGetIt(
   gh.lazySingleton<_i407.SystemMonitor>(() => appModule.systemMonitor);
   gh.lazySingleton<_i344.YOLOViewController>(() => appModule.yoloController);
   gh.lazySingleton<_i678.Platform>(() => appModule.platform);
-  gh.lazySingleton<_i992.RemoteModelDataSource>(
-    () => _i992.RemoteModelDataSource(gh<_i519.Client>()),
-  );
   gh.lazySingleton<_i222.SystemMonitorRepository>(
     () => _i570.SystemMonitorRepositoryImpl(gh<_i407.SystemMonitor>()),
+  );
+  gh.lazySingleton<_i992.RemoteModelDataSource>(
+    () => _i992.RemoteModelDataSource(gh<_i519.Client>(), gh<_i678.Platform>()),
   );
   gh.factory<_i789.LocalModelDataSource>(
     () => _i789.LocalModelDataSourceImpl(
