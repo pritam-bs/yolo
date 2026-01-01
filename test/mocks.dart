@@ -45,6 +45,6 @@ import 'package:yolo/domain/usecases/system_metrics_monitor_stop.dart';
   SystemMetricsMonitorDispose,
   PathProviderPlatform,
   http.Client,
-  Platform
+  Platform,
 ])
 void main() {}

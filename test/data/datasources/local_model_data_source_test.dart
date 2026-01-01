@@ -11,7 +11,6 @@ import 'package:archive/archive.dart';
 
 import 'mock_path_provider_platform.dart';
 
-
 void main() {
   late MemoryFileSystem fileSystem;
   late MockPathProviderPlatform mockPathProvider;
@@ -56,7 +55,10 @@ void main() {
   group('LocalModelDataSourceImpl Tests', () {
     group('iOS Platform (mlpackage handling)', () {
       setUp(() {
-        dataSource = LocalModelDataSourceImpl(fileSystem, FakePlatform(operatingSystem:"ios"));
+        dataSource = LocalModelDataSourceImpl(
+          fileSystem,
+          FakePlatform(operatingSystem: "ios"),
+        );
       });
 
       test(
@@ -113,7 +115,9 @@ void main() {
 
     group('Android Platform (tflite handling)', () {
       setUp(() {
-        dataSource = LocalModelDataSourceImpl(fileSystem, FakePlatform(operatingSystem: "android"),
+        dataSource = LocalModelDataSourceImpl(
+          fileSystem,
+          FakePlatform(operatingSystem: "android"),
         );
       });
 
@@ -142,7 +146,9 @@ void main() {
 
     group('Unsupported Platforms', () {
       test('should throw UnsupportedError on Windows/Desktop', () async {
-        dataSource = LocalModelDataSourceImpl(fileSystem, FakePlatform(operatingSystem: "windows"),
+        dataSource = LocalModelDataSourceImpl(
+          fileSystem,
+          FakePlatform(operatingSystem: "windows"),
         );
 
         expect(
