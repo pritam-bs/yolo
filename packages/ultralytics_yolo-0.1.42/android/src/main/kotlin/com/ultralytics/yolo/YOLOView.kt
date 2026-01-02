@@ -31,9 +31,10 @@ import android.view.Gravity
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 import android.content.res.Configuration
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.CompatibilityList
-import org.tensorflow.lite.gpu.GpuDelegate
+import com.google.android.gms.tflite.client.TfLiteInitializationOptions
+import com.google.android.gms.tflite.java.TfLite
+import org.tensorflow.lite.InterpreterApi
+import org.tensorflow.lite.gpu.GpuDelegateFactory
 import org.tensorflow.lite.nnapi.NnApiDelegate
 
 class YOLOView @JvmOverloads constructor(
@@ -399,78 +400,65 @@ class YOLOView @JvmOverloads constructor(
 
     // region Model / Task
 
-    private fun createCustomOptions(useGpu: Boolean = true): Interpreter.Options {
-        val options = Interpreter.Options().apply {
-            // Optimized CPU fallback with XNNPACK
-            // Get available cores, but cap it at 4 for thermal stability
-            val cpuCores = Runtime.getRuntime().availableProcessors()
-            val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-            setNumThreads(optimalThreads)
-            setUseXNNPACK(true)
-        }
-
-        // GPU Delegate
-        var compatList: CompatibilityList? = null
-        try {
-            compatList = CompatibilityList()
-
-            if (useGpu && compatList.isDelegateSupportedOnThisDevice) {
-                val gpuOptions = compatList.bestOptionsForThisDevice.apply {
-                    isPrecisionLossAllowed = true  // Enables FP16 for YOLO models
-                    setInferencePreference(GpuDelegate.Options.INFERENCE_PREFERENCE_SUSTAINED_SPEED)
-                }
-                options.addDelegate(GpuDelegate(gpuOptions))
-                Log.d(TAG, "GPU Delegate enabled")
-                return options
+    private fun createCustomOptions(useGpu: Boolean = true): InterpreterApi.Options {
+        val options = InterpreterApi.Options().apply {
+            setRuntime(InterpreterApi.Options.TfLiteRuntime.FROM_SYSTEM_ONLY)
+            if (useGpu) {
+                addDelegateFactory(GpuDelegateFactory())
             }
-        } catch (e: Exception) {
-            Log.w(TAG, "GPU Delegate unavailable: ${e.message}")
-        } finally {
-            compatList?.close()  // Proper resource cleanup
         }
-
-        Log.d(TAG, "Using optimized CPU (4 threads + XNNPACK)")
         return options
     }
 
-
     fun setModel(modelPath: String, task: YOLOTask, useGpu: Boolean = true, callback: ((Boolean) -> Unit)? = null) {
-        Executors.newSingleThreadExecutor().execute {
-            try {
-                val options = createCustomOptions(useGpu)
-                val newPredictor = when (task) {
-                    YOLOTask.DETECT -> ObjectDetector(context, modelPath, loadLabels(modelPath), customOptions = options)
-                    YOLOTask.SEGMENT -> Segmenter(context, modelPath, loadLabels(modelPath), customOptions = options)
-                    YOLOTask.CLASSIFY -> Classifier(context, modelPath, loadLabels(modelPath), customOptions = options)
-                    YOLOTask.POSE -> PoseEstimator(context, modelPath, loadLabels(modelPath), customOptions = options)
-                    YOLOTask.OBB -> ObbDetector(context, modelPath, loadLabels(modelPath), customOptions = options)
-                }
-                
-                // Apply thresholds to all predictor types
-                newPredictor.apply {
-                    setConfidenceThreshold(confidenceThreshold)
-                    setIouThreshold(iouThreshold)
-                    setNumItemsThreshold(numItemsThreshold)
-                }
+        val initOptions = TfLiteInitializationOptions.builder()
+            .setEnableGpuDelegateSupport(useGpu)
+            .build()
 
-                post {
-                    this.task = task
-                    this.predictor = newPredictor
-                    this.modelName = modelPath.substringAfterLast("/")
-                    modelLoadCallback?.invoke(true)
-                    callback?.invoke(true)
-                    Log.d(TAG, "Model loaded successfully: $modelPath")
+        TfLite.initialize(context, initOptions).addOnSuccessListener {
+            Log.d(TAG, "TfLite runtime initialized successfully.")
+            Executors.newSingleThreadExecutor().execute {
+                try {
+                    val options = createCustomOptions(useGpu)
+                    val newPredictor = when (task) {
+                        YOLOTask.DETECT -> ObjectDetector(context, modelPath, loadLabels(modelPath), customOptions = options)
+                        YOLOTask.SEGMENT -> Segmenter(context, modelPath, loadLabels(modelPath), customOptions = options)
+                        YOLOTask.CLASSIFY -> Classifier(context, modelPath, loadLabels(modelPath), customOptions = options)
+                        YOLOTask.POSE -> PoseEstimator(context, modelPath, loadLabels(modelPath), customOptions = options)
+                        YOLOTask.OBB -> ObbDetector(context, modelPath, loadLabels(modelPath), customOptions = options)
+                    }
+
+                    // Apply thresholds to all predictor types
+                    newPredictor.apply {
+                        setConfidenceThreshold(confidenceThreshold)
+                        setIouThreshold(iouThreshold)
+                        setNumItemsThreshold(numItemsThreshold)
+                    }
+
+                    post {
+                        this.task = task
+                        this.predictor = newPredictor
+                        this.modelName = modelPath.substringAfterLast("/")
+                        modelLoadCallback?.invoke(true)
+                        callback?.invoke(true)
+                        Log.d(TAG, "Model loaded successfully: $modelPath")
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed to load model: $modelPath. Camera will run without inference.", e)
+                    post {
+                        // Set predictor to null to ensure camera-only mode
+                        this.predictor = null
+                        this.modelName = "No Model"
+                        modelLoadCallback?.invoke(false)
+                        callback?.invoke(false)
+                    }
                 }
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to load model: $modelPath. Camera will run without inference.", e)
-                post {
-                    // Set predictor to null to ensure camera-only mode
-                    this.predictor = null
-                    this.modelName = "No Model"
-                    modelLoadCallback?.invoke(false)
-                    callback?.invoke(false)
-                }
+            }
+        }.addOnFailureListener { e ->
+            Log.e(TAG, "Error initializing TfLite runtime.", e)
+            post {
+                modelLoadCallback?.invoke(false)
+                callback?.invoke(false)
             }
         }
     }
@@ -1578,71 +1566,74 @@ class YOLOView @JvmOverloads constructor(
      * Returns the captured image as a ByteArray (JPEG format)
      */
     fun captureFrame(): ByteArray? {
-        try {
-            // Create bitmap to hold the captured frame
-            val width = width
-            val height = height
-            if (width <= 0 || height <= 0) {
-                Log.e(TAG, "Invalid view dimensions for capture: ${width}x${height}")
-                return null
-            }
-            
-            // Create bitmap and canvas
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            
-            // Method 1: Try to get bitmap from PreviewView directly
-            var cameraFrameCaptured = false
-            previewView.bitmap?.let { cameraBitmap ->
-                Log.d(TAG, "Got camera bitmap from PreviewView: ${cameraBitmap.width}x${cameraBitmap.height}")
-                // Draw the camera bitmap scaled to fit
-                val matrix = Matrix()
-                val scaleX = width.toFloat() / cameraBitmap.width
-                val scaleY = height.toFloat() / cameraBitmap.height
-                matrix.setScale(scaleX, scaleY)
-                canvas.drawBitmap(cameraBitmap, matrix, null)
-                cameraFrameCaptured = true
-            }
-            
-            if (!cameraFrameCaptured) {
-                // Method 2: Use hardware acceleration to capture the view
-                Log.w(TAG, "PreviewView.bitmap is null, trying hardware capture")
+        val future = Executors.newSingleThreadExecutor().submit<ByteArray?> {
+            try {
+                // Create bitmap to hold the captured frame
+                val width = width
+                val height = height
+                if (width <= 0 || height <= 0) {
+                    Log.e(TAG, "Invalid view dimensions for capture: ${width}x${height}")
+                    return@submit null
+                }
                 
-                // Enable drawing cache temporarily
-                isDrawingCacheEnabled = true
-                buildDrawingCache()
-                drawingCache?.let { cache ->
-                    canvas.drawBitmap(cache, 0f, 0f, null)
+                // Create bitmap and canvas
+                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(bitmap)
+                
+                // Method 1: Try to get bitmap from PreviewView directly
+                var cameraFrameCaptured = false
+                previewView.bitmap?.let { cameraBitmap ->
+                    Log.d(TAG, "Got camera bitmap from PreviewView: ${cameraBitmap.width}x${cameraBitmap.height}")
+                    // Draw the camera bitmap scaled to fit
+                    val matrix = Matrix()
+                    val scaleX = width.toFloat() / cameraBitmap.width
+                    val scaleY = height.toFloat() / cameraBitmap.height
+                    matrix.setScale(scaleX, scaleY)
+                    canvas.drawBitmap(cameraBitmap, matrix, null)
                     cameraFrameCaptured = true
                 }
-                isDrawingCacheEnabled = false
                 
                 if (!cameraFrameCaptured) {
-                    // Method 3: Last resort - draw the entire view hierarchy
-                    Log.w(TAG, "Drawing cache failed, using draw method")
-                    // Draw PreviewView first
-                    previewView.draw(canvas)
+                    // Method 2: Use hardware acceleration to capture the view
+                    Log.w(TAG, "PreviewView.bitmap is null, trying hardware capture")
+                    
+                    // Enable drawing cache temporarily
+                    isDrawingCacheEnabled = true
+                    buildDrawingCache()
+                    drawingCache?.let { cache ->
+                        canvas.drawBitmap(cache, 0f, 0f, null)
+                        cameraFrameCaptured = true
+                    }
+                    isDrawingCacheEnabled = false
+                    
+                    if (!cameraFrameCaptured) {
+                        // Method 3: Last resort - draw the entire view hierarchy
+                        Log.w(TAG, "Drawing cache failed, using draw method")
+                        // Draw PreviewView first
+                        previewView.draw(canvas)
+                    }
                 }
+                
+                // Always draw the overlay on top
+                overlayView.draw(canvas)
+                
+                // Convert bitmap to JPEG byte array
+                val outputStream = java.io.ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+                val imageData = outputStream.toByteArray()
+                
+                // Clean up
+                outputStream.close()
+                bitmap.recycle()
+                
+                Log.d(TAG, "Frame captured successfully: ${imageData.size} bytes, camera captured: $cameraFrameCaptured")
+                return@submit imageData
+            } catch (e: Exception) {
+                Log.e(TAG, "Error capturing frame", e)
+                return@submit null
             }
-            
-            // Always draw the overlay on top
-            overlayView.draw(canvas)
-            
-            // Convert bitmap to JPEG byte array
-            val outputStream = java.io.ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-            val imageData = outputStream.toByteArray()
-            
-            // Clean up
-            outputStream.close()
-            bitmap.recycle()
-            
-            Log.d(TAG, "Frame captured successfully: ${imageData.size} bytes, camera captured: $cameraFrameCaptured")
-            return imageData
-        } catch (e: Exception) {
-            Log.e(TAG, "Error capturing frame", e)
-            return null
         }
+        return future.get() // Block and wait for result
     }
 
     /**

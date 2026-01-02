@@ -91,6 +91,13 @@ android {
         }
     }
 
+    configurations.all {
+        exclude group: 'com.google.ai.edge.litert', module: 'litert'
+        exclude group: 'com.google.ai.edge.litert', module: 'litert-api'
+        exclude group: 'com.google.ai.edge.litert', module: 'litert-gpu'
+        exclude group: 'com.google.ai.edge.litert', module: 'litert-support-api'
+    }
+
     dependencies {
         // Flutter embedding - continue build even if not found in CI environment
         if (flutterRoot) {
@@ -103,10 +110,13 @@ android {
             compileOnly 'io.flutter:flutter_embedding_release:1.0.0-1527ae0ec577a4ef50e65f6fefcfc1326707d9bf'
         }
         
-        implementation("com.google.ai.edge.litert:litert:1.4.1")
-        implementation("com.google.ai.edge.litert:litert-gpu:1.4.1")
-        implementation('com.google.ai.edge.litert:litert-support-api:1.4.1')
-        implementation('com.google.ai.edge.litert:litert-metadata:1.4.1')
+        implementation("com.google.android.gms:play-services-tflite-java:16.4.0")
+        implementation("com.google.android.gms:play-services-tflite-gpu:16.4.0")
+        implementation("com.google.android.gms:play-services-tflite-support:16.4.0")
+        implementation("com.google.android.gms:play-services-tflite-acceleration-service:16.4.0-beta01")
+        implementation 'org.tensorflow:tensorflow-lite-support:0.5.0'
+        implementation 'org.tensorflow:tensorflow-lite-metadata:0.5.0'
+        implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.10.0'
         testImplementation("junit:junit:4.13.2")
         androidTestImplementation("androidx.test.ext:junit:1.1.5")
         androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

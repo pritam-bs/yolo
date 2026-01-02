@@ -6,9 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.RectF
 import android.util.Log
 import org.tensorflow.lite.DataType
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.GpuDelegate
-import org.tensorflow.lite.support.common.FileUtil
+import org.tensorflow.lite.InterpreterApi
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ops.Rot90Op
@@ -16,14 +14,9 @@ import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.metadata.MetadataExtractor
-import org.tensorflow.lite.support.metadata.schema.ModelMetadata
 import org.yaml.snakeyaml.Yaml
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import android.content.res.AssetManager
-
-import org.json.JSONObject
-import org.tensorflow.lite.gpu.CompatibilityList
 
 import java.io.ByteArrayInputStream
 import java.nio.MappedByteBuffer
@@ -41,7 +34,7 @@ class ObjectDetector(
     context: Context,
     modelPath: String,
     override var labels: List<String>,
-    private val customOptions: Interpreter.Options? = null
+    private val customOptions: InterpreterApi.Options? = null
 ) : BasePredictor() {
     // Inference output dimensions
     private var out1 = 0
@@ -72,19 +65,6 @@ class ObjectDetector(
     // (3) ByteBuffer for TFLite input (1 * height * width * 3 * 4 bytes)
     private lateinit var inputBuffer: ByteBuffer
 
-    // Options for TensorFlow Lite Interpreter
-    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
-        // Get available cores, but cap it at 4 for thermal stability
-        val cpuCores = Runtime.getRuntime().availableProcessors()
-        val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-        setNumThreads(optimalThreads)
-        setUseXNNPACK(true) // Crucial for CPU efficiency
-    })
-
-    // ========== TFLite Interpreter ==========
-    // Use protected var interpreter: Interpreter? = null from BasePredictor if available
-    // Otherwise, keep it in this class as usual
     init {
         val assetManager = context.assets
         val modelBuffer  = YOLOUtils.loadModelFile(context, modelPath)
@@ -107,54 +87,19 @@ class ObjectDetector(
 
         if (!labelsWereLoaded) {
             Log.w(TAG, "No embedded labels found from appended ZIP or FlatBuffers. Using labels passed via constructor (if any) or an empty list.")
-            // If labels were passed via constructor and not overridden, they will be used.
-            // If no labels were passed and none loaded, this.labels will be what was passed or an uninitialized/empty list
-            // depending on how the 'labels' property was handled if it was nullable or had a default.
-            // Given 'override var labels: List<String>' is passed in constructor, it will hold the passed value.
             if (this.labels.isEmpty()) {
                  Log.w(TAG, "Warning: No labels loaded and no labels provided via constructor. Detections might lack class names.")
             }
         }
 
-        try {
-            // --- ATTEMPT 1: Best Case (Hardware Acceleration for useGpu = true) ---
-            interpreter = Interpreter(modelBuffer, interpreterOptions)
-            Log.i(TAG, "TFLite: Success with hardware acceleration.")
-        } catch (hardwareError: Exception) {
-            Log.e(TAG, "TFLite: Hardware acceleration failed: ${hardwareError.message}")
-
-            try {
-                // --- ATTEMPT 2: Safe Case (CPU Only) ---
-                Log.i(TAG, "TFLite: Retrying with safe CPU-only options...")
-
-                val safeOptions = Interpreter.Options().apply {
-                    // Get available cores, but cap it at 4 for thermal stability
-                    val cpuCores = Runtime.getRuntime().availableProcessors()
-                    val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-                    setNumThreads(optimalThreads)
-                    setUseXNNPACK(true)
-                }
-
-                // Re-attempt creation with clean options
-                interpreter = Interpreter(modelBuffer, safeOptions)
-                Log.i(TAG, "TFLite: Successfully fell back to CPU.")
-
-            } catch (cpuError: Exception) {
-                // --- FINAL FAILURE: Fatal Error ---
-                Log.e(TAG, "TFLite: Fatal error - CPU initialization failed.")
-                // Throw the error or notify the UI that the model is unusable
-                throw cpuError
-            }
-        }
-
+        interpreter = InterpreterApi.create(modelBuffer, customOptions)
 
         // Call allocateTensors() once during initialization, not in the inference loop
-        interpreter.allocateTensors()
+        interpreter?.allocateTensors()
         Log.d(TAG, "TFLite model loaded: $modelPath, tensors allocated")
 
         // Check input shape (example: [1, inHeight, inWidth, 3])
-        val inputShape = interpreter.getInputTensor(0).shape()
+        val inputShape = interpreter?.getInputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         val inBatch = inputShape[0]         // Usually 1
         val inHeight = inputShape[1]        // Example: 320
         val inWidth = inputShape[2]         // Example: 320
@@ -168,7 +113,7 @@ class ObjectDetector(
 
         // Output shape (varies by model, modify as needed)
         // Example: [1, 84, 2100] = [batch, outHeight, outWidth]
-        val outputShape = interpreter.getOutputTensor(0).shape()
+        val outputShape = interpreter?.getOutputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         out1 = outputShape[1] // 84
         out2 = outputShape[2] // 2100
         Log.d(TAG, "Model output shape = [1, $out1, $out2]")
@@ -332,7 +277,7 @@ class ObjectDetector(
 
         // ======== Inference ============
         Log.d(TAG, "Predict Start: Inference")
-        interpreter.run(inputBuffer, rawOutput)
+        interpreter?.run(inputBuffer, rawOutput)
         var inferenceTimeMs = (System.nanoTime() - stageStartTime) / 1_000_000.0
         Log.d(TAG, "Predict Stage: Inference done in $inferenceTimeMs ms")
         stageStartTime = System.nanoTime()
@@ -342,7 +287,7 @@ class ObjectDetector(
         // val postStart = System.nanoTime() // This was previously here, now using stageStartTime
         val outHeight = rawOutput[0].size      // out1
         val outWidth = rawOutput[0][0].size      // out2
-        val shape = interpreter.getOutputTensor(0).shape() // example: [1, 84, 8400]
+        val shape = interpreter?.getOutputTensor(0)?.shape() ?: intArrayOf(0,0,0) // example: [1, 84, 8400]
         Log.d("TFLite", "Output shape: " + shape.contentToString())
 
 //        // Transpose output ([1][c][w] → [w][c])

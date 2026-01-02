@@ -6,7 +6,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import org.tensorflow.lite.DataType
-import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.InterpreterApi
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
@@ -22,20 +22,10 @@ class Classifier(
     context: Context,
     modelPath: String,
     override var labels: List<String> = emptyList(),
-    customOptions: Interpreter.Options? = null,
+    customOptions: InterpreterApi.Options? = null,
     private val classifierOptions: Map<String, Any>? = null
 ) : BasePredictor() {
-
-    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
-        // Get available cores, but cap it at 4 for thermal stability
-        val cpuCores = Runtime.getRuntime().availableProcessors()
-        val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-        setNumThreads(optimalThreads)
-        setUseXNNPACK(true) // Crucial for CPU efficiency
-    })
     
-
     var numClass: Int = 0
     private var modelInputChannels: Int = 3  // Default to 3-channel, will be detected
     private var isGrayscaleModel: Boolean = false
@@ -77,39 +67,9 @@ class Classifier(
             }
         }
 
-        try {
-            // --- ATTEMPT 1: Best Case (Hardware Acceleration for useGpu = true) ---
-            interpreter = Interpreter(modelBuffer, interpreterOptions)
-            Log.i(TAG, "TFLite: Success with hardware acceleration.")
-        } catch (hardwareError: Exception) {
-            Log.e(TAG, "TFLite: Hardware acceleration failed: ${hardwareError.message}")
+        interpreter = InterpreterApi.create(modelBuffer, customOptions)
 
-            try {
-                // --- ATTEMPT 2: Safe Case (CPU Only) ---
-                Log.i(TAG, "TFLite: Retrying with safe CPU-only options...")
-
-                val safeOptions = Interpreter.Options().apply {
-                    // Get available cores, but cap it at 4 for thermal stability
-                    val cpuCores = Runtime.getRuntime().availableProcessors()
-                    val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-                    setNumThreads(optimalThreads)
-                    setUseXNNPACK(true)
-                }
-
-                // Re-attempt creation with clean options
-                interpreter = Interpreter(modelBuffer, safeOptions)
-                Log.i(TAG, "TFLite: Successfully fell back to CPU.")
-
-            } catch (cpuError: Exception) {
-                // --- FINAL FAILURE: Fatal Error ---
-                Log.e(TAG, "TFLite: Fatal error - CPU initialization failed.")
-                // Throw the error or notify the UI that the model is unusable
-                throw cpuError
-            }
-        }
-
-        val inputShape = interpreter.getInputTensor(0).shape()
+        val inputShape = interpreter?.getInputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         val inBatch = inputShape[0]
         val inHeight = inputShape[1]
         val inWidth = inputShape[2]
@@ -137,7 +97,7 @@ class Classifier(
         modelInputSize = Pair(inWidth, inHeight)
         Log.d(TAG, "Model input size = $inWidth x $inHeight")
 
-        val outputShape = interpreter.getOutputTensor(0).shape()
+        val outputShape = interpreter?.getOutputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         // e.g. outputShape = [1, 1000] for ImageNet, [1, 12] for EMNIST
         numClass = outputShape[1]
         
@@ -239,7 +199,7 @@ class Classifier(
         }
 
         val outputArray = Array(1) { FloatArray(numClass) }
-        interpreter.run(inputBuffer, outputArray)
+        interpreter?.run(inputBuffer, outputArray)
 
         updateTiming()
 

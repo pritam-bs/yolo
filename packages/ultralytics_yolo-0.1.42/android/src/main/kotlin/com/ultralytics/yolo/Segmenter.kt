@@ -7,9 +7,7 @@ import android.graphics.*
 import android.util.Log
 import android.util.Size
 import org.tensorflow.lite.DataType
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.CompatibilityList
-import org.tensorflow.lite.gpu.GpuDelegate
+import org.tensorflow.lite.InterpreterApi
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -30,7 +28,7 @@ class Segmenter(
     context: Context,
     modelPath: String,
     override var labels: List<String>,
-    private val customOptions: Interpreter.Options? = null
+    private val customOptions: InterpreterApi.Options? = null
 ) : BasePredictor() {
 
     private val boxFeatureLength = 4  // (x, y, w, h)
@@ -42,16 +40,6 @@ class Segmenter(
     private var maskW = 0
     private var maskC = 0
     private var numItemsThreshold = 30
-
-    // TFLite Interpreter options
-    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
-        // Get available cores, but cap it at 4 for thermal stability
-        val cpuCores = Runtime.getRuntime().availableProcessors()
-        val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-        setNumThreads(optimalThreads)
-        setUseXNNPACK(true) // Crucial for CPU efficiency
-    })
 
     /** ImageProcessor for image preprocessing - separate ones for camera portrait/landscape and single images */
     private lateinit var imageProcessorCameraPortrait: ImageProcessor
@@ -94,44 +82,14 @@ class Segmenter(
         }
 
         // Create Interpreter
-        try {
-            // --- ATTEMPT 1: Best Case (Hardware Acceleration for useGpu = true) ---
-            interpreter = Interpreter(modelBuffer, interpreterOptions)
-            Log.i("Segmenter", "TFLite: Success with hardware acceleration.")
-        } catch (hardwareError: Exception) {
-            Log.e("Segmenter", "TFLite: Hardware acceleration failed: ${hardwareError.message}")
-
-            try {
-                // --- ATTEMPT 2: Safe Case (CPU Only) ---
-                Log.i("Segmenter", "TFLite: Retrying with safe CPU-only options...")
-
-                val safeOptions = Interpreter.Options().apply {
-                    // Get available cores, but cap it at 4 for thermal stability
-                    val cpuCores = Runtime.getRuntime().availableProcessors()
-                    val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-                    setNumThreads(optimalThreads)
-                    setUseXNNPACK(true)
-                }
-
-                // Re-attempt creation with clean options
-                interpreter = Interpreter(modelBuffer, safeOptions)
-                Log.i("Segmenter", "TFLite: Successfully fell back to CPU.")
-
-            } catch (cpuError: Exception) {
-                // --- FINAL FAILURE: Fatal Error ---
-                Log.e("Segmenter", "TFLite: Fatal error - CPU initialization failed.")
-                // Throw the error or notify the UI that the model is unusable
-                throw cpuError
-            }
-        }
+        interpreter = InterpreterApi.create(modelBuffer, customOptions)
 
         // Call allocateTensors() once during initialization
-        interpreter.allocateTensors()
+        interpreter?.allocateTensors()
         Log.d("Segmenter", "TFLite model loaded and tensors allocated")
 
         // Input tensor shape: [1, height, width, 3]
-        val inputShape = interpreter.getInputTensor(0).shape()
+        val inputShape = interpreter?.getInputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         // Example: [1, 640, 640, 3]
         val inHeight = inputShape[1]
         val inWidth = inputShape[2]
@@ -140,8 +98,8 @@ class Segmenter(
         modelInputSize = Pair(inWidth, inHeight)
 
         // Get and initialize output buffer sizes
-        val out0Shape = interpreter.getOutputTensor(0).shape()
-        val out1Shape = interpreter.getOutputTensor(1).shape()
+        val out0Shape = interpreter?.getOutputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
+        val out1Shape = interpreter?.getOutputTensor(1)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         
         // Initialize output0 buffer (example: [1,116,2100])
         val batch0 = out0Shape[0]
@@ -236,7 +194,7 @@ class Segmenter(
         // (3) Execute inference
         val outputMap = mapOf(0 to output0, 1 to output1)
         try {
-            interpreter.runForMultipleInputsOutputs(arrayOf(inputBuffer), outputMap)
+            interpreter?.runForMultipleInputsOutputs(arrayOf(inputBuffer), outputMap)
         } catch (e: Exception) {
             Log.e("Segmenter", "Inference error: ${e.message}")
             val fpsDouble: Double = if (t4 > 0f) (1f / t4).toDouble() else 0.0

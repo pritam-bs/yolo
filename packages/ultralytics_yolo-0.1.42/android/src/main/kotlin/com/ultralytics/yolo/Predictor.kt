@@ -3,7 +3,7 @@
 package com.ultralytics.yolo
 
 import android.graphics.Bitmap
-import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.InterpreterApi
 import android.graphics.Matrix;
 
 interface Predictor {
@@ -32,10 +32,10 @@ interface Predictor {
 abstract class BasePredictor : Predictor {
     override var isUpdating: Boolean = false
     override lateinit var labels: List<String>
-    protected lateinit var interpreter: Interpreter
+    protected var interpreter: InterpreterApi? = null
     override lateinit var inputSize: Size
     protected lateinit var modelInputSize: Pair<Int, Int>
-    protected fun isInterpreterInitialized() = this::interpreter.isInitialized
+    protected fun isInterpreterInitialized() = interpreter != null
 
     protected var t0: Long = 0L
     protected var t2: Double = 0.0
@@ -49,9 +49,7 @@ abstract class BasePredictor : Predictor {
     var isFrontCamera: Boolean = false
 
     fun close() {
-        if (isInterpreterInitialized()) {
-            interpreter.close()
-        }
+        interpreter?.close()
     }
 
     protected fun updateTiming() {
