@@ -6,9 +6,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.Log
 import org.tensorflow.lite.DataType
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.CompatibilityList
-import org.tensorflow.lite.gpu.GpuDelegate
+import org.tensorflow.lite.InterpreterApi
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -30,18 +28,10 @@ class ObbDetector(
     context: Context,
     modelPath: String,
     override var labels: List<String>,
-    customOptions: Interpreter.Options? = null
+    customOptions: InterpreterApi.Options? = null
 ) : BasePredictor() {
     
     private var numItemsThreshold = 30
-    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
-        // Get available cores, but cap it at 4 for thermal stability
-        val cpuCores = Runtime.getRuntime().availableProcessors()
-        val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-        setNumThreads(optimalThreads)
-        setUseXNNPACK(true) // Crucial for CPU efficiency
-    })
 
     // Similar to PoseEstimator, use ImageProcessor - separate ones for camera portrait/landscape and single images
     private lateinit var imageProcessorCameraPortrait: ImageProcessor
@@ -89,49 +79,19 @@ class ObbDetector(
             }
         }
 
-        try {
-            // --- ATTEMPT 1: Best Case (Hardware Acceleration for useGpu = true) ---
-            interpreter = Interpreter(modelBuffer, interpreterOptions)
-            Log.i("ObbDetector", "TFLite: Success with hardware acceleration.")
-        } catch (hardwareError: Exception) {
-            Log.e("ObbDetector", "TFLite: Hardware acceleration failed: ${hardwareError.message}")
-
-            try {
-                // --- ATTEMPT 2: Safe Case (CPU Only) ---
-                Log.i("ObbDetector", "TFLite: Retrying with safe CPU-only options...")
-
-                val safeOptions = Interpreter.Options().apply {
-                    // Get available cores, but cap it at 4 for thermal stability
-                    val cpuCores = Runtime.getRuntime().availableProcessors()
-                    val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-                    setNumThreads(optimalThreads)
-                    setUseXNNPACK(true)
-                }
-
-                // Re-attempt creation with clean options
-                interpreter = Interpreter(modelBuffer, safeOptions)
-                Log.i("ObbDetector", "TFLite: Successfully fell back to CPU.")
-
-            } catch (cpuError: Exception) {
-                // --- FINAL FAILURE: Fatal Error ---
-                Log.e("ObbDetector", "TFLite: Fatal error - CPU initialization failed.")
-                // Throw the error or notify the UI that the model is unusable
-                throw cpuError
-            }
-        }
+        interpreter = InterpreterApi.create(modelBuffer, customOptions)
 
         // Call allocateTensors() once during initialization, not in the inference loop
-        interpreter.allocateTensors()
+        interpreter?.allocateTensors()
         Log.d("ObbDetector", "TFLite model loaded and tensors allocated")
 
-        val inputShape = interpreter.getInputTensor(0).shape()
+        val inputShape = interpreter?.getInputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         val inHeight = inputShape[1]
         val inWidth = inputShape[2]
         inputSize = Size(inWidth, inHeight)
         modelInputSize = Pair(inWidth, inHeight)
         
-        val outShape = interpreter.getOutputTensor(0).shape() // e.g.: [1, outChannels, outAnchors]
+        val outShape = interpreter?.getOutputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized") // e.g.: [1, outChannels, outAnchors]
         outBatch = outShape[0]       // Usually 1
         outChannels = outShape[1]    // (4 + numClasses + 1)
         outAnchors = outShape[2]     // Total number of anchors
@@ -214,7 +174,7 @@ class ObbDetector(
         inputBuffer.put(processedImage.buffer)
         inputBuffer.rewind()
 
-        interpreter.run(inputBuffer, rawOutput)
+        interpreter?.run(inputBuffer, rawOutput)
         updateTiming()
 
         for (i in 0 until outAnchors) {

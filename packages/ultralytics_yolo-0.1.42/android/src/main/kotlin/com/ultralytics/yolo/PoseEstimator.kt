@@ -7,8 +7,7 @@ import android.graphics.*
 import android.util.Log
 import android.util.Size
 import org.tensorflow.lite.DataType
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.GpuDelegate
+import org.tensorflow.lite.InterpreterApi
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -25,7 +24,6 @@ import java.nio.MappedByteBuffer
 import kotlin.math.max
 import kotlin.math.min
 import androidx.collection.ArrayMap
-import org.tensorflow.lite.gpu.CompatibilityList
 
 class PoseEstimator(
     context: Context,
@@ -33,7 +31,7 @@ class PoseEstimator(
     override var labels: List<String>,
     private var confidenceThreshold: Float = 0.25f,   // Can be changed as needed
     private var iouThreshold: Float = 0.45f,          // Can be changed as needed
-    private val customOptions: Interpreter.Options? = null
+    private val customOptions: InterpreterApi.Options? = null
 ) : BasePredictor() {
 
     companion object {
@@ -85,15 +83,6 @@ class PoseEstimator(
         }
     }
 
-    private val interpreterOptions: Interpreter.Options = (customOptions ?: Interpreter.Options().apply {
-        // Get available cores, but cap it at 4 for thermal stability
-        val cpuCores = Runtime.getRuntime().availableProcessors()
-        val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-        setNumThreads(optimalThreads)
-        setUseXNNPACK(true) // Crucial for CPU efficiency
-    })
-
     private lateinit var imageProcessorCameraPortrait: ImageProcessor
     private lateinit var imageProcessorCameraPortraitFront: ImageProcessor
     private lateinit var imageProcessorCameraLandscape: ImageProcessor
@@ -135,49 +124,19 @@ class PoseEstimator(
             }
         }
 
-        try {
-            // --- ATTEMPT 1: Best Case (Hardware Acceleration for useGpu = true) ---
-            interpreter = Interpreter(modelBuffer, interpreterOptions)
-            Log.i("PoseEstimator", "TFLite: Success with hardware acceleration.")
-        } catch (hardwareError: Exception) {
-            Log.e("PoseEstimator", "TFLite: Hardware acceleration failed: ${hardwareError.message}")
-
-            try {
-                // --- ATTEMPT 2: Safe Case (CPU Only) ---
-                Log.i("PoseEstimator", "TFLite: Retrying with safe CPU-only options...")
-
-                val safeOptions = Interpreter.Options().apply {
-                    // Get available cores, but cap it at 4 for thermal stability
-                    val cpuCores = Runtime.getRuntime().availableProcessors()
-                    val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-                    setNumThreads(optimalThreads)
-                    setUseXNNPACK(true)
-                }
-
-                // Re-attempt creation with clean options
-                interpreter = Interpreter(modelBuffer, safeOptions)
-                Log.i("PoseEstimator", "TFLite: Successfully fell back to CPU.")
-
-            } catch (cpuError: Exception) {
-                // --- FINAL FAILURE: Fatal Error ---
-                Log.e("PoseEstimator", "TFLite: Fatal error - CPU initialization failed.")
-                // Throw the error or notify the UI that the model is unusable
-                throw cpuError
-            }
-        }
+        interpreter = InterpreterApi.create(modelBuffer, customOptions)
 
         // Call allocateTensors() once during initialization
-        interpreter.allocateTensors()
+        interpreter?.allocateTensors()
         Log.d("PoseEstimator", "TFLite model loaded and tensors allocated")
 
-        val inputShape = interpreter.getInputTensor(0).shape()
+        val inputShape = interpreter?.getInputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         val inHeight = inputShape[1]
         val inWidth = inputShape[2]
         inputSize = com.ultralytics.yolo.Size(inWidth, inHeight)
         modelInputSize = Pair(inWidth, inHeight)
         
-        val outputShape = interpreter.getOutputTensor(0).shape()  // e.g.: [1, 56, 2100]
+        val outputShape = interpreter?.getOutputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")  // e.g.: [1, 56, 2100]
         batchSize = outputShape[0]           // 1
         val outFeatures = outputShape[1]     // 56
         numAnchors = outputShape[2]          // 2100 etc.
@@ -253,7 +212,7 @@ class PoseEstimator(
         inputBuffer.put(processedImage.buffer)
         inputBuffer.rewind()
 
-        interpreter.run(inputBuffer, outputArray)
+        interpreter?.run(inputBuffer, outputArray)
         // Update processing time measurement
         updateTiming()
 

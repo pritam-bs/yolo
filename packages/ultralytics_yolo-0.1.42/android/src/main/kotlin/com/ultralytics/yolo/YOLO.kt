@@ -10,9 +10,8 @@ import android.util.Log
 import androidx.camera.core.ImageProxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.CompatibilityList
-import org.tensorflow.lite.gpu.GpuDelegate
+import org.tensorflow.lite.InterpreterApi
+import org.tensorflow.lite.gpu.GpuDelegateFactory
 import org.tensorflow.lite.nnapi.NnApiDelegate
 import java.io.IOException
 import java.net.URL
@@ -39,37 +38,13 @@ class YOLO(
      * Create custom options for TFLite interpreters
      * Note: each predictor will handle these options differently
      */
-    private fun createCustomOptions(useGpu: Boolean = true): Interpreter.Options {
-        val options = Interpreter.Options().apply {
-            // Optimized CPU fallback with XNNPACK
-            // Get available cores, but cap it at 4 for thermal stability
-            val cpuCores = Runtime.getRuntime().availableProcessors()
-            val optimalThreads = if (cpuCores > 4) 4 else cpuCores
-
-            setNumThreads(optimalThreads)
-            setUseXNNPACK(true)
-        }
-
-        // GPU Delegate
-        var compatList: CompatibilityList? = null
-        try {
-            compatList = CompatibilityList()
-
-            if (useGpu && compatList.isDelegateSupportedOnThisDevice) {
-                val gpuOptions = compatList.bestOptionsForThisDevice.apply {
-                    isPrecisionLossAllowed = true  // Enables FP16 for YOLO models
-                }
-                options.addDelegate(GpuDelegate(gpuOptions))
-                Log.d(TAG, "GPU Delegate enabled")
-                return options
+    private fun createCustomOptions(useGpu: Boolean = true): InterpreterApi.Options {
+        val options = InterpreterApi.Options().apply {
+            setRuntime(InterpreterApi.Options.TfLiteRuntime.FROM_SYSTEM_ONLY)
+            if (useGpu) {
+                addDelegateFactory(GpuDelegateFactory())
             }
-        } catch (e: Exception) {
-            Log.w(TAG, "GPU Delegate unavailable: ${e.message}")
-        } finally {
-            compatList?.close()  // Proper resource cleanup
         }
-
-        Log.d(TAG, "Using optimized CPU (4 threads + XNNPACK)")
         return options
     }
 
