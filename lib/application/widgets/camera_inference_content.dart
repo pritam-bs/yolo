@@ -71,7 +71,9 @@ class CameraInferenceContent extends StatelessWidget {
               onResult(detections);
             },
             onPerformanceMetrics: (metrics) {
-              context.read<CameraInferenceBloc>().add(UpdateFps(metrics.fps));
+              context
+                  .read<CameraInferenceBloc>()
+                  .add(UpdatePerformanceMetrics(metrics));
             },
             onZoomChanged: (zoom) {
               context.read<CameraInferenceBloc>().add(SetZoomLevel(zoom));

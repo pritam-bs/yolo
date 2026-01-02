@@ -1,3 +1,4 @@
+import 'package:ultralytics_yolo/yolo_performance_metrics.dart';
 import 'package:ultralytics_yolo/yolo_view.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:yolo/domain/entities/models.dart';
@@ -25,10 +26,15 @@ abstract class CameraInferenceEvent with _$CameraInferenceEvent {
   const factory CameraInferenceEvent.toggleSlider(InferenceParameter type) =
       ToggleSlider;
   const factory CameraInferenceEvent.updateFps(double fps) = UpdateFps;
+  const factory CameraInferenceEvent.updatePerformanceMetrics(
+      YOLOPerformanceMetrics metrics) = UpdatePerformanceMetrics;
   const factory CameraInferenceEvent.updateLensFacing(LensFacing lensFacing) =
       UpdateLensFacing;
   const factory CameraInferenceEvent.retryModelDownload() = RetryModelDownload;
   const factory CameraInferenceEvent.resumeCamera() = ResumeCamera;
   const factory CameraInferenceEvent.setInitialConfig() = SetInitialConfig;
   const factory CameraInferenceEvent.startSystemMonitor() = StartSystemMonitor;
+  const factory CameraInferenceEvent.showAveragePerformanceAlert() =
+      ShowAveragePerformanceAlert;
+  const factory CameraInferenceEvent.resetAlert() = ResetAlert;
 }

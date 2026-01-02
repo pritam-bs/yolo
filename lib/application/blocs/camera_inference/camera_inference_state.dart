@@ -20,8 +20,17 @@ abstract class CameraInferenceState with _$CameraInferenceState {
     @Default(1.0) double currentZoomLevel,
     @Default([]) List<DetectionResult> detections,
     @Default(0.0) double currentFps,
+    @Default(0.0) double processingTimeMs,
     @Default(LensFacing.back) LensFacing currentLensFacing,
     @Default(SystemHealthState.normal) SystemHealthState systemHealthState,
+    @Default([]) List<double> processingTimes,
+    @Default([]) List<double> fpsValues,
+    @Default([]) List<double> ramUsages,
+    DateTime? monitoringStartTime,
+    @Default(false) bool showAlert,
+    double? averageProcessingTime,
+    double? averageFps,
+    double? averageRamUsage,
   }) = _CameraInferenceState;
 }
 

@@ -38,6 +38,7 @@ class CameraView extends StatelessWidget {
         CameraInferenceOverlay(
           isLandscape: isLandscape,
           currentFps: state.currentFps,
+          processingTimeMs: state.processingTimeMs,
         ),
         CameraControls(
           currentZoomLevel: state.currentZoomLevel,

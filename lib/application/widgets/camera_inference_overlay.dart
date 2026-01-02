@@ -15,10 +15,12 @@ class CameraInferenceOverlay extends StatelessWidget {
     super.key,
     required this.isLandscape,
     required this.currentFps,
+    required this.processingTimeMs,
   });
 
   final bool isLandscape;
   final double currentFps;
+  final double processingTimeMs;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +49,7 @@ class CameraInferenceOverlay extends StatelessWidget {
               DetectionStatsDisplay(
                 detectionCount: state.detections.length,
                 currentFps: currentFps,
+                processingTimeMs: processingTimeMs,
               ),
               const SizedBox(height: 8),
               SystemStatDisplay(systemStatus: state.systemHealthState),
