@@ -7,6 +7,8 @@ import android.graphics.Bitmap
 import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.InterpreterApi
+// REMOVED: import org.tensorflow.lite.gpu.GpuDelegateFactory
+// REMOVED: import org.tensorflow.lite.nnapi.NnApiDelegate
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
@@ -20,9 +22,10 @@ import java.nio.MappedByteBuffer
 
 class Classifier(
     context: Context,
+    modelBuffer: MappedByteBuffer,
     modelPath: String,
     override var labels: List<String> = emptyList(),
-    customOptions: InterpreterApi.Options? = null,
+    private val interpreterOptions: InterpreterApi.Options, // CHANGED: from preferredDelegate
     private val classifierOptions: Map<String, Any>? = null
 ) : BasePredictor() {
     
@@ -36,7 +39,6 @@ class Classifier(
     private lateinit var imageProcessorSingleImage: ImageProcessor
 
     init {
-        val modelBuffer = YOLOUtils.loadModelFile(context, modelPath)
 
         // ===== Load label information (try Appended ZIP → FlatBuffers in order) =====
         var loadedLabels = YOLOFileUtils.loadLabelsFromAppendedZip(context, modelPath)
@@ -58,7 +60,7 @@ class Classifier(
             Log.w(TAG, "No embedded labels found from appended ZIP or FlatBuffers. Using labels passed via constructor (if any) or an empty list.")
             
             // Check if labels are provided via classifierOptions
-            val optionsLabels = classifierOptions?.get("labels") as? List<*>
+            val optionsLabels = classifierOptions?.get("labels") as? List<*> 
             if (optionsLabels != null) {
                 this.labels = optionsLabels.map { it.toString() }
                 Log.i(TAG, "Using labels from classifierOptions (${this.labels.size} classes): ${this.labels}")
@@ -67,7 +69,7 @@ class Classifier(
             }
         }
 
-        interpreter = InterpreterApi.create(modelBuffer, customOptions)
+        interpreter = InterpreterApi.create(modelBuffer, interpreterOptions) // CHANGED: Pass interpreterOptions
 
         val inputShape = interpreter?.getInputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         val inBatch = inputShape[0]
@@ -117,7 +119,7 @@ class Classifier(
         imageProcessorCameraPortrait = ImageProcessor.Builder()
             .add(Rot90Op(3))  // 270-degree rotation for back camera
             .add(ResizeOp(inHeight, inWidth, ResizeOp.ResizeMethod.BILINEAR))
-            .add(NormalizeOp(INPUT_MEAN, INPUT_STD))
+            .add(NormalizeOp(Companion.INPUT_MEAN, Companion.INPUT_STD))
             .add(CastOp(DataType.FLOAT32))
             .build()
             
@@ -125,21 +127,21 @@ class Classifier(
         imageProcessorCameraPortraitFront = ImageProcessor.Builder()
             .add(Rot90Op(1))  // 90-degree rotation for front camera
             .add(ResizeOp(inHeight, inWidth, ResizeOp.ResizeMethod.BILINEAR))
-            .add(NormalizeOp(INPUT_MEAN, INPUT_STD))
+            .add(NormalizeOp(Companion.INPUT_MEAN, Companion.INPUT_STD))
             .add(CastOp(DataType.FLOAT32))
             .build()
             
         // For camera feed in landscape mode (no rotation)
         imageProcessorCameraLandscape = ImageProcessor.Builder()
             .add(ResizeOp(inHeight, inWidth, ResizeOp.ResizeMethod.BILINEAR))
-            .add(NormalizeOp(INPUT_MEAN, INPUT_STD))
+            .add(NormalizeOp(Companion.INPUT_MEAN, Companion.INPUT_STD))
             .add(CastOp(DataType.FLOAT32))
             .build()
             
         // For single images (no rotation)
         imageProcessorSingleImage = ImageProcessor.Builder()
             .add(ResizeOp(inHeight, inWidth, ResizeOp.ResizeMethod.BILINEAR))
-            .add(NormalizeOp(INPUT_MEAN, INPUT_STD))
+            .add(NormalizeOp(Companion.INPUT_MEAN, Companion.INPUT_STD))
             .add(CastOp(DataType.FLOAT32))
             .build()
         }
@@ -247,6 +249,8 @@ class Classifier(
 
         private const val INPUT_MEAN = 0f
         private const val INPUT_STD = 255f
+
+        // REMOVED: createPredictorOptions function
     }
     
     /**
@@ -269,7 +273,6 @@ class Classifier(
                         val namesMap = data["names"] as? Map<Int, String>
                         if (namesMap != null) {
                             labels = namesMap.values.toList()
-                            Log.d(TAG, "Loaded labels from metadata: $labels")
                             return true
                         }
                     }

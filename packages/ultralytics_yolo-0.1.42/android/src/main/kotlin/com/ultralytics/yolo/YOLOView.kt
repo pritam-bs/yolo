@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 import android.content.res.Configuration
 import com.google.android.gms.tflite.client.TfLiteInitializationOptions
+import com.google.android.gms.tflite.gpu.support.TfLiteGpu
 import com.google.android.gms.tflite.java.TfLite
 import org.tensorflow.lite.InterpreterApi
 import org.tensorflow.lite.gpu.GpuDelegateFactory
@@ -400,67 +401,80 @@ class YOLOView @JvmOverloads constructor(
 
     // region Model / Task
 
-    private fun createCustomOptions(useGpu: Boolean = true): InterpreterApi.Options {
-        val options = InterpreterApi.Options().apply {
-            setRuntime(InterpreterApi.Options.TfLiteRuntime.FROM_SYSTEM_ONLY)
-            if (useGpu) {
-                addDelegateFactory(GpuDelegateFactory())
-            }
-        }
-        return options
-    }
 
-    fun setModel(modelPath: String, task: YOLOTask, useGpu: Boolean = true, callback: ((Boolean) -> Unit)? = null) {
-        val initOptions = TfLiteInitializationOptions.builder()
-            .setEnableGpuDelegateSupport(useGpu)
-            .build()
 
-        TfLite.initialize(context, initOptions).addOnSuccessListener {
-            Log.d(TAG, "TfLite runtime initialized successfully.")
-            Executors.newSingleThreadExecutor().execute {
-                try {
-                    val options = createCustomOptions(useGpu)
-                    val newPredictor = when (task) {
-                        YOLOTask.DETECT -> ObjectDetector(context, modelPath, loadLabels(modelPath), customOptions = options)
-                        YOLOTask.SEGMENT -> Segmenter(context, modelPath, loadLabels(modelPath), customOptions = options)
-                        YOLOTask.CLASSIFY -> Classifier(context, modelPath, loadLabels(modelPath), customOptions = options)
-                        YOLOTask.POSE -> PoseEstimator(context, modelPath, loadLabels(modelPath), customOptions = options)
-                        YOLOTask.OBB -> ObbDetector(context, modelPath, loadLabels(modelPath), customOptions = options)
-                    }
+    fun setModel(
+        modelPath: String,
+        task: YOLOTask,
+        preferredDelegate: TFLiteAccelerationDelegate = TFLiteAccelerationDelegate.GPU,
+        classifierOptions: Map<String, Any>? = null,
+        callback: ((Boolean) -> Unit)? = null
+    ) {
 
-                    // Apply thresholds to all predictor types
-                    newPredictor.apply {
-                        setConfidenceThreshold(confidenceThreshold)
-                        setIouThreshold(iouThreshold)
-                        setNumItemsThreshold(numItemsThreshold)
-                    }
+        val accelerationHelper = TFLiteAccelerationHelper(context)
+        // 1. Trigger Initialization using the new helper
+        accelerationHelper.initializeTfLite(preferredDelegate)
+            .addOnSuccessListener {
+                Log.d(TAG, "TfLite runtime initialized successfully via Helper.")
 
-                    post {
-                        this.task = task
-                        this.predictor = newPredictor
-                        this.modelName = modelPath.substringAfterLast("/")
-                        modelLoadCallback?.invoke(true)
-                        callback?.invoke(true)
-                        Log.d(TAG, "Model loaded successfully: $modelPath")
-                    }
-                } catch (e: Exception) {
-                    Log.w(TAG, "Failed to load model: $modelPath. Camera will run without inference.", e)
-                    post {
-                        // Set predictor to null to ensure camera-only mode
-                        this.predictor = null
-                        this.modelName = "No Model"
-                        modelLoadCallback?.invoke(false)
-                        callback?.invoke(false)
+                // Move to background thread for file I/O and validation
+                Executors.newSingleThreadExecutor().execute {
+                    try {
+                        // 2. Load model buffer using YOLOUtils
+                        val modelBuffer = YOLOUtils.loadModelFile(context, modelPath)
+                        val labels = loadLabels(modelPath)
+
+                        // 3. Use Coroutine to run suspend validation
+                        // We block this specific background thread to wait for validation
+                        val validatedResult = kotlinx.coroutines.runBlocking {
+                            accelerationHelper.selectAndValidateDelegate(modelBuffer, preferredDelegate)
+                        }
+
+                        // 4. Get optimized options
+                        val interpreterOptions = accelerationHelper.createInterpreterOptions(validatedResult, preferredDelegate)
+
+                        // 5. Create specific predictor passing labels and options
+                        val newPredictor = when (task) {
+                            YOLOTask.DETECT -> ObjectDetector(context, modelBuffer, modelPath, labels, interpreterOptions)
+                            YOLOTask.SEGMENT -> Segmenter(context, modelBuffer, modelPath, labels, interpreterOptions)
+                            YOLOTask.CLASSIFY -> Classifier(context, modelBuffer, modelPath, labels, interpreterOptions = interpreterOptions)
+                            YOLOTask.POSE -> PoseEstimator(context, modelBuffer, modelPath, labels, interpreterOptions=interpreterOptions)
+                            YOLOTask.OBB -> ObbDetector(context, modelBuffer, modelPath, labels, interpreterOptions)
+                        }
+
+                        // Apply thresholds
+                        newPredictor.apply {
+                            setConfidenceThreshold(confidenceThreshold)
+                            setIouThreshold(iouThreshold)
+                            setNumItemsThreshold(numItemsThreshold)
+                        }
+
+                        post {
+                            this.task = task
+                            this.predictor = newPredictor
+                            this.modelName = modelPath.substringAfterLast("/")
+                            modelLoadCallback?.invoke(true)
+                            callback?.invoke(true)
+                            Log.d(TAG, "Model loaded successfully: $modelPath")
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to load/optimize model: $modelPath", e)
+                        post {
+                            this.predictor = null
+                            this.modelName = "No Model"
+                            modelLoadCallback?.invoke(false)
+                            callback?.invoke(false)
+                        }
                     }
                 }
             }
-        }.addOnFailureListener { e ->
-            Log.e(TAG, "Error initializing TfLite runtime.", e)
-            post {
-                modelLoadCallback?.invoke(false)
-                callback?.invoke(false)
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error initializing TfLite runtime.", e)
+                post {
+                    modelLoadCallback?.invoke(false)
+                    callback?.invoke(false)
+                }
             }
-        }
     }
 
     private fun loadLabels(modelPath: String): List<String> {

@@ -152,4 +152,37 @@ object YOLOUtils {
             }
         }
     }
+
+    /**
+     * Efficiently decodes a byte array into a Bitmap, optionally scaling it down if maxSize is provided.
+     * This helps reduce memory usage and speeds up decoding for large images that don't need full resolution.
+     *
+     * @param imageData The image data as a ByteArray.
+     * @param maxSize The maximum dimension (width or height) the bitmap should have. If 0 or less, no scaling.
+     * @return The decoded and optionally scaled Bitmap.
+     */
+    fun scaleBitmap(imageData: ByteArray, maxSize: Int): android.graphics.Bitmap? {
+        if (imageData.isEmpty()) {
+            return null
+        }
+
+        val options = android.graphics.BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+        android.graphics.BitmapFactory.decodeByteArray(imageData, 0, imageData.size, options)
+
+        var actualWidth = options.outWidth
+        var actualHeight = options.outHeight
+
+        options.inJustDecodeBounds = false
+
+        if (maxSize > 0 && (actualWidth > maxSize || actualHeight > maxSize)) {
+            val scale = Math.max(actualWidth, actualHeight) / maxSize.toFloat()
+            options.inSampleSize = scale.toInt()
+            // Recalculate dimensions for more accurate scaling
+            actualWidth = options.outWidth / options.inSampleSize
+            actualHeight = options.outHeight / options.inSampleSize
+        }
+        
+        return android.graphics.BitmapFactory.decodeByteArray(imageData, 0, imageData.size, options)
+    }
 }

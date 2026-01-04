@@ -60,6 +60,7 @@ class CameraInferenceContent extends StatelessWidget {
             task: modelType.toYoloTask,
             streamingConfig: const YOLOStreamingConfig.highPerformance(),
             useGpu: true,
+            preferredDelegate: TFLiteAccelerationDelegate.gpu,
             lensFacing: currentLensFacing,
             showOverlays: true,
             confidenceThreshold: confidenceThreshold,
@@ -71,9 +72,9 @@ class CameraInferenceContent extends StatelessWidget {
               onResult(detections);
             },
             onPerformanceMetrics: (metrics) {
-              context
-                  .read<CameraInferenceBloc>()
-                  .add(UpdatePerformanceMetrics(metrics));
+              context.read<CameraInferenceBloc>().add(
+                UpdatePerformanceMetrics(metrics),
+              );
             },
             onZoomChanged: (zoom) {
               context.read<CameraInferenceBloc>().add(SetZoomLevel(zoom));

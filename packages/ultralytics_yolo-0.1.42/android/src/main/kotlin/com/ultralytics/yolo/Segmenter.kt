@@ -8,6 +8,8 @@ import android.util.Log
 import android.util.Size
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.InterpreterApi
+// REMOVED: import org.tensorflow.lite.gpu.GpuDelegateFactory
+// REMOVED: import org.tensorflow.lite.nnapi.NnApiDelegate
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -26,9 +28,10 @@ import kotlin.math.min
 
 class Segmenter(
     context: Context,
+    modelBuffer: MappedByteBuffer,
     modelPath: String,
     override var labels: List<String>,
-    private val customOptions: InterpreterApi.Options? = null
+    private val interpreterOptions: InterpreterApi.Options
 ) : BasePredictor() {
 
     private val boxFeatureLength = 4  // (x, y, w, h)
@@ -55,8 +58,6 @@ class Segmenter(
     private lateinit var output1: Array<Array<Array<FloatArray>>>
 
     init {
-        // Load model file (automatic extension appending)
-        val modelBuffer = YOLOUtils.loadModelFile(context, modelPath)
 
         // ===== Load label information (try Appended ZIP → FlatBuffers in order) =====
         var loadedLabels = YOLOFileUtils.loadLabelsFromAppendedZip(context, modelPath)
@@ -64,29 +65,28 @@ class Segmenter(
 
         if (labelsWereLoaded) {
             this.labels = loadedLabels!! // Use labels from appended ZIP
-            Log.i("Segmenter", "Labels successfully loaded from appended ZIP.")
+            Log.i(TAG, "Labels successfully loaded from appended ZIP.")
         } else {
-            Log.w("Segmenter", "Could not load labels from appended ZIP, trying FlatBuffers metadata...")
+            Log.w(TAG, "Could not load labels from appended ZIP, trying FlatBuffers metadata...")
             // Try FlatBuffers as a fallback
             if (loadLabelsFromFlatbuffers(modelBuffer)) {
                 labelsWereLoaded = true
-                Log.i("Segmenter", "Labels successfully loaded from FlatBuffers metadata.")
+                Log.i(TAG, "Labels successfully loaded from FlatBuffers metadata.")
             }
         }
 
         if (!labelsWereLoaded) {
-            Log.w("Segmenter", "No embedded labels found from appended ZIP or FlatBuffers. Using labels passed via constructor (if any) or an empty list.")
+            Log.w(TAG, "No embedded labels found from appended ZIP or FlatBuffers. Using labels passed via constructor (if any) or an empty list.")
             if (this.labels.isEmpty()) {
-                Log.w("Segmenter", "Warning: No labels loaded and no labels provided via constructor. Detections might lack class names.")
+                Log.w(TAG, "Warning: No labels loaded and no labels provided via constructor. Detections might lack class names.")
             }
         }
 
-        // Create Interpreter
-        interpreter = InterpreterApi.create(modelBuffer, customOptions)
+        interpreter = InterpreterApi.create(modelBuffer, interpreterOptions) // CHANGED: Pass interpreterOptions
 
         // Call allocateTensors() once during initialization
         interpreter?.allocateTensors()
-        Log.d("Segmenter", "TFLite model loaded and tensors allocated")
+        Log.d(TAG, "TFLite model loaded and tensors allocated")
 
         // Input tensor shape: [1, height, width, 3]
         val inputShape = interpreter?.getInputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
@@ -196,7 +196,7 @@ class Segmenter(
         try {
             interpreter?.runForMultipleInputsOutputs(arrayOf(inputBuffer), outputMap)
         } catch (e: Exception) {
-            Log.e("Segmenter", "Inference error: ${e.message}")
+            Log.e(TAG, "Inference error: ${e.message}")
             val fpsDouble: Double = if (t4 > 0f) (1f / t4).toDouble() else 0.0
             return YOLOResult(
                 origShape = com.ultralytics.yolo.Size(origWidth, origHeight),
@@ -387,6 +387,14 @@ class Segmenter(
         val maskCoeffs: FloatArray
     )
     
+    companion object {
+        private const val TAG = "Segmenter"
+        private const val CONFIDENCE_THRESHOLD = 0.25F
+        private const val IOU_THRESHOLD = 0.4F
+
+        // REMOVED: createPredictorOptions function
+    }
+    
     /**
      * Load labels from FlatBuffers metadata
      */
@@ -395,10 +403,10 @@ class Segmenter(
         val files = extractor.associatedFileNames
         if (!files.isNullOrEmpty()) {
             for (fileName in files) {
-                Log.d("Segmenter", "Found associated file: $fileName")
+                Log.d(TAG, "Found associated file: $fileName")
                 extractor.getAssociatedFile(fileName)?.use { stream ->
                     val fileString = String(stream.readBytes(), Charsets.UTF_8)
-                    Log.d("Segmenter", "Associated file contents:\n$fileString")
+                    Log.d(TAG, "Associated file contents:\n$fileString")
 
                     val yaml = Yaml()
                     @Suppress("UNCHECKED_CAST")
@@ -407,18 +415,17 @@ class Segmenter(
                         val namesMap = data["names"] as? Map<Int, String>
                         if (namesMap != null) {
                             labels = namesMap.values.toList()
-                            Log.d("Segmenter", "Loaded labels from metadata: $labels")
                             return true
                         }
                     }
                 }
             }
         } else {
-            Log.d("Segmenter", "No associated files found in the metadata.")
+            Log.d(TAG, "No associated files found in the metadata.")
         }
         false
     } catch (e: Exception) {
-        Log.e("Segmenter", "Failed to extract metadata: ${e.message}")
+        Log.e(TAG, "Failed to extract metadata: ${e.message}")
         false
     }
 }

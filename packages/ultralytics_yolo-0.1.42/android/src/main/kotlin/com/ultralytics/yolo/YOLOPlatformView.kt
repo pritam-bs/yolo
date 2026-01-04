@@ -121,8 +121,16 @@ class YOLOPlatformView(
             }
             
             // Load model
-            val useGpu = creationParams?.get("useGpu") as? Boolean ?: true
-            yoloView.setModel(modelPath, task, useGpu)
+            val useGpuParam = creationParams?.get("useGpu") as? Boolean ?: true
+        val preferredDelegateString = creationParams?.get("preferredDelegate") as? String ?: TFLiteAccelerationDelegate.NNAPI.name
+        
+        val preferredDelegate = try {
+            TFLiteAccelerationDelegate.valueOf(preferredDelegateString.uppercase())
+        } catch (e: IllegalArgumentException) {
+            Log.w(TAG, "Invalid preferredDelegate string: $preferredDelegateString. Defaulting to GPU.")
+            TFLiteAccelerationDelegate.GPU
+        }
+            yoloView.setModel(modelPath, task, preferredDelegate)
             
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing YOLOPlatformView", e)
@@ -355,7 +363,14 @@ class YOLOPlatformView(
                 "setModel" -> {
                     var modelPath = call.argument<String>("modelPath")
                     val taskString = call.argument<String>("task")
-                    val useGpu = call.argument<Boolean>("useGpu") ?: true
+                    val preferredDelegateString = call.argument<String>("preferredDelegate") as? String ?: TFLiteAccelerationDelegate.GPU.name
+                    
+                    val preferredDelegate = try {
+                        TFLiteAccelerationDelegate.valueOf(preferredDelegateString.uppercase())
+                    } catch (e: IllegalArgumentException) {
+                        Log.w(TAG, "Invalid preferredDelegate string: $preferredDelegateString. Defaulting to GPU.")
+                        TFLiteAccelerationDelegate.GPU
+                    }
                     
                     if (modelPath == null || taskString == null) {
                         result.error("invalid_args", "modelPath and task are required", null)
@@ -365,7 +380,7 @@ class YOLOPlatformView(
                     modelPath = resolveModelPath(context, modelPath)
                     val task = YOLOTask.valueOf(taskString.uppercase())
                     
-                    yoloView.setModel(modelPath, task, useGpu) { success ->
+                    yoloView.setModel(modelPath, task, preferredDelegate) { success ->
                         if (success) {
                             Log.d(TAG, "Model switched successfully")
                             result.success(null)

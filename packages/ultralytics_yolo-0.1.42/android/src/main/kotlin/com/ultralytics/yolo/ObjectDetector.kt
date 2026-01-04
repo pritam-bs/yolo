@@ -7,6 +7,8 @@ import android.graphics.RectF
 import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.InterpreterApi
+// REMOVED: import org.tensorflow.lite.gpu.GpuDelegateFactory
+// REMOVED: import org.tensorflow.lite.nnapi.NnApiDelegate
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ops.Rot90Op
@@ -32,9 +34,10 @@ import java.util.zip.ZipInputStream
  */
 class ObjectDetector(
     context: Context,
+    modelBuffer: MappedByteBuffer,
     modelPath: String,
     override var labels: List<String>,
-    private val customOptions: InterpreterApi.Options? = null
+    private val interpreterOptions: InterpreterApi.Options
 ) : BasePredictor() {
     // Inference output dimensions
     private var out1 = 0
@@ -46,15 +49,12 @@ class ObjectDetector(
     private lateinit var imageProcessorSingleImage: ImageProcessor
 
 
-//    companion object {
-//
-//    }
     // Reuse inference output array ([1][out1][out2])
     private lateinit var rawOutput: Array<Array<FloatArray>>
     // Transposed array for post-processing
     private lateinit var predictions: Array<FloatArray>
 
-    // ======== Workspace for fast preprocessing ========
+    // ======== Workspace for fast preprocessing ======== 
     // (1) Temporary scaled Bitmap matching model input size
     //     No 90-degree rotation needed, so simply cache createScaledBitmap() equivalent
     private lateinit var scaledBitmap: Bitmap
@@ -67,7 +67,6 @@ class ObjectDetector(
 
     init {
         val assetManager = context.assets
-        val modelBuffer  = YOLOUtils.loadModelFile(context, modelPath)
 
         /* --- Get labels from metadata (try Appended ZIP → FlatBuffers in order) --- */
         var loadedLabels = YOLOFileUtils.loadLabelsFromAppendedZip(context, modelPath)
@@ -92,7 +91,7 @@ class ObjectDetector(
             }
         }
 
-        interpreter = InterpreterApi.create(modelBuffer, customOptions)
+        interpreter = InterpreterApi.create(modelBuffer, interpreterOptions)
 
         // Call allocateTensors() once during initialization, not in the inference loop
         interpreter?.allocateTensors()
@@ -132,7 +131,7 @@ class ObjectDetector(
             .add(Rot90Op(3))  // 270-degree rotation (3 * 90 degrees) for back camera
             .add(ResizeOp(inputSize.height, inputSize.width, ResizeOp.ResizeMethod.BILINEAR))
             .add(NormalizeOp(INPUT_MEAN, INPUT_STANDARD_DEVIATION))
-            .add(CastOp(INPUT_IMAGE_TYPE))
+            .add(CastOp(DataType.FLOAT32))
             .build()
             
         // 2. For front camera in portrait mode - 90-degree rotation
@@ -140,21 +139,21 @@ class ObjectDetector(
             .add(Rot90Op(1))  // 90-degree rotation for front camera
             .add(ResizeOp(inputSize.height, inputSize.width, ResizeOp.ResizeMethod.BILINEAR))
             .add(NormalizeOp(INPUT_MEAN, INPUT_STANDARD_DEVIATION))
-            .add(CastOp(INPUT_IMAGE_TYPE))
+            .add(CastOp(DataType.FLOAT32))
             .build()
             
         // 3. For camera feed in landscape mode - no rotation needed
         imageProcessorCameraLandscape = ImageProcessor.Builder()
             .add(ResizeOp(inputSize.height, inputSize.width, ResizeOp.ResizeMethod.BILINEAR))
             .add(NormalizeOp(INPUT_MEAN, INPUT_STANDARD_DEVIATION))
-            .add(CastOp(INPUT_IMAGE_TYPE))
+            .add(CastOp(DataType.FLOAT32))
             .build()
             
         // 4. For single images - no rotation needed
         imageProcessorSingleImage = ImageProcessor.Builder()
             .add(ResizeOp(inputSize.height, inputSize.width, ResizeOp.ResizeMethod.BILINEAR))
             .add(NormalizeOp(INPUT_MEAN, INPUT_STANDARD_DEVIATION))
-            .add(CastOp(INPUT_IMAGE_TYPE))
+            .add(CastOp(DataType.FLOAT32))
             .build()
             
         Log.d(TAG, "ObjectDetector initialized.")
@@ -192,7 +191,6 @@ class ObjectDetector(
                         val namesMap = data["names"] as? Map<Int, String>
                         if (namesMap != null) {
                             labels = namesMap.values.toList()          // Same as old code
-                            Log.d(TAG, "Loaded labels from metadata: $labels")
                             return true
                         }
                     }
@@ -215,7 +213,7 @@ class ObjectDetector(
         // Int array for pixel reading
         intValues = IntArray(width * height)
 
-        // Buffer for TFLite input
+        // Buffer for TFLite input (1 * height * width * 3 * 4 bytes)
         inputBuffer = ByteBuffer.allocateDirect(1 * width * height * 3 * 4).apply {
             order(ByteOrder.nativeOrder())
         }
@@ -275,14 +273,14 @@ class ObjectDetector(
         Log.d(TAG, "Predict Stage: Preprocessing done in $preprocessTimeMs ms")
         stageStartTime = System.nanoTime()
 
-        // ======== Inference ============
+        // ======== Inference ============ 
         Log.d(TAG, "Predict Start: Inference")
         interpreter?.run(inputBuffer, rawOutput)
         var inferenceTimeMs = (System.nanoTime() - stageStartTime) / 1_000_000.0
         Log.d(TAG, "Predict Stage: Inference done in $inferenceTimeMs ms")
         stageStartTime = System.nanoTime()
 
-        // ======== Post-processing (same as existing code) ============
+        // ======== Post-processing (same as existing code) ============ 
         Log.d(TAG, "Predict Start: Postprocessing")
         // val postStart = System.nanoTime() // This was previously here, now using stageStartTime
         val outHeight = rawOutput[0].size      // out1
@@ -411,5 +409,7 @@ class ObjectDetector(
         private val OUTPUT_IMAGE_TYPE = DataType.FLOAT32
         private const val CONFIDENCE_THRESHOLD = 0.25F
         private const val IOU_THRESHOLD = 0.4F
+
+        // REMOVED: createPredictorOptions function
     }
 }
