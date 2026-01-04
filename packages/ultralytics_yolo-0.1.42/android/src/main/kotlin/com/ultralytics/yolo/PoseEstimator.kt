@@ -8,6 +8,8 @@ import android.util.Log
 import android.util.Size
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.InterpreterApi
+// REMOVED: import org.tensorflow.lite.gpu.GpuDelegateFactory
+// REMOVED: import org.tensorflow.lite.nnapi.NnApiDelegate
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -27,23 +29,14 @@ import androidx.collection.ArrayMap
 
 class PoseEstimator(
     context: Context,
+    modelBuffer: MappedByteBuffer,
     modelPath: String,
     override var labels: List<String>,
     private var confidenceThreshold: Float = 0.25f,   // Can be changed as needed
     private var iouThreshold: Float = 0.45f,          // Can be changed as needed
-    private val customOptions: InterpreterApi.Options? = null
+    private val interpreterOptions: InterpreterApi.Options // CHANGED: from preferredDelegate
 ) : BasePredictor() {
 
-    companion object {
-        // xywh(4) + conf(1) + keypoints(17*3=51) = 56
-        private const val OUTPUT_FEATURES = 56
-        private const val KEYPOINTS_COUNT = 17
-        private const val KEYPOINTS_FEATURES = KEYPOINTS_COUNT * 3 // x, y, conf per keypoint
-        private const val MAX_POOL_SIZE = 100 
-        
-        private const val INPUT_SIZE = 640
-    }
-    
     private var numItemsThreshold = 30
     
     private val boxPool = ObjectPool<Box>(MAX_POOL_SIZE) { Box(0, "", 0f, RectF(), RectF()) }
@@ -59,7 +52,7 @@ class PoseEstimator(
         private val maxSize: Int,
         private val factory: () -> T
     ) {
-        private val pool = ArrayList<T>(maxSize)
+        private val pool = ArrayList<T>(maxSize) 
         
         @Synchronized
         fun acquire(): T {
@@ -99,7 +92,6 @@ class PoseEstimator(
     private var numAnchors = 0
 
     init {
-        val modelBuffer = YOLOUtils.loadModelFile(context, modelPath)
 
         // ===== Load label information (try Appended ZIP → FlatBuffers in order) =====
         var loadedLabels = YOLOFileUtils.loadLabelsFromAppendedZip(context, modelPath)
@@ -107,28 +99,28 @@ class PoseEstimator(
 
         if (labelsWereLoaded) {
             this.labels = loadedLabels!! // Use labels from appended ZIP
-            Log.i("PoseEstimator", "Labels successfully loaded from appended ZIP.")
+            Log.i(TAG, "Labels successfully loaded from appended ZIP.")
         } else {
-            Log.w("PoseEstimator", "Could not load labels from appended ZIP, trying FlatBuffers metadata...")
+            Log.w(TAG, "Could not load labels from appended ZIP, trying FlatBuffers metadata...")
             // Try FlatBuffers as a fallback
             if (loadLabelsFromFlatbuffers(modelBuffer)) {
                 labelsWereLoaded = true
-                Log.i("PoseEstimator", "Labels successfully loaded from FlatBuffers metadata.")
+                Log.i(TAG, "Labels successfully loaded from FlatBuffers metadata.")
             }
         }
 
         if (!labelsWereLoaded) {
-            Log.w("PoseEstimator", "No embedded labels found from appended ZIP or FlatBuffers. Using labels passed via constructor (if any) or an empty list.")
+            Log.w(TAG, "No embedded labels found from appended ZIP or FlatBuffers. Using labels passed via constructor (if any) or an empty list.")
             if (this.labels.isEmpty()) {
-                Log.w("PoseEstimator", "Warning: No labels loaded and no labels provided via constructor. Detections might lack class names.")
+                Log.w(TAG, "Warning: No labels loaded and no labels provided via constructor. Detections might lack class names.")
             }
         }
 
-        interpreter = InterpreterApi.create(modelBuffer, customOptions)
+        interpreter = InterpreterApi.create(modelBuffer, interpreterOptions) // CHANGED: Pass interpreterOptions
 
         // Call allocateTensors() once during initialization
         interpreter?.allocateTensors()
-        Log.d("PoseEstimator", "TFLite model loaded and tensors allocated")
+        Log.d(TAG, "TFLite model loaded and tensors allocated")
 
         val inputShape = interpreter?.getInputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         val inHeight = inputShape[1]
@@ -152,7 +144,7 @@ class PoseEstimator(
         inputBuffer = ByteBuffer.allocateDirect(inputBytes).apply {
             order(java.nio.ByteOrder.nativeOrder())
         }
-        Log.d("PoseEstimator", "Direct ByteBuffer allocated with native ordering: $inputBytes bytes")
+        Log.d(TAG, "Direct ByteBuffer allocated with native ordering: $inputBytes bytes")
         
         // For camera feed in portrait mode (with rotation)
         imageProcessorCameraPortrait = ImageProcessor.Builder()
@@ -226,7 +218,7 @@ class PoseEstimator(
         )
 
         // Apply numItemsThreshold limit
-        val limitedDetections = rawDetections.take(numItemsThreshold)
+        val limitedDetections = rawDetections.take(numItemsThreshold) 
         
         val boxes = limitedDetections.map { it.box }
         val keypointsList = limitedDetections.map { it.keypoints }
@@ -253,9 +245,9 @@ class PoseEstimator(
         iouThreshold: Float,
         origWidth: Int,
         origHeight: Int
-    ): List<PoseDetection> {
+    ): List<Companion.PoseDetection> {
 
-        val detections = mutableListOf<PoseDetection>()
+        val detections = mutableListOf<Companion.PoseDetection>()
 
         // Assume modelInputSize = (640, 640) for example
         val (modelW, modelH) = modelInputSize
@@ -337,7 +329,7 @@ class PoseEstimator(
             )
             
             detections.add(
-                PoseDetection(
+                Companion.PoseDetection(
                     box = boxObj,
                     keypoints = keypoints
                 )
@@ -352,9 +344,9 @@ class PoseEstimator(
 
 
     private fun nmsPoseDetections(
-        detections: List<PoseDetection>,
+        detections: List<Companion.PoseDetection>,
         iouThreshold: Float
-    ): List<PoseDetection> {
+    ): List<Companion.PoseDetection> {
         val confidenceThreshold = 0.25f  // Configurable threshold
         val filteredDetections = detections.filter { it.box.conf >= confidenceThreshold }
         
@@ -363,7 +355,7 @@ class PoseEstimator(
         }
         
         val sorted = filteredDetections.sortedByDescending { it.box.conf }
-        val picked = mutableListOf<PoseDetection>()
+        val picked = mutableListOf<Companion.PoseDetection>()
         val used = BooleanArray(sorted.size)
 
         for (i in sorted.indices) {
@@ -450,10 +442,23 @@ class PoseEstimator(
         return iouThreshold.toDouble()
     }
 
-    private data class PoseDetection(
-        val box: Box,
-        val keypoints: Keypoints
-    )
+    companion object {
+        private const val TAG = "PoseEstimator"
+        // xywh(4) + conf(1) + keypoints(17*3=51) = 56
+        private const val OUTPUT_FEATURES = 56
+        private const val KEYPOINTS_COUNT = 17
+        private const val KEYPOINTS_FEATURES = KEYPOINTS_COUNT * 3 // x, y, conf per keypoint
+        private const val MAX_POOL_SIZE = 100 
+        
+        private const val INPUT_SIZE = 640
+
+        // REMOVED: createPredictorOptions function
+
+        private data class PoseDetection(
+            val box: Box,
+            val keypoints: Keypoints
+        )
+    }
     
     /**
      * Load labels from FlatBuffers metadata
@@ -463,10 +468,10 @@ class PoseEstimator(
         val files = extractor.associatedFileNames
         if (!files.isNullOrEmpty()) {
             for (fileName in files) {
-                Log.d("PoseEstimator", "Found associated file: $fileName")
+                Log.d(TAG, "Found associated file: $fileName")
                 extractor.getAssociatedFile(fileName)?.use { stream ->
                     val fileString = String(stream.readBytes(), Charsets.UTF_8)
-                    Log.d("PoseEstimator", "Associated file contents:\n$fileString")
+                    Log.d(TAG, "Associated file contents:\n$fileString")
 
                     val yaml = Yaml()
                     @Suppress("UNCHECKED_CAST")
@@ -475,18 +480,17 @@ class PoseEstimator(
                         val namesMap = data["names"] as? Map<Int, String>
                         if (namesMap != null) {
                             labels = namesMap.values.toList()
-                            Log.d("PoseEstimator", "Loaded labels from metadata: $labels")
                             return true
                         }
                     }
                 }
             }
         } else {
-            Log.d("PoseEstimator", "No associated files found in the metadata.")
+            Log.d(TAG, "No associated files found in the metadata.")
         }
         false
     } catch (e: Exception) {
-        Log.e("PoseEstimator", "Failed to extract metadata: ${e.message}")
+        Log.e(TAG, "Failed to extract metadata: ${e.message}")
         false
     }
 }
