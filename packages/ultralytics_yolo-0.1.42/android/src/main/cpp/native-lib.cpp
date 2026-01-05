@@ -7,7 +7,11 @@
 #include <algorithm>
 #include <cmath>
 #include <cfloat>
-#include <cstdlib>
+
+// Constants for array indexing
+const int BOX_INFO_OFFSET = 4; // x, y, width, height
+const int BOX_OUTPUT_SIZE = 6; // x, y, width, height, confidence, class_index
+
 
 // Custom rectangle structure
 struct Rect {
@@ -24,26 +28,9 @@ struct DetectedObject {
     float confidence;
 };
 
-// Quicksort for descending order
-static void qsort_descent_inplace(std::vector<DetectedObject>& objects, int left, int right) {
-    int i = left;
-    int j = right;
-    float p = objects[(left + right) / 2].confidence;
-    while (i <= j) {
-        while (objects[i].confidence > p) i++;
-        while (objects[j].confidence < p) j--;
-        if (i <= j) {
-            std::swap(objects[i], objects[j]);
-            i++; j--;
-        }
-    }
-    if (left < j) qsort_descent_inplace(objects, left, j);
-    if (i < right) qsort_descent_inplace(objects, i, right);
-}
-
-static void qsort_descent_inplace(std::vector<DetectedObject>& objects) {
-    if (!objects.empty())
-        qsort_descent_inplace(objects, 0, objects.size() - 1);
+// Sort by confidence in descending order
+static bool compareDetectedObjects(const DetectedObject& a, const DetectedObject& b) {
+    return a.confidence > b.confidence;
 }
 
 // Calculate intersection area (common area of two rectangles)
@@ -125,7 +112,7 @@ Java_com_ultralytics_yolo_ObjectDetector_postprocess(
         float class_score = -FLT_MAX;
         // Get each class score (assuming class scores start from the 4th index)
         for (int c = 0; c < num_classes; c++) {
-            float score = vec[c + 4][i];
+            float score = vec[c + BOX_INFO_OFFSET][i];
             if (score > class_score) {
                 class_score = score;
                 class_index = c;
@@ -152,7 +139,7 @@ Java_com_ultralytics_yolo_ObjectDetector_postprocess(
     }
 
     // Sort by score
-    qsort_descent_inplace(proposals);
+    std::sort(proposals.begin(), proposals.end(), compareDetectedObjects);
 
     // Apply Non-Maximum Suppression (NMS)
     std::vector<int> picked;
@@ -171,7 +158,7 @@ Java_com_ultralytics_yolo_ObjectDetector_postprocess(
     jobjectArray objArray = env->NewObjectArray(objects.size(), floatArrayCls, NULL);
     if (objArray == NULL) return NULL;
     for (int i = 0; i < objects.size(); i++) {
-        float box[6] = {
+        float box[BOX_OUTPUT_SIZE] = {
                 objects[i].rect.x,
                 objects[i].rect.y,
                 objects[i].rect.width,
@@ -179,9 +166,9 @@ Java_com_ultralytics_yolo_ObjectDetector_postprocess(
                 objects[i].confidence,
                 static_cast<float>(objects[i].index)
         };
-        jfloatArray iarr = env->NewFloatArray(6);
+        jfloatArray iarr = env->NewFloatArray(BOX_OUTPUT_SIZE);
         if (iarr == NULL) return NULL;
-        env->SetFloatArrayRegion(iarr, 0, 6, box);
+        env->SetFloatArrayRegion(iarr, 0, BOX_OUTPUT_SIZE, box);
         env->SetObjectArrayElement(objArray, i, iarr);
         env->DeleteLocalRef(iarr);
     }

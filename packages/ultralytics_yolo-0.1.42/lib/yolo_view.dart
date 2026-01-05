@@ -17,6 +17,9 @@ import 'package:ultralytics_yolo/widgets/yolo_overlay.dart';
 /// Enum for camera lens facing direction
 enum LensFacing { back, front }
 
+/// Enum for TFLite acceleration delegate matching native side
+enum TFLiteAccelerationDelegate { gpu, cpu, nnapi, metal }
+
 /// A Flutter widget that displays a real-time camera preview with YOLO object detection.
 class YOLOView extends StatefulWidget {
   final String modelPath;
@@ -32,6 +35,7 @@ class YOLOView extends StatefulWidget {
   final double confidenceThreshold;
   final double iouThreshold;
   final bool useGpu;
+  final TFLiteAccelerationDelegate preferredDelegate;
   final bool showOverlays;
   final YOLOOverlayTheme overlayTheme;
   final LensFacing lensFacing;
@@ -51,6 +55,7 @@ class YOLOView extends StatefulWidget {
     this.confidenceThreshold = 0.5,
     this.iouThreshold = 0.45,
     this.useGpu = true,
+    this.preferredDelegate = TFLiteAccelerationDelegate.gpu,
     this.showOverlays = true,
     this.overlayTheme = const YOLOOverlayTheme(),
     this.lensFacing = LensFacing.back,
@@ -279,6 +284,7 @@ class _YOLOViewState extends State<YOLOView> {
       'numItemsThreshold': _effectiveController.numItemsThreshold,
       'viewId': _viewId,
       'useGpu': widget.useGpu,
+      'preferredDelegate': widget.preferredDelegate.name.toUpperCase(),
       'showOverlays': widget.showOverlays,
       'lensFacing': widget.lensFacing.name,
     };

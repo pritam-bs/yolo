@@ -7,6 +7,8 @@ import android.graphics.*
 import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.InterpreterApi
+// REMOVED: import org.tensorflow.lite.gpu.GpuDelegateFactory
+// REMOVED: import org.tensorflow.lite.nnapi.NnApiDelegate
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.CastOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -26,9 +28,10 @@ import kotlin.math.min
 
 class ObbDetector(
     context: Context,
+    modelBuffer: MappedByteBuffer,
     modelPath: String,
     override var labels: List<String>,
-    customOptions: InterpreterApi.Options? = null
+    private val interpreterOptions: InterpreterApi.Options // CHANGED: from preferredDelegate
 ) : BasePredictor() {
     
     private var numItemsThreshold = 30
@@ -54,7 +57,6 @@ class ObbDetector(
     private var outAnchors = 0
 
     init {
-        val modelBuffer = YOLOUtils.loadModelFile(context, modelPath)
 
         // ===== Load label information (try Appended ZIP → FlatBuffers in order) =====
         var loadedLabels = YOLOFileUtils.loadLabelsFromAppendedZip(context, modelPath)
@@ -62,28 +64,28 @@ class ObbDetector(
 
         if (labelsWereLoaded) {
             this.labels = loadedLabels!! // Use labels from appended ZIP
-            Log.i("ObbDetector", "Labels successfully loaded from appended ZIP.")
+            Log.i(TAG, "Labels successfully loaded from appended ZIP.")
         } else {
-            Log.w("ObbDetector", "Could not load labels from appended ZIP, trying FlatBuffers metadata...")
+            Log.w(TAG, "Could not load labels from appended ZIP, trying FlatBuffers metadata...")
             // Try FlatBuffers as a fallback
             if (loadLabelsFromFlatbuffers(modelBuffer)) {
                 labelsWereLoaded = true
-                Log.i("ObbDetector", "Labels successfully loaded from FlatBuffers metadata.")
+                Log.i(TAG, "Labels successfully loaded from FlatBuffers metadata.")
             }
         }
 
         if (!labelsWereLoaded) {
-            Log.w("ObbDetector", "No embedded labels found from appended ZIP or FlatBuffers. Using labels passed via constructor (if any) or an empty list.")
+            Log.w(TAG, "No embedded labels found from appended ZIP or FlatBuffers. Using labels passed via constructor (if any) or an empty list.")
             if (this.labels.isEmpty()) {
-                Log.w("ObbDetector", "Warning: No labels loaded and no labels provided via constructor. Detections might lack class names.")
+                Log.w(TAG, "Warning: No labels loaded and no labels provided via constructor. Detections might lack class names.")
             }
         }
 
-        interpreter = InterpreterApi.create(modelBuffer, customOptions)
+        interpreter = InterpreterApi.create(modelBuffer, interpreterOptions) // CHANGED: Pass interpreterOptions
 
         // Call allocateTensors() once during initialization, not in the inference loop
         interpreter?.allocateTensors()
-        Log.d("ObbDetector", "TFLite model loaded and tensors allocated")
+        Log.d(TAG, "TFLite model loaded and tensors allocated")
 
         val inputShape = interpreter?.getInputTensor(0)?.shape() ?: throw IllegalStateException("Interpreter not initialized")
         val inHeight = inputShape[1]
@@ -245,9 +247,9 @@ class ObbDetector(
         // === NMS ===
         val boxes = detections.map { it.obb }
         val scores = detections.map { it.score }
-        val keepIndices = nonMaxSuppressionOBB(boxes, scores, iouThreshold)
+        val keepIndices = Companion.nonMaxSuppressionOBB(boxes, scores, iouThreshold)
 
-        return keepIndices.map { idx ->
+        return keepIndices.map {idx -> // Added idx here
             val d = detections[idx]
             OBBResult(
                 box = d.obb,
@@ -286,7 +288,7 @@ class ObbDetector(
                 paint.style = Paint.Style.FILL
                 paint.textSize = 40f
                 canvas.drawText(
-                    "${detection.cls} ${"%.2f".format(detection.confidence * 100)}%",
+                    "${detection.cls} ${String.format("%.2f", detection.confidence * 100)}%",
                     poly[0].x,
                     poly[0].y - 10,
                     paint
@@ -295,147 +297,6 @@ class ObbDetector(
             }
         }
         return output
-    }
-
-
-    private fun nonMaxSuppressionOBB(
-        boxes: List<OBB>,
-        scores: List<Float>,
-        iouThreshold: Float
-    ): List<Int> {
-        val sortedIndices = scores.indices.sortedByDescending { scores[it] }
-        val keep = mutableListOf<Int>()
-        val active = BooleanArray(boxes.size) { true }
-        val infoList = boxes.map { OBBInfo(it) }
-
-        for (i in sortedIndices.indices) {
-            val idx = sortedIndices[i]
-            if (!active[idx]) continue
-            keep.add(idx)
-            val boxA = infoList[idx]
-            for (j in (i + 1) until sortedIndices.size) {
-                val idxB = sortedIndices[j]
-                if (!active[idxB]) continue
-                val boxB = infoList[idxB]
-                if (boxA.aabbIntersect(boxB)) {
-                    val iouVal = boxA.iou(boxB)
-                    if (iouVal > iouThreshold) {
-                        active[idxB] = false
-                    }
-                }
-            }
-        }
-        return keep
-    }
-
-    private data class OBBInfo(
-        val obb: OBB,
-        val polygon: List<PointF>,
-        val area: Float,
-        val aabb: RectF
-    ) {
-        constructor(obb: OBB) : this(
-            obb,
-            obb.toPolygon(),
-            obb.area,
-            obb.toAABB()
-        )
-
-        fun iou(other: OBBInfo): Float {
-            val interPoly = polygonIntersection(polygon, other.polygon)
-            val interArea = polygonArea(interPoly)
-            val unionArea = area + other.area - interArea
-            if (unionArea <= 0f) return 0f
-            return interArea / unionArea
-        }
-
-        fun aabbIntersect(other: OBBInfo): Boolean {
-            return RectF.intersects(this.aabb, other.aabb)
-        }
-    }
-
-    private fun polygonIntersection(subject: List<PointF>, clip: List<PointF>): List<PointF> {
-        var outputList = subject
-        if (outputList.isEmpty()) return emptyList()
-        val clipClosed = if (clip.isNotEmpty() && clip.first() == clip.last()) {
-            clip
-        } else {
-            clip + clip.first()
-        }
-
-        for (i in 0 until (clipClosed.size - 1)) {
-            val p1 = clipClosed[i]
-            val p2 = clipClosed[i + 1]
-            val inputList = outputList
-            outputList = mutableListOf()
-            if (inputList.isEmpty()) break
-
-            val inputClosed = if (inputList.isNotEmpty() && inputList.first() == inputList.last()) {
-                inputList
-            } else {
-                inputList + inputList.first()
-            }
-
-            for (j in 0 until (inputClosed.size - 1)) {
-                val current = inputClosed[j]
-                val next = inputClosed[j + 1]
-                val currentInside = isInside(current, p1, p2)
-                val nextInside    = isInside(next,    p1, p2)
-
-                if (currentInside && nextInside) {
-                    outputList.add(next)
-                } else if (currentInside && !nextInside) {
-                    val inter = computeIntersection(current, next, p1, p2)
-                    if (inter != null) outputList.add(inter)
-                } else if (!currentInside && nextInside) {
-                    val inter = computeIntersection(current, next, p1, p2)
-                    if (inter != null) outputList.add(inter)
-                    outputList.add(next)
-                }
-            }
-        }
-        return outputList
-    }
-
-    private fun isInside(point: PointF, p1: PointF, p2: PointF): Boolean {
-        val cross = (p2.x - p1.x) * (point.y - p1.y) -
-                (p2.y - p1.y) * (point.x - p1.x)
-        return cross >= 0f
-    }
-
-    private fun computeIntersection(
-        p1: PointF,
-        p2: PointF,
-        clipStart: PointF,
-        clipEnd: PointF
-    ): PointF? {
-        val x1 = p1.x
-        val y1 = p1.y
-        val x2 = p2.x
-        val y2 = p2.y
-        val x3 = clipStart.x
-        val y3 = clipStart.y
-        val x4 = clipEnd.x
-        val y4 = clipEnd.y
-
-        val denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
-        if (kotlin.math.abs(denom) < 1e-7) {
-            return null
-        }
-        val t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom
-        val ix = x1 + t * (x2 - x1)
-        val iy = y1 + t * (y2 - y1)
-        return PointF(ix.toFloat(), iy.toFloat())
-    }
-
-    private fun polygonArea(poly: List<PointF>): Float {
-        if (poly.size < 3) return 0f
-        var area = 0f
-        for (i in 0 until (poly.size - 1)) {
-            area += (poly[i].x * poly[i + 1].y) - (poly[i + 1].x * poly[i].y)
-        }
-        area += (poly.last().x * poly.first().y) - (poly.first().x * poly.last().y)
-        return kotlin.math.abs(area) * 0.5f
     }
     
     /**
@@ -446,10 +307,10 @@ class ObbDetector(
         val files = extractor.associatedFileNames
         if (!files.isNullOrEmpty()) {
             for (fileName in files) {
-                Log.d("ObbDetector", "Found associated file: $fileName")
+                Log.d(TAG, "Found associated file: $fileName")
                 extractor.getAssociatedFile(fileName)?.use { stream ->
                     val fileString = String(stream.readBytes(), Charsets.UTF_8)
-                    Log.d("ObbDetector", "Associated file contents:\n$fileString")
+                    Log.d(TAG, "Associated file contents:\n$fileString")
 
                     val yaml = Yaml()
                     @Suppress("UNCHECKED_CAST")
@@ -458,19 +319,166 @@ class ObbDetector(
                         val namesMap = data["names"] as? Map<Int, String>
                         if (namesMap != null) {
                             labels = namesMap.values.toList()
-                            Log.d("ObbDetector", "Loaded labels from metadata: $labels")
                             return true
                         }
                     }
                 }
             }
         } else {
-            Log.d("ObbDetector", "No associated files found in the metadata.")
+            Log.d(TAG, "No associated files found in the metadata.")
         }
         false
     } catch (e: Exception) {
-        Log.e("ObbDetector", "Failed to extract metadata: ${e.message}")
+        Log.e(TAG, "Failed to extract metadata: ${e.message}")
         false
+    }
+
+    companion object {
+        private const val TAG = "ObbDetector"
+        private const val CONFIDENCE_THRESHOLD = 0.25F
+        private const val IOU_THRESHOLD = 0.4F
+
+        // REMOVED: createPredictorOptions function
+
+        private fun nonMaxSuppressionOBB(
+            boxes: List<OBB>,
+            scores: List<Float>,
+            iouThreshold: Float
+        ): List<Int> {
+            val sortedIndices = scores.indices.sortedByDescending { scores[it] }
+            val keep = mutableListOf<Int>()
+            val active = BooleanArray(boxes.size) { true }
+            val infoList = boxes.map { OBBInfo(it) }
+
+            for (i in sortedIndices.indices) {
+                val idx = sortedIndices[i]
+                if (!active[idx]) continue
+                keep.add(idx)
+                val boxA = infoList[idx]
+                for (j in (i + 1) until sortedIndices.size) {
+                    val idxB = sortedIndices[j]
+                    if (!active[idxB]) continue
+                    val boxB = infoList[idxB]
+                    if (boxA.aabbIntersect(boxB)) {
+                        val iouVal = boxA.iou(boxB)
+                        if (iouVal > iouThreshold) {
+                            active[idxB] = false
+                        }
+                    }
+                }
+            }
+            return keep
+        }
+
+        private data class OBBInfo(
+            val obb: OBB,
+            val polygon: List<PointF>,
+            val area: Float,
+            val aabb: RectF
+        ) {
+            constructor(obb: OBB) : this(
+                obb,
+                obb.toPolygon(),
+                obb.area,
+                obb.toAABB()
+            )
+
+            fun iou(other: OBBInfo): Float {
+                val interPoly = polygonIntersection(polygon, other.polygon)
+                val interArea = polygonArea(interPoly)
+                val unionArea = area + other.area - interArea
+                if (unionArea <= 0f) return 0f
+                return interArea / unionArea
+            }
+
+            fun aabbIntersect(other: OBBInfo): Boolean {
+                return RectF.intersects(this.aabb, other.aabb)
+            }
+        }
+
+        private fun polygonIntersection(subject: List<PointF>, clip: List<PointF>): List<PointF> {
+            var outputList = subject
+            if (outputList.isEmpty()) return emptyList()
+            val clipClosed = if (clip.isNotEmpty() && clip.first() == clip.last()) {
+                clip
+            } else {
+                clip + clip.first()
+            }
+
+            for (i in 0 until (clipClosed.size - 1)) {
+                val p1 = clipClosed[i]
+                val p2 = clipClosed[i + 1]
+                val inputList = outputList
+                outputList = mutableListOf()
+                if (inputList.isEmpty()) break
+
+                val inputClosed = if (inputList.isNotEmpty() && inputList.first() == inputList.last()) {
+                    inputList
+                } else {
+                    inputList + inputList.first()
+                }
+
+                for (j in 0 until (inputClosed.size - 1)) {
+                    val current = inputClosed[j]
+                    val next = inputClosed[j + 1]
+                    val currentInside = isInside(current, p1, p2)
+                    val nextInside    = isInside(next,    p1, p2)
+
+                    if (currentInside && nextInside) {
+                        outputList.add(next)
+                    } else if (currentInside && !nextInside) {
+                        val inter = computeIntersection(current, next, p1, p2)
+                        if (inter != null) outputList.add(inter)
+                    } else if (!currentInside && nextInside) {
+                        val inter = computeIntersection(current, next, p1, p2)
+                        if (inter != null) outputList.add(inter)
+                        outputList.add(next)
+                    }
+                }
+            }
+            return outputList
+        }
+
+        private fun isInside(point: PointF, p1: PointF, p2: PointF): Boolean {
+            val cross = (p2.x - p1.x) * (point.y - p1.y) - 
+                    (p2.y - p1.y) * (point.x - p1.x)
+            return cross >= 0f
+        }
+
+        private fun computeIntersection(
+            p1: PointF,
+            p2: PointF,
+            clipStart: PointF,
+            clipEnd: PointF
+        ): PointF? {
+            val x1 = p1.x
+            val y1 = p1.y
+            val x2 = p2.x
+            val y2 = p2.y
+            val x3 = clipStart.x
+            val y3 = clipStart.y
+            val x4 = clipEnd.x
+            val y4 = clipEnd.y
+
+            val denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+            if (kotlin.math.abs(denom) < 1e-7) {
+                return null
+            }
+            val t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom
+            val ix = x1 + t * (x2 - x1)
+            val iy = y1 + t * (y2 - y1)
+            return PointF(ix.toFloat(), iy.toFloat())
+        }
+
+        private fun polygonArea(poly: List<PointF>): Float {
+            if (poly.size < 3) return 0f
+            var area = 0f
+            for (i in 0 until (poly.size - 1)) {
+                area += (poly[i].x * poly[i + 1].y) - (poly[i + 1].x * poly[i].y)
+            }
+            area += (poly.last().x * poly.first().y) - (poly.first().x * poly.last().y)
+            return kotlin.math.abs(area) * 0.5f
+        }
     }
 }
 
